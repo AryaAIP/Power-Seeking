@@ -34,15 +34,24 @@ step() { echo; echo "== $*"; }
 step "1. The machine"
 . /etc/os-release
 echo "$PRETTY_NAME $(uname -m), $(nproc) cores, $(free -g | awk '/^Mem/ {print $2}') GB memory"
-[ "$VERSION_ID" = 26.04 ] && [ "$(uname -m)" = x86_64 ] || echo "WARNING: WSL runs Ubuntu 26.04 on x86_64, and this machine differs"
+[ "$(uname -m)" = x86_64 ] || { echo "this needs an x86_64 machine"; exit 1; }
+[ "$VERSION_ID" = 26.04 ] || echo "note: WSL runs Ubuntu 26.04; this machine runs $VERSION_ID (Docker and Python versions may differ, printed below)"
 
 step "2. Packages"
 export DEBIAN_FRONTEND=noninteractive
 cloud-init status --wait >/dev/null 2>&1 || true  # a fresh EC2 machine updates its packages at boot and holds the lock
 apt-get -o DPkg::Lock::Timeout=600 update -qq
-apt-get -o DPkg::Lock::Timeout=600 install -y -qq docker.io docker-compose-v2 git rsync python3 tmux curl >/dev/null
-dpkg-query -W -f='${Package} ${Version}\n' docker.io docker-compose-v2 containerd runc python3
-echo "(WSL: docker.io 29.1.3-0ubuntu4.1, docker-compose-v2 2.40.3+ds1-0ubuntu1, containerd 2.2.2-0ubuntu1.2, runc 1.4.0-0ubuntu1, python3 3.14.3-0ubuntu2)"
+apt-get -o DPkg::Lock::Timeout=600 install -y -qq git rsync python3 tmux curl >/dev/null
+# Docker: Ubuntu's own packages, as in WSL, unless the machine already has a Docker (e.g. Lambda's images ship Docker's
+# docker-ce, which Ubuntu's packages would conflict with). Then only Compose is added if missing.
+if ! command -v docker >/dev/null; then
+  apt-get -o DPkg::Lock::Timeout=600 install -y -qq docker.io docker-compose-v2 >/dev/null
+elif ! docker compose version >/dev/null 2>&1; then
+  apt-get -o DPkg::Lock::Timeout=600 install -y -qq docker-compose-plugin >/dev/null 2>&1 \
+    || apt-get -o DPkg::Lock::Timeout=600 install -y -qq docker-compose-v2 >/dev/null
+fi
+echo "$(docker --version), $(docker compose version), $(python3 --version)"
+echo "(WSL: Docker 29.1.3 and Compose 2.40.3 from Ubuntu's docker.io and docker-compose-v2, Python 3.14)"
 
 step "3. Docker and kernel settings"
 python3 - "$POOL" <<'PY'
@@ -65,7 +74,7 @@ if [ "$(cat /etc/docker/daemon.json 2>/dev/null)" != "$want" ]; then
   mkdir -p /etc/docker && echo "$want" > /etc/docker/daemon.json
   systemctl restart docker && echo "wrote /etc/docker/daemon.json and restarted Docker"
 fi
-systemctl enable -q docker containerd
+systemctl enable -q docker containerd 2>/dev/null || systemctl enable -q docker
 docker info --format 'Docker {{.ServerVersion}}, storage {{.Driver}} {{.DriverStatus}}'
 # Many environments at once: the containers' processes all count against root's inotify limits.
 printf '%s\n' "# The power experiment: many environments at once (harness/vm/setup.sh)" \
