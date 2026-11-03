@@ -376,3 +376,14 @@
   - **The Nov 1 pilot transcripts** (`linuxarena-pilot/transcripts/`) come from environments the redaction doesn't cover, so they're excluded through `.gitignore`.
   - **First commit:** 1c84c5c, 2,665 files, with no `.eval` and no pilot transcripts.
   - **Not pushed:** pushing waits for Arya to name the GitHub account and repository.
+- **About 02:00. Pushed to GitHub,** once Arya made `AryaAIP/Power-Seeking` private (an anonymous request now gets 404). Branch `initial-import`, commits 1c84c5c and ebbcf44.
+- **About 02:10. Step 2: no machine-specific paths in the code.**
+  - **The change:** every Python script takes its folders from the new `harness/power_paths.py`, and every bash script from `harness/paths.sh`. They read `POWER_V0_HOME` (default `~/power-v0`), `POWER_V0_DATA`, `POWER_V0_CT` and `POWER_V0_EXP`; the defaults are today's WSL folders. `sync.sh` now works out its own source folder and writes the experiment folder's location into the synced copy's `exp-dir` file. `harness/README.md` describes all of it.
+  - **Checked against the committed code on the same data:**
+    - `power_horizons.py`'s JSON and printed output are identical;
+    - `make_hz_jobs.py` (12 lines) and `make_search_jobs.py` (27 lines) print identical jobs;
+    - the unit tests pass, and every bash script parses;
+    - `launch.sh` finds its folders and refuses a used label;
+    - an export of `nowork-v2-S0` into a temporary folder differs only in its README's raw-data line, now "Raw data (unredacted, outside the repository)";
+    - a dashboard rebuild embeds the same data. Only the build time and the order of some keys differ, so the committed page was kept.
+  - **For the VM set-up (step 3):** `~/power-v0/config/ct.env`, which isn't in the repository, also sets `POWER_V0_DATA`. Its template must match the VM's folders.

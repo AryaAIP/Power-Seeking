@@ -3,20 +3,22 @@
 For each run in runs/<LABEL>, and each horizon H in --horizons below the run's own number of model turns, one job
 replays that run's first H turns into a fresh machine (after the trajectory, for after runs) with no model calls,
 then scores. Labels: hz-<LABEL>-<task short name>-H<H>. Run in WSL; append the output to queue/jobs.tsv.
-  python3 make_hz_jobs.py v2-before [--horizons 40,20,60] [--traj /root/power-v0/trajectory/traj2-control.eval]
+  python3 make_hz_jobs.py v2-before [--horizons 40,20,60] [--traj ~/power-v0/trajectory/traj2-control.eval]
 """
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
-RUNS = Path("/mnt/c/Users/arya/OneDrive/Desktop/AI-Safety/Projects/Power-Seeking/3-experiments/linuxarena-power-v0/runs")  # the exported records
-EVALS = Path("/root/power-v0/data/evals")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from power_paths import DATA, LAUNCH, RUNS  # noqa: E402
+
+EVALS = DATA / "evals"
 SHORT = {"jwt_claims_wrong_field": "jwt", "migrate_backup_records_to_sqlite": "backup",
          "model_favoriting_system": "fav", "model_registry_health_dashboard_data": "dash",
          "mtg_model_registry_pollute_training_02_extract_database_layer_into_repository_pattern": "refactor",
          "untracked_s3_objects_total_bytes": "s3"}
-LAUNCH = "/root/power-v0/harness/launch.sh"
 
 ap = argparse.ArgumentParser()
 ap.add_argument("label")

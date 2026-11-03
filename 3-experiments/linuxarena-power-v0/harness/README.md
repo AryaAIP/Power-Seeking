@@ -1,6 +1,12 @@
 # Harness
 
-The code for LinuxArena power v0. **This folder is the one copy to edit.** `sync.sh` copies it into WSL at `/root/power-v0/harness/`, where it runs, and checks the hashes. Everything runs inside WSL as root. The setup is described in section 3 of the session notes (`../../../SESSION-NOTES-for-compacted-Claude.md`). LinuxArena and Control Tower code stays inside WSL and is never copied here.
+The code for LinuxArena power v0. **This folder is the one copy to edit.** `sync.sh` copies it to `~/power-v0/harness/`, where it runs, and checks the hashes. On the laptop everything runs inside WSL as root, so `~` is `/root`. The setup is described in section 3 of the session notes (`../../../SESSION-NOTES-for-compacted-Claude.md`). LinuxArena and Control Tower code stays inside WSL and is never copied here.
+
+**Paths.** No script names a machine-specific folder. Python scripts take every location from `power_paths.py`, and bash scripts from `paths.sh`; the two have the same defaults. To run somewhere else, set these environment variables, or leave them unset to keep the defaults:
+- `POWER_V0_HOME`, the working folder outside the repository (data, queue, config, trajectories, the synced harness, Control Tower). Default `~/power-v0`;
+- `POWER_V0_DATA`, default `$POWER_V0_HOME/data`;
+- `POWER_V0_CT`, default `$POWER_V0_HOME/src/control-tower`;
+- `POWER_V0_EXP`, the experiment folder in the repository. It's found automatically: from this folder's location, or, in the synced copy, from the `exp-dir` file `sync.sh` writes there.
 
 ## Running things
 
@@ -8,10 +14,11 @@ The code for LinuxArena power v0. **This folder is the one copy to edit.** `sync
 | --- | --- |
 | `power_v0.py` | The policy `power_v0:power_policy`. It covers: <ul><li>the trajectory replay;</li><li>the `dev` setup: password emptied, test database, read-only login;</li><li>the solver;</li><li>per-step scoring (`prefix_log`, `prefix_turns`);</li><li>the probe;</li><li>the end-of-run snapshot.</li></ul> Every prompt and note is defined here: `ONBOARDING`, `INCLINATIONS` (`gentle`, and `keep` for the re-recorded B), `HANDOVER` and `HANDOVER_NOTES`. Replays wait for the service to be healthy after a restart (`replay_health_gate`) |
 | `launch.sh` | Runs one batch under a new label: `PURPOSE="why" launch.sh <label> tasks/<file>.txt <parallel> -p name=value ...`. It writes the exact configuration and exports the records, and it refuses a label that's already used |
-| `night_queue.py` | Starts jobs from `/root/power-v0/queue/jobs.tsv` in order, with a cap on environments and a deadline. **Set `DEADLINE` before each use** |
+| `night_queue.py` | Starts jobs from `~/power-v0/queue/jobs.tsv` in order, with a cap on environments and a deadline. **Set `DEADLINE` before each use** |
 | `night_stop.sh` | The hard stop: kills runs and removes containers. With `wait`, it waits until the time set in it |
 | `make_hz_jobs.py` | Prints the queue lines for per-step scoring of one batch: `make_hz_jobs.py <label> --horizons 5,10 [--traj <eval>]` |
-| `sync.sh` | Copies this folder into WSL, replacing files atomically, so running jobs are unaffected |
+| `sync.sh` | Copies this folder to `~/power-v0/harness/`, replacing files atomically, so running jobs are unaffected. Also records where the experiment folder is, in the copy's `exp-dir` file |
+| `power_paths.py`, `paths.sh` | Every folder the scripts use, for Python and bash. See "Paths" above |
 | `tasks/` | Task files for `--task-file`: <ul><li>`v0_tasks.txt`, the six future tasks;</li><li>`rbac_task.txt`, the trajectory task;</li><li>`one_<task>.txt`, one task each;</li><li>the probe and replay-check files</li></ul> |
 
 ## Reading results

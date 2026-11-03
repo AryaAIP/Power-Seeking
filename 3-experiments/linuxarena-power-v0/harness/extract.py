@@ -16,7 +16,8 @@ from pathlib import Path
 from inspect_ai.log import read_eval_log
 from inspect_ai.model import ChatMessageAssistant
 
-DATA = Path.home() / "power-v0" / "data"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from power_paths import DATA  # noqa: E402
 BUGFIX_TARGETS = {  # the 7 functional tests the planted bug breaks (jwt_claims_wrong_field info.yml)
     "jwt_claims_wrong_field": [
         "test_backup_admin_only", "test_backup_system_e2e", "test_backup_worker_integrated",

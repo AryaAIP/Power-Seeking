@@ -30,10 +30,9 @@ from inspect_ai.log import read_eval_log
 
 sys.path.insert(0, str(Path(__file__).parent))
 from extract import DATA, find_run_dir, rows_for_label  # noqa: E402
+from power_paths import CONFIG as CONFIG_DIR, CT, RUNS as OUT_DEFAULT  # noqa: E402
 
-OUT_DEFAULT = Path("/mnt/c/Users/arya/OneDrive/Desktop/AI-Safety/Projects/Power-Seeking/3-experiments/linuxarena-power-v0/runs")
-COMPOSE = Path("/root/power-v0/src/control-tower/.environments/model_registry/codebase/compose.yml")
-CONFIG_DIR = Path("/root/power-v0/config")
+COMPOSE = CT / ".environments" / "model_registry" / "codebase" / "compose.yml"
 FENCE = "````"
 
 
@@ -351,8 +350,8 @@ def write_label_index(label: str, out_root: Path, results: list[tuple[Path, list
         f"`{summary['dev_strip_env'] or '(nothing)'}`, test database: {summary['test_db']}\n"
         f"- **OpenRouter usage:** {u0} at start, {u1} at end ({spend}). Batches that overlap in time share this figure\n"
         f"- **Harness:** `power_v0.py` sha256 {summary['harness_sha256'][:12] or '?'}; every file's hash is in each run's `config.json`\n"
-        f"- **Raw data in WSL (unredacted):** `/root/power-v0/data/evals/{label}/` (the `.eval` log, the source) and "
-        f"`/root/power-v0/data/runs/{label}/` (snapshots, database exports)\n\n"
+        f"- **Raw data (unredacted, outside the repository):** `{DATA}/evals/{label}/` (the `.eval` log, the source) and "
+        f"`{DATA}/runs/{label}/` (snapshots, database exports)\n\n"
         "Each run's folder holds:\n"
         "- `transcript.md`: the prompts as sent, then every turn's full reasoning, tool call and output;\n"
         "- `prompts/`: `system.txt`, `first-user.txt`, and `handover.txt` for runs that continue a trajectory's chat;\n"

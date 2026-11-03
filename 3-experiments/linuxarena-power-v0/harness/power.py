@@ -15,11 +15,13 @@ difference; overall it reports the mean difference across tasks with a 95% boots
 import argparse
 import csv
 import random
+import sys
 from collections import defaultdict
 from pathlib import Path
 from statistics import mean, median
 
-DATA = Path.home() / "power-v0" / "data"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from power_paths import DATA  # noqa: E402
 
 
 def num(x):

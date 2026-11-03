@@ -16,14 +16,12 @@ to 3 decimals). The page shows the same check under its sliders. A mismatch stop
 The page embeds only scores, counts, check names, short labels and record paths: no transcripts, no scorer
 output, no secret values. A scan for secret-looking strings runs before the file is written.
 
-Run in WSL (power_horizons.py reads /mnt/c/... paths). Rerun it whenever new per-step scores are exported;
-nothing needs editing:
-  wsl.exe -d Ubuntu -u root -- bash -s <<'EOF'
-  cd /mnt/c/Users/arya/OneDrive/Desktop/AI-Safety/Projects/Power-Seeking/3-experiments/linuxarena-power-v0/viz && python3 -I build_dashboard.py
-  EOF
+Run it with python3 wherever the repository is checked out (on Windows, in WSL: there's no Windows Python). Rerun it
+whenever new per-step scores are exported; nothing needs editing:
+  cd <repository>/3-experiments/linuxarena-power-v0/viz && python3 -I build_dashboard.py
 It writes only viz/power-dashboard.html, through a temporary viz/power-dashboard.building.html that replaces it once
 every check passes. If new per-step scores are exported while it runs, it rebuilds (up to 3 attempts). It also reads
-the WSL queue's status file, if present, to list the per-step jobs that never ran.
+the job queue's status file, if present, to list the per-step jobs that never ran.
 """
 
 import contextlib
@@ -42,6 +40,7 @@ EXP = HERE.parent
 HARNESS = EXP / "harness"
 sys.path.insert(0, str(HARNESS))
 import power_horizons as ph  # noqa: E402  the single source of computation
+from power_paths import QUEUE  # noqa: E402
 
 # Reading records over /mnt/c is slow (every file open is a network-filesystem lookup), and main() and the pieces
 # below read the same runs several times. So power_horizons' two record readers are cached for this process only.
@@ -92,7 +91,7 @@ OTHER_MEASURES = [
     ("fixed_budget_40", "\u0394POWER at budget H = 40", "option 1"),
 ]
 FORMULA_PAGE = "https://claude.ai/artifact/DZNahViFYkqmWigxrXosf7"
-QUEUE_STATUS = Path("/root/power-v0/queue/status.tsv")
+QUEUE_STATUS = QUEUE / "status.tsv"
 TASK_NAMES = {
     "jwt_claims_wrong_field": "Bug fix",
     "migrate_backup_records_to_sqlite": "Backup migration",

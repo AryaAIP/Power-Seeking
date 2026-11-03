@@ -9,20 +9,20 @@
 # to disk). Runs with -p solve=false make no model calls and get a placeholder key.
 set -u
 LABEL=$1; TASKS=$2; PAR=$3; shift 3
-H=/root/power-v0/harness; D=/root/power-v0/data; CT=/root/power-v0/src/control-tower
+H=$(cd "$(dirname "$0")" && pwd); . "$H/paths.sh"; D=$POWER_V0_DATA; CT=$POWER_V0_CT
 [ -e "$D/evals/$LABEL" ] || [ -e "$D/runs/$LABEL" ] && { echo "label $LABEL already used: refusing"; exit 3; }
 case "$TASKS" in /*) TF=$TASKS ;; *) TF=$H/$TASKS ;; esac
 [ -f "$TF" ] || { echo "no task file $TF"; exit 1; }
 case " $* " in *" solve=false "*) export OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-placeholder-no-model-calls} ;; esac
 [ -n "${OPENROUTER_API_KEY:-}" ] || { echo "OPENROUTER_API_KEY not set"; exit 1; }
 mkdir -p "$D/evals/$LABEL"
-cd "$CT"; set -a; . /root/power-v0/config/ct.env; set +a; export PYTHONPATH=$H
+cd "$CT"; set -a; . "$POWER_V0_HOME/config/ct.env"; set +a; export PYTHONPATH=$H
 
 usage(){ case "$OPENROUTER_API_KEY" in placeholder*) echo "n/a (no model calls)" ;; *)
   curl -s -m 15 https://openrouter.ai/api/v1/key -H "Authorization: Bearer $OPENROUTER_API_KEY" \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["usage"])' 2>/dev/null || echo unknown ;; esac; }
 
-CFG=/root/power-v0/config/$LABEL.txt
+CFG=$POWER_V0_HOME/config/$LABEL.txt
 {
   echo "label=$LABEL tasks=$TF max_samples=$PAR started=$(date -u +%FT%TZ)"
   echo "purpose: ${PURPOSE:-not given}"
@@ -41,7 +41,7 @@ CFG=/root/power-v0/config/$LABEL.txt
   --no-upload --no-fail-on-error --log-dir $D/evals/$LABEL --run-name power-v0-$LABEL > $D/evals/$LABEL.console.txt 2>&1
 rc=$?
 LOG=$(ls -t $D/evals/$LABEL/*.eval 2>/dev/null | head -1)
-case "$TF" in *rbac_task.txt) [ -n "$LOG" ] && cp "$LOG" /root/power-v0/trajectory/$LABEL.eval ;; esac
+case "$TF" in *rbac_task.txt) [ -n "$LOG" ] && cp "$LOG" "$POWER_V0_HOME/trajectory/$LABEL.eval" ;; esac
 { echo "finished=$(date -u +%FT%TZ) ct_exit=$rc"; echo "log: ${LOG:-none}"; echo "openrouter usage at end: $(usage)"; } >> "$CFG"
 .venv/bin/python $H/export_run.py "$LABEL" --check 2>&1 | grep -v -E "No tool calls associated|No pricing|Unknown policy|attempts fields|WARNING" > $D/evals/$LABEL.export.txt
 echo "$LABEL: ct exit=$rc at $(date -u +%T), runs saved: $(find $D/runs/$LABEL -name meta.json 2>/dev/null | wc -l), export: $(grep -c complete $D/evals/$LABEL.export.txt) complete, $(grep -c MISSING $D/evals/$LABEL.export.txt) incomplete"

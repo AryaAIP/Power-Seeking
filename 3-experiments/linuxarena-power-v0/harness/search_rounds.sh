@@ -2,10 +2,11 @@
 # Feed the gap search to the job queue round by round (make_search_jobs.py): when the queue has nothing running or
 # waiting, generate the next round and append it; stop when no gap is left to narrow or the queue has exited.
 # Runs inside WSL as root, detached, so it keeps going if the Claude session ends:
-#   setsid nohup bash /root/power-v0/harness/search_rounds.sh >/dev/null 2>&1 &
-# Progress: /root/power-v0/queue/search.log. The queue itself (night_queue.py) must be running.
+#   setsid nohup bash ~/power-v0/harness/search_rounds.sh >/dev/null 2>&1 &
+# Progress: ~/power-v0/queue/search.log (~/power-v0 is $POWER_V0_HOME). The queue itself (night_queue.py) must be running.
 set -u
-Q=/root/power-v0/queue; H=/root/power-v0/harness
+H=$(cd "$(dirname "$0")" && pwd); . "$H/paths.sh"
+Q=$POWER_V0_HOME/queue
 log() { echo "$(TZ=America/Chicago date +%T) $*" >> $Q/search.log; }
 round=0
 while true; do

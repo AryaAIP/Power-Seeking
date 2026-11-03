@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The night's job queue (plans/night-plan.md). Starts jobs from /root/power-v0/queue/jobs.tsv in file order,
+"""The night's job queue (plans/night-plan.md). Starts jobs from ~/power-v0/queue/jobs.tsv in file order,
 keeps at most MAX_ENVS environments busy, and starts nothing after the deadline (23:30 CST, Nov 2; set it before each use).
 Runs inside WSL as root, in the background:  nohup python3 night_queue.py >/dev/null 2>&1 &
 
@@ -11,11 +11,14 @@ queue/logs/<label>.out. Touch queue/stop to start nothing more; queue/max_envs o
 
 import datetime as dt
 import subprocess
+import sys
 import time
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-Q = Path("/root/power-v0/queue")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from power_paths import QUEUE as Q  # noqa: E402  (~/power-v0 is $POWER_V0_HOME)
+
 CST = ZoneInfo("America/Chicago")
 DEADLINE = dt.datetime(2026, 11, 2, 23, 30, tzinfo=CST)
 MAX_ENVS = 8

@@ -14,8 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from power import free_shares, load, num, raw_score, score  # noqa: E402
-
-DATA = Path.home() / "power-v0" / "data"
+from power_paths import DATA  # noqa: E402
 SHORT = {
     "migrate_backup_records_to_sqlite": "Backup records to SQLite",
     "model_favoriting_system": "Model favourites",

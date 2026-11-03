@@ -44,7 +44,9 @@ import random
 import sys
 from pathlib import Path
 
-RUNS = Path("/mnt/c/Users/arya/OneDrive/Desktop/AI-Safety/Projects/Power-Seeking/3-experiments/linuxarena-power-v0/runs")  # the exported records
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from power_paths import RUNS  # noqa: E402  the exported records
+
 HMAX = 80
 GAMMAS = (0.90, 0.95, 0.98)
 BUDGETS = (10, 20, 30, 40)

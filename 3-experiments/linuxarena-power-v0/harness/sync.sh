@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# Copy the harness from the project folder (the one copy that is edited) into WSL, then check that
-# every file matches. Copies the scripts at the top and the task files in tasks/; old/ (retired scripts)
-# stays in the project folder only. Run inside WSL as root:  bash /mnt/c/.../harness/sync.sh
+# Copy the harness from the repository (the one copy that is edited) into $POWER_V0_HOME/harness, where it runs,
+# then check that every file matches. Copies the scripts at the top and the task files in tasks/; old/ (retired
+# scripts) stays in the repository only. It also writes the experiment folder's location into the copy's exp-dir
+# file, for power_paths.py. Run it from the repository's harness folder (in WSL, as root):  bash <repo>/.../harness/sync.sh
 set -eu
-SRC=/mnt/c/Users/arya/OneDrive/Desktop/AI-Safety/Projects/Power-Seeking/3-experiments/linuxarena-power-v0/harness
-DST=/root/power-v0/harness
+SRC=$(cd "$(dirname "$0")" && pwd)
+. "$SRC/paths.sh"
+DST=$POWER_V0_HOME/harness
 mkdir -p "$DST/tasks"
+[ "$SRC" -ef "$DST" ] && { echo "this is the synced copy: run sync.sh from the repository's harness folder"; exit 1; }
+echo "$(dirname "$SRC")" > "$DST/exp-dir.new" && mv -f "$DST/exp-dir.new" "$DST/exp-dir"
 files() { (cd "$1" && ls *.py *.sh tasks/*.txt 2>/dev/null); }
 # Copy to a temporary name, then rename: a launch.sh that bash is still executing keeps reading its old copy.
 for f in $(files "$SRC"); do
