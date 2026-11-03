@@ -25,7 +25,7 @@
    - launch the machine (see [aws-machine.md](aws-machine.md));
    - save `Power1.pem` in `C:\Users\arya\.ssh\`;
    - send the public IPv4 address.
-2. **Claude, in WSL:** put the key where SSH accepts it, then copy everything over. The 1.4 GB of raw data takes a while on the home connection.
+2. **Claude, in WSL:** commit first, since `copy.sh` sends only committed files. Put the key where SSH accepts it, then copy everything over. The 1.4 GB of raw data takes a while on the home connection; `COPY_DATA=0` leaves it out when the night's runs don't replay old runs.
 
    ```bash
    install -D -m 400 /mnt/c/Users/arya/.ssh/Power1.pem ~/.ssh/Power1.pem
@@ -38,8 +38,14 @@
 3. **Claude, set up the machine:**
 
    ```bash
-   ssh -i ~/.ssh/Power1.pem ubuntu@<address> sudo bash /root/Power-Seeking/3-experiments/linuxarena-power-v0/harness/vm/setup.sh
+   VM="ssh -i ~/.ssh/Power1.pem -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts_power_vm ubuntu@<address>"
+   $VM "sudo bash -c 'setsid nohup bash /root/Power-Seeking/3-experiments/linuxarena-power-v0/harness/vm/setup.sh > /root/setup.log 2>&1 < /dev/null &'"
+   $VM sudo tail -5 /root/setup.log
    ```
+
+   - **Why it runs detached:** it downloads about 13 GB, which takes longer than one command may run, and it must survive the connection dropping.
+   - **Watch it** with the `tail` line; it ends with "set-up done".
+   - **The SSH options:** this login keeps the machine's host key in its own file, the same one `copy.sh` uses, and accepts a new machine's key on first contact.
 
    It's safe to rerun, and it ends with a list of checks. It:
    - installs Docker and the other packages, and prints their versions next to WSL's;
@@ -67,7 +73,7 @@
 
    - **Every task should say "same."** Any difference gets looked into before any paid run.
    - **These checks never enter the power numbers.** They're no-work runs, not per-step scores, and `power_horizons.py` only uses no-work runs it's named on its command line.
-5. **Claude, the queue cap.** Watch `uptime` and `free -g` during the checks and the first batch. Raise `~/power-v0/queue/max_envs` in steps while the load stays under about 128 and memory has room ([aws-machine.md](aws-machine.md), "How many environments at once").
+5. **Claude, the queue cap.** Watch `uptime` and `free -g` during the checks and the first batch. Raise `~/power-v0/queue/max_envs` in steps (write it whole: `echo 24 > max_envs.new && mv max_envs.new max_envs`) while the load stays under about 128 and memory has room ([aws-machine.md](aws-machine.md), "How many environments at once").
 6. **Paid runs** only with Arya's go-ahead, through the queue Arya starts ("Each session", step 3).
 
 ## Each session
@@ -79,7 +85,7 @@
 3. **Arya: the key and the queue.** Use a tmux session, so the queue survives the connection closing. From WSL:
 
    ```bash
-   ssh -i ~/.ssh/Power1.pem ubuntu@<address>
+   ssh -i ~/.ssh/Power1.pem -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts_power_vm ubuntu@<address>
    ```
 
    Then, on the machine:

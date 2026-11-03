@@ -50,8 +50,12 @@ def main() -> None:
     running: dict[str, tuple[subprocess.Popen, int, str]] = {}
     finished: dict[str, tuple[str, str, str, int]] = {}
     log(f"queue started, deadline {deadline():%Y-%m-%d %H:%M}")
+    max_envs = MAX_ENVS
     while True:
-        max_envs = int((Q / "max_envs").read_text().strip()) if (Q / "max_envs").exists() else MAX_ENVS
+        try:  # a file caught mid-write reads as empty: keep the last cap
+            max_envs = int((Q / "max_envs").read_text().strip()) if (Q / "max_envs").exists() else MAX_ENVS
+        except ValueError:
+            pass
         for label, (p, envs, t0) in list(running.items()):
             if p.poll() is not None:
                 finished[label] = ("done", t0, f"{now():%H:%M:%S}", p.returncode)

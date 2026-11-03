@@ -2,13 +2,14 @@
 # Copy what the cloud machine needs from WSL, or bring its results back (plans/vm-runbook.md). Runs in WSL as root.
 #   copy.sh to <address>     the repository (a git bundle of the current branch: committed files only), uv, and the
 #                            raw data: data/, trajectory/ and config/'s per-run settings. Raw data goes only over SSH.
+#                            COPY_DATA=0 leaves out data/ (old runs' logs and snapshots): only trajectory/ and config/ go.
 #   copy.sh venv <address>   WSL's Control Tower environment and its Python, only if uv sync fails on the machine
 #   copy.sh back <address>   the machine's readable records into this repository's runs/, and its raw data into WSL
 # The machine's login is ubuntu (with sudo) and the key ~/.ssh/Power1.pem; VM_USER and VM_KEY change them. Both sides
 # use the same folders ($POWER_V0_HOME, default /root/power-v0), so paths inside the raw data stay valid.
 set -euo pipefail
 WHAT=${1:-}; ADDR=${2:-}
-[ -n "$ADDR" ] && case "$WHAT" in to|venv|back) ;; *) false ;; esac || { sed -n 2,6p "$0"; exit 1; }
+[ -n "$ADDR" ] && case "$WHAT" in to|venv|back) ;; *) false ;; esac || { sed -n 2,7p "$0"; exit 1; }
 HERE=$(cd "$(dirname "$0")" && pwd)
 . "$HERE/../paths.sh"
 EXP=$(dirname "$(dirname "$HERE")")
@@ -22,7 +23,7 @@ SSH="ssh -i $KEY -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$HOME
 RSYNC=(rsync -a --partial --mkpath --info=stats1 -e "$SSH" --rsync-path="sudo rsync")
 [ -f "$KEY" ] || { echo "no key at $KEY"; exit 1; }
 $SSH "$DEST" 'command -v rsync >/dev/null && command -v git >/dev/null ||
-  { sudo apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq rsync git >/dev/null; }'
+  { sudo cloud-init status --wait >/dev/null 2>&1; sudo apt-get -o DPkg::Lock::Timeout=600 update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=600 install -y -qq rsync git >/dev/null; }'
 
 case "$WHAT" in
 to)
@@ -42,7 +43,7 @@ echo "repository on the machine: $(git -C "$R" log --oneline -1)"
 true
 EOF
   "${RSYNC[@]}" "$HOME/.local/bin/uv" "$HOME/.local/bin/uvx" "$DEST:/root/.local/bin/"
-  for d in data trajectory; do "${RSYNC[@]}" "$POWER_V0_HOME/$d/" "$DEST:$POWER_V0_HOME/$d/"; done
+  for d in $([ "${COPY_DATA:-1}" = 0 ] || echo data) trajectory; do "${RSYNC[@]}" "$POWER_V0_HOME/$d/" "$DEST:$POWER_V0_HOME/$d/"; done
   "${RSYNC[@]}" --exclude 'ct.env*' "$POWER_V0_HOME/config/" "$DEST:$POWER_V0_HOME/config/"
   echo "next, on the machine: sudo bash $REMOTE_EXP/harness/vm/setup.sh"
   ;;

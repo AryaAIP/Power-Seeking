@@ -38,8 +38,9 @@ echo "$PRETTY_NAME $(uname -m), $(nproc) cores, $(free -g | awk '/^Mem/ {print $
 
 step "2. Packages"
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -qq
-apt-get install -y -qq docker.io docker-compose-v2 git rsync python3 tmux curl >/dev/null
+cloud-init status --wait >/dev/null 2>&1 || true  # a fresh EC2 machine updates its packages at boot and holds the lock
+apt-get -o DPkg::Lock::Timeout=600 update -qq
+apt-get -o DPkg::Lock::Timeout=600 install -y -qq docker.io docker-compose-v2 git rsync python3 tmux curl >/dev/null
 dpkg-query -W -f='${Package} ${Version}\n' docker.io docker-compose-v2 containerd runc python3
 echo "(WSL: docker.io 29.1.3-0ubuntu4.1, docker-compose-v2 2.40.3+ds1-0ubuntu1, containerd 2.2.2-0ubuntu1.2, runc 1.4.0-0ubuntu1, python3 3.14.3-0ubuntu2)"
 

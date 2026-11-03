@@ -83,9 +83,12 @@ def outcome(run: Path) -> dict:
         turns = len(rows)
     p = sc.get("parsed") or {}
     expl = next((v.get("explanation") or "" for v in (sc.get("scorer") or {}).values()), "")
-    if "Error scoring" in expl:
-        # the scorer itself crashed (e.g. its own build timed out): no outcome, not zero checks. A scorer that
-        # ran and failed the task early (e.g. the agent's code didn't build) is a real outcome, handled below.
+    unscored = not (expl.strip() or sc.get("checks") or sc.get("bugfix_tests")
+                    or any(v is not None for k, v in p.items() if k in ("checks_passed", "checks_total", "answer_matches_recomputed")))
+    if "Error scoring" in expl or unscored:
+        # the scorer itself crashed (e.g. its own build timed out), or the sample failed before scoring and left no
+        # scorer output (Nov 3): no outcome, not zero checks. A scorer that ran and failed the task early (e.g. the
+        # agent's code didn't build) is a real outcome, handled below.
         return {"task": task, "turns": turns, "kind": "error", "x": None, "meta": meta, "path": str(run.relative_to(RUNS))}
     if task in TARGETS:
         got = {t["test"]: t["outcome"] == "PASSED" for t in sc.get("bugfix_tests") or []}
@@ -103,13 +106,33 @@ def outcome(run: Path) -> dict:
 
 
 def one_per_task(label: str) -> dict:
-    out = {}
-    for r in runs_of(label):
-        o = outcome(r)
-        if o["task"] in out:
-            raise SystemExit(f"{label}: more than one run of {o['task']}; this script expects one")
-        out[o["task"]] = o
+    """{task: outcome} for a batch, or for several comma-separated batches (a rerun, a swapped-in task): a later
+    batch's run is used only for a task the earlier ones lack or whose scorer errored there (Nov 3)."""
+    out: dict = {}
+    for lab in label.split(","):
+        batch: dict = {}
+        for r in runs_of(lab):
+            o = outcome(r)
+            if o["task"] in batch:
+                raise SystemExit(f"{lab}: more than one run of {o['task']}; this script expects one")
+            batch[o["task"]] = o
+        for t, o in batch.items():
+            if t not in out or out[t]["kind"] == "error":
+                out[t] = o
     return out
+
+
+def same_kind(scored: dict, base0: dict, tasks: list) -> None:
+    """In place: a check-list scorer that exits early (e.g. "Server not ready. Passed 0/N") lists no checks, so that
+    outcome reads as counts. In a task scored by check list elsewhere, it means no check passed (Nov 3)."""
+    for t in tasks:
+        outs = [o for st in scored.values() for o in st[t].values()] + ([base0[t]] if t in base0 else [])
+        if any(o["kind"] == "checks" for o in outs):
+            for o in outs:
+                if o["kind"] == "counts":
+                    if o["x"][0]:
+                        print(f"note: {o['path']}: {o['x'][0]} checks passed by count but none listed; read as none", file=sys.stderr)
+                    o["kind"], o["x"] = "checks", {}
 
 
 def excluded_labels() -> set:
@@ -164,12 +187,13 @@ REWARD = "first-pass"
 def first_pass(scored: dict) -> dict:
     """The scored outcomes turned into success-by-H: a check passes at H if it passed at any scored horizon up to H
     (a running maximum of the count for the count-scored task)."""
-    out, seen, best = {}, set(), 0
+    out, seen, best, total = {}, set(), 0, 0
     for h in sorted(scored):
         o = scored[h]
         if o["kind"] == "counts":
-            best = max(best, o["x"][0])
-            out[h] = {**o, "x": (best, o["x"][1])}
+            # the largest total too: a scorer that exits early may report fewer checks (or none) than it has
+            best, total = max(best, o["x"][0]), max(total, o["x"][1])
+            out[h] = {**o, "x": (best, total)}
         else:
             seen |= {c for c, v in o["x"].items() if v}
             out[h] = {**o, "x": {c: (c in seen) for c in set(o["x"]) | seen}}
@@ -239,7 +263,7 @@ def main() -> None:
         solver, zero = one_per_task(lab), one_per_task(nw)
         for task, o in solver.items():
             s = {0: zero[task]} if task in zero else {}
-            pre = prefixes.get((lab, task), {})
+            pre = prefixes.get((o["path"].split("/")[0], task), {})  # the batch this task's run came from
             s.update(pre)
             s = {h: v for h, v in s.items() if h < o["turns"]}  # a prefix at or past the end adds nothing
             # the run's own score, unless its scorer crashed and a full-length replay rescored it
@@ -264,6 +288,7 @@ def main() -> None:
     tasks = sorted(set.intersection(*(set(v) for v in scored.values())) - bad_tasks)
 
     base0 = one_per_task(a.nowork_before)
+    same_kind(scored, base0, tasks)
     checks, free = {}, {}
     for t in tasks:
         all_o = [o for st in scored.values() for o in st[t].values()]

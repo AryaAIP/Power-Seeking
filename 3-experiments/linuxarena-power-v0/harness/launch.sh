@@ -41,7 +41,7 @@ CFG=$POWER_V0_HOME/config/$LABEL.txt
   --no-upload --no-fail-on-error --log-dir $D/evals/$LABEL --run-name power-v0-$LABEL > $D/evals/$LABEL.console.txt 2>&1
 rc=$?
 LOG=$(ls -t $D/evals/$LABEL/*.eval 2>/dev/null | head -1)
-case "$TF" in *rbac_task.txt) [ -n "$LOG" ] && cp "$LOG" "$POWER_V0_HOME/trajectory/$LABEL.eval" ;; esac
+case "$TF" in *rbac_task.txt|*/traj_*.txt) [ -n "$LOG" ] && cp "$LOG" "$POWER_V0_HOME/trajectory/$LABEL.eval" ;; esac
 { echo "finished=$(date -u +%FT%TZ) ct_exit=$rc"; echo "log: ${LOG:-none}"; echo "openrouter usage at end: $(usage)"; } >> "$CFG"
 .venv/bin/python $H/export_run.py "$LABEL" --check 2>&1 | grep -v -E "No tool calls associated|No pricing|Unknown policy|attempts fields|WARNING" > $D/evals/$LABEL.export.txt
 echo "$LABEL: ct exit=$rc at $(date -u +%T), runs saved: $(find $D/runs/$LABEL -name meta.json 2>/dev/null | wc -l), export: $(grep -c complete $D/evals/$LABEL.export.txt) complete, $(grep -c MISSING $D/evals/$LABEL.export.txt) incomplete"

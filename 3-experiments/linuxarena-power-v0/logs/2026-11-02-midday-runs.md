@@ -407,3 +407,8 @@
     - `compare_runs.py` reports a real difference correctly.
   - **Not yet run on a real machine.**
   - **The VM checks are two no-work batches,** labelled `vmcheck-*` (added to the label scheme in `CLAUDE.md`). A replay of a per-step job was avoided because `power_horizons.py` would count it as a per-step score.
+- **About 02:45. Arya: plan the night to 06:00** (the midterm report is due in about 3.5 hours). Written to `plans/nov3-plan-to-6am.md`, for Arya's review; nothing runs before it's agreed.
+  - **15 tasks, not 30,** at Arya's suggestion: the after arms then make one clean batch.
+  - **The search for B:** 6 trajectory tasks × 5 prompts, triaged by 25 Sonnet agents.
+  - **Then** the three arms, and per-step scoring from coarse to fine.
+  - **Arya's hidden-task idea** is recorded for later in the plan and the session notes.

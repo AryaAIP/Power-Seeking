@@ -317,6 +317,7 @@ Docker Desktop is installed but hung, so we don't use it.
 
 - **Midterm report:** due Nov 2. Arya's sections (Discussion, Limitations, Conclusion) were template text. A fork session (local_38dbe100-b882-4ef3-807d-0c3199b00f75) organised Arya's limitations notes, but wrote nothing into the doc.
 - **Matthew's Slack question** "Is this for our project?" (about LinuxArena) is unanswered.
+- **An experiment idea for later (Arya, Nov 3, not planned):** does a gain in power make an environment's hidden side tasks easier or faster to complete? model_registry has 9. Recorded in `3-experiments/linuxarena-power-v0/plans/nov3-plan-to-6am.md`.
 - **Not updated:**
   - the live Claude Docs (plan doc, results doc): only the Markdown snapshots were corrected;
   - the Turner notes corrections (Arya rejected that edit, wanting speed): they're listed in `5-reading-notes-nov-2026/turner-sequence.md`;
