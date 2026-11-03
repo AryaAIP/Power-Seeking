@@ -187,6 +187,7 @@ TRAJ_TASK_ASKS = {
 EXPECTED_TASKS = sorted(t for t in TASK_BLURBS if SHORT.get(t) in {"jwt", "backup", "fav", "dash", "refactor", "s3"})
 CONFIG: dict = {}  # the --config file's contents; empty for the default (Nov 2) run
 TRAJ = {"A": "traj2-control", "B": "traj3-power"}
+INTERVALS = False  # 95% bootstrap intervals over tasks on the page: only when the --config file says "intervals": true
 POWER_V0 = HARNESS / "power_v0.py"
 HZ_LABEL = re.compile(r"^hz-(?P<src>.+)-(?P<short>[a-z0-9]+)-H(?P<h>\d+)(?:-r(?P<r>\d+))?$")
 STEP_HEADER = re.compile(r"^### Step \d+: `([^`]+)`", re.M)
@@ -752,6 +753,8 @@ def build_data(report: dict, printed: str, c: dict) -> dict:
             row[key] = {"low": r6(lo), "high": r6(hi), "s": [fmt(lo), fmt(hi)]}
         ba_rows.append(row)
     ba_mean = {key: cell(gains["BA"][key]) for key in ("summed", GAMMA_KEY, "fixed_budget")}
+    if INTERVALS:
+        add_intervals(gains, c, headline + other, ba_mean)
 
     pc = report["power_curve"]
     power = {st: {"low": [r6(v) for v in pc[st]["low"]], "high": [r6(v) for v in pc[st]["high"]]} for st in arms}
@@ -901,6 +904,39 @@ def build_data(report: dict, printed: str, c: dict) -> dict:
     }
 
 
+N_RESAMPLES = ph.bootstrap.__defaults__[0]  # power_horizons' bootstrap: resamples over tasks, fixed seed
+
+
+def interval_words(n_tasks: int) -> str:
+    return (f"95% interval from resampling the {n_tasks} tasks ({N_RESAMPLES:,} resamples). It reflects which tasks were "
+            "picked, not variation between trajectories: each arm has one trajectory.")
+
+
+def add_intervals(gains: dict, c: dict, rows: list, ba_mean: dict) -> None:
+    """In place: each shown gain gets 'ci', the 95% interval from the lower end of low's bootstrap interval to the upper
+    end of high's. A and B: power_horizons' own low_ci95 and high_ci95. B minus A, which power_horizons doesn't report:
+    its bootstrap() (same resamples, same seed) over the per-task B minus A lows and highs, in its task order."""
+    done: dict = {}
+
+    def ci(a: str, key: str) -> dict:
+        if a == "BA":
+            if key not in done:
+                g = gains["BA"][key]
+                done[key] = (ph.bootstrap([{key: g["per_task_low"][t]} for t in c["tasks"]], key),
+                             ph.bootstrap([{key: g["per_task_high"][t]} for t in c["tasks"]], key))
+            lo, hi = done[key]
+        else:
+            lo, hi = gains[a][key]["low_ci95"], gains[a][key]["high_ci95"]
+        return {"low": r6(lo[0]), "high": r6(hi[1]), "s": [fmt(lo[0]), fmt(hi[1])],
+                "lowCI": [r6(x) for x in lo], "highCI": [r6(x) for x in hi]}
+
+    for row in rows:
+        for a in row["comps"]:
+            row["comps"][a]["ci"] = ci(a, row["key"])
+    for key in ba_mean:
+        ba_mean[key]["ci"] = ci("BA", key)
+
+
 def summary_sentences(gains: dict) -> list[str]:
     s = {a: gains[a]["summed"] for a in gains}
     word = {"A": "for the control trajectory", "B": "for the power-seeking trajectory",
@@ -920,6 +956,11 @@ def summary_sentences(gains: dict) -> list[str]:
         for a in ("A", "B", "BA"):
             if a not in straddle:
                 out.append(f"The average {word[a]} lies entirely {'above' if s[a]['low'] > 0 else 'below'} zero.")
+    if INTERVALS:
+        n = len(gains["A"]["summed"]["per_task_low"])
+        out.append("Each range runs from a lower to an upper bound, which come from the turns that weren't scored. "
+                   "The headline table also gives each one's " + interval_words(n))
+        return out
     out.append("There is one trajectory of each kind and one run per task, so the page shows no statistical uncertainty. "
                "Each range runs from a lower to an upper bound, which come from the turns that weren't scored.")
     return out
@@ -948,7 +989,7 @@ def configure(path: Path) -> None:
       out          the page to write, relative to viz/ (default power-dashboard.html); --out overrides it
       date         for the page's heading, e.g. "Nov 3, 2026"
       handover_B   the hand-over note B's after runs get, used only until their records exist (default "stop")"""
-    global BEFORE, AFTERS, TRAJECTORIES, VIEWER_TRAJECTORIES, PLAIN_NAMES, PH_ARGS, EXPECTED_TASKS, CONFIG, TRAJ, OUT
+    global BEFORE, AFTERS, TRAJECTORIES, VIEWER_TRAJECTORIES, PLAIN_NAMES, PH_ARGS, EXPECTED_TASKS, CONFIG, TRAJ, OUT, INTERVALS
     cfg = json.loads(path.read_text(encoding="utf-8"))
     CONFIG = cfg
     BEFORE = tuple(cfg["before"])
@@ -966,6 +1007,7 @@ def configure(path: Path) -> None:
     for k, (lab, nw) in AFTERS.items():
         PH_ARGS += ["--after", f"{k}={lab}", "--nowork-after", f"{k}={nw}"]
     EXPECTED_TASKS = list(cfg["tasks"])
+    INTERVALS = cfg.get("intervals") is True
     TASK_NAMES["mtg_model_registry_privilege_escalation_03_implement_granular_rbac_permission_enforcement_layer"] = "Permission checks"
     if cfg.get("out"):
         OUT = HERE / cfg["out"]
@@ -1114,6 +1156,38 @@ def page_template(data: dict) -> str:
         ("'With the agent starting the 6 tasks from", f"'With the agent starting the {n} tasks from"),
     ]:
         page = swap(page, old, new)
+    if INTERVALS:  # the 95% intervals in data (each shown cell's 'ci'): show them, and say what they are
+        words = interval_words(n)
+        ci_js = ("var ci = {src}.ci; if (ci) el('div', {{ 'class': 'subline' }}, td, '95% interval ' + "
+                 "uminus(ci.s[0]) + ' .. ' + uminus(ci.s[1]));")
+        for old, new in [
+            ("        var c = row.comps[k].s, td = el('td', null, r);\n"
+             "        el('span', { 'class': 'range' }, td, uminus(c.low) + ' .. ' + uminus(c.high));\n",
+             "        var c = row.comps[k].s, td = el('td', null, r);\n"
+             "        el('span', { 'class': 'range' }, td, uminus(c.low) + ' .. ' + uminus(c.high));\n"
+             "        " + ci_js.format(src="row.comps[k]") + "\n"),
+            ("      var c = D.baMean[k[0]].s, td = el('td', null, m);\n"
+             "      el('span', { 'class': 'range' }, td, uminus(c.low) + ' .. ' + uminus(c.high));\n",
+             "      var c = D.baMean[k[0]].s, td = el('td', null, m);\n"
+             "      el('span', { 'class': 'range' }, td, uminus(c.low) + ' .. ' + uminus(c.high));\n"
+             "      " + ci_js.format(src="D.baMean[k[0]]") + "\n"),
+            ("<dd>There is one trajectory of each kind and one run per task, so no statistical uncertainty is shown.</dd>",
+             f"<dd>Each gain in the headline table has a {words} It runs from the lower end of the low value's interval "
+             "to the upper end of the high value's.</dd>"),
+            ('  <div class="panel scroll"><table id="headline"></table></div>\n',
+             '  <div class="panel scroll"><table id="headline"></table></div>\n'
+             f'  <p class="small">Under each low .. high value: its {words} It runs from the lower end of the low '
+             "value's interval to the upper end of the high value's.</p>\n"),
+            ("Everything in this section follows the sliders. A lower γ or a smaller H puts more weight on a head start.</p>\n",
+             "Everything in this section follows the sliders. A lower γ or a smaller H puts more weight on a head start.</p>\n"
+             '  <p class="small">The values the sliders recompute have no 95% intervals; the headline table above has '
+             "them for the fixed choices.</p>\n"),
+            ("'Change H with the step budget slider above. There is one trajectory of each kind and one run per task, "
+             "so no statistical uncertainty is shown.'",
+             "'Change H with the step budget slider above. Values recomputed with the sliders have no 95% intervals; "
+             "the headline table has them.'"),
+        ]:
+            page = swap(page, old, new)
     if not data["intro"]["notes"].get("stop"):
         page = swap(page, "For the power-seeking trajectory, that message starts with this note:</p>\n  <blockquote class=\"note\" id=\"note-stop\"></blockquote>",
                     "Neither trajectory's after runs get an extra note in that message.</p>")
@@ -1235,6 +1309,14 @@ def verify_page(path: Path) -> tuple[bool, str]:
             s, want = row["comps"][arm]["s"], nums.get((arm, row["key"]))
             if not want or [s["low"], s["high"]] != [want[0], want[3]]:
                 problems.append(f"shown cell {arm} {row['key']} differs from the printed output")
+    if INTERVALS:  # the shown 95% intervals: low's lower end and high's upper end, as power_horizons prints them
+        for row in data["headline"] + data["otherMeasures"]:
+            for arm in ("A", "B"):
+                ci, want = row["comps"][arm].get("ci"), nums.get((arm, row["key"]))
+                n += 2
+                if not ci or not want or ci["s"] != [want[1], want[5]]:
+                    problems.append(f"shown 95% interval {arm} {row['key']}: page {ci and ci['s']} vs printed "
+                                    f"{want and [want[1], want[5]]}")
     for arm, want in counts.items():
         n += 2
         if data["improved"][arm] != want:

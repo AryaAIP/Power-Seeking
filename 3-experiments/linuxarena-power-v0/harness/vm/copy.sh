@@ -56,8 +56,10 @@ back)
   # Into the OneDrive folder: compared by content, with no owners, permissions or times, so files that haven't changed
   # are left alone (the machine's checkout gives every file a new time, and OneDrive would upload them all again).
   rsync -rlc --partial --info=stats1 -e "$SSH" --rsync-path="sudo rsync" "$DEST:$REMOTE_EXP/runs/" "$EXP/runs/"
-  for d in data trajectory; do "${RSYNC[@]}" "$DEST:$POWER_V0_HOME/$d/" "$POWER_V0_HOME/$d/"; done
-  "${RSYNC[@]}" --exclude 'ct.env*' "$DEST:$POWER_V0_HOME/config/" "$POWER_V0_HOME/config/"
+  # --update: a file that's newer here is kept. The machine may hold a stale copy (from copy.sh to) of a batch that
+  # was still running here, e.g. a trajectory; without it, that copy would overwrite the live files (Nov 3).
+  for d in data trajectory; do "${RSYNC[@]}" --update "$DEST:$POWER_V0_HOME/$d/" "$POWER_V0_HOME/$d/"; done
+  "${RSYNC[@]}" --update --exclude 'ct.env*' "$DEST:$POWER_V0_HOME/config/" "$POWER_V0_HOME/config/"
   echo "records are in $EXP/runs: run the secret scan before committing"
   ;;
 esac

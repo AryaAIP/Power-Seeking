@@ -142,4 +142,6 @@
 | `../harness/vm/setup.sh` | Sets the machine up, as above. Run on the machine as root |
 | `../harness/vm/copy.sh` | Runs in WSL. `to` copies the code, uv and the raw data over; `venv` copies WSL's Control Tower environment; `back` brings the records and raw data back |
 | `../harness/vm/compare_runs.py` | Compares two batches task by task (check names only, never scorer output) |
+| `../harness/vm/finish_v4.sh` | Runs in WSL. Copy back, rebuild the registry, POWER for the v4 arms, the dashboard, the secret scan, a summary |
+| `../harness/vm/secret_scan.py` | The secret scan `finish_v4.sh` runs (paths and kinds of match only) |
 | `../harness/vm/ct-packages.txt` | WSL's Control Tower packages, exactly. `setup.sh` compares the machine's with it |
