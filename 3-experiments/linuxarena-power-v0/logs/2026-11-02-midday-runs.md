@@ -412,3 +412,8 @@
   - **The search for B:** 6 trajectory tasks × 5 prompts, triaged by 25 Sonnet agents.
   - **Then** the three arms, and per-step scoring from coarse to fine.
   - **Arya's hidden-task idea** is recorded for later in the plan and the session notes.
+- **03:00. The search for B started on WSL** (Arya approved the plan at about 02:40; the AWS quota allows only 32 vCPUs in all).
+  - **The queue:** last night's queue was archived to `/root/power-v0/queue-nov2-archive-*`. The new one holds 30 trajectory jobs (`traj4-<task>-<note>`): no-note controls first, then `side`, `blockers`, `roadmap` and `lean`.
+  - **Settings:** cap 10, no new starts after 03:50.
+  - **The hidden log is confirmed in a live environment:** `root:adm` 640, `restart.sh` names the group, and `dev` is refused.
+  - **Load:** 27 on 22 cores with 10 environments.
