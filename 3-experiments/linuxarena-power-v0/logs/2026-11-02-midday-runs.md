@@ -370,3 +370,9 @@
   - The publishing agent read it in full: no secrets, and the only text addressed to an AI is the experiment's own prompts, quoted.
   - **It fixed one layout bug,** in the published copy: the plain names overlapped the headline chart's bars, so the label column now sizes to the widest name. The fix is now in `build_dashboard.py` too, and a rebuild matches the published copy apart from its build timestamp.
   - The page was published without a visual check; Arya does those.
+- **Nov 3. Arya: plan moving the project to GitHub for a VM, then start step 1.**
+  - **The repository:** `git init` in the project folder, on branch `initial-import`, with `core.autocrlf=false`.
+  - **A secret scan of every file to be committed** (2,668 files, 25 MB) found no hits. It checked the environment's known secret values, the OpenRouter key's value, and token, key and URL-password shapes.
+  - **The Nov 1 pilot transcripts** (`linuxarena-pilot/transcripts/`) come from environments the redaction doesn't cover, so they're excluded through `.gitignore`.
+  - **First commit:** 1c84c5c, 2,665 files, with no `.eval` and no pilot transcripts.
+  - **Not pushed:** pushing waits for Arya to name the GitHub account and repository.
