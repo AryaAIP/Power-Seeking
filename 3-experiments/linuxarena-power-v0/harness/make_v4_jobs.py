@@ -3,7 +3,8 @@ machines"). Machine K runs part K of the tasks (tasks/v4_tasks_pK.txt) in every 
 raw data on the same machine; the 30 trajectories are dealt out in turn. Append the output to queue/jobs.tsv there.
   python3 -I make_v4_jobs.py K start             the free check (no work) and this machine's share of the trajectories
   python3 -I make_v4_jobs.py K before            the before arm
-  python3 -I make_v4_jobs.py K after A B         the after arms and their no-work runs, A and B being trajectory labels
+  python3 -I make_v4_jobs.py K after A B [noteA noteB]  the after arms, then their no-work runs; A and B are trajectory labels,
+                                                 the notes are HANDOVER_NOTES keys or none (default: none for A, use for B)
 """
 
 import subprocess
@@ -35,13 +36,19 @@ elif stage == "before":
     print(line(f"v4-before-p{k}", n_tasks(f), f, n_tasks(f), "-p solver_user=dev",
                f"The before arm, part {k} of 4: the solver from the untouched machine"))
 elif stage == "after":
-    a, b = rest
+    # Hand-over notes (HANDOVER_NOTES in power_v0.py), optional 5th and 6th arguments: A's (default none) and B's
+    # (default "use", Arya Nov 3: keep what you have and use it to work faster). "none" = no note.
+    a, b, *notes = rest
+    note_a, note_b = (notes + ["none", "use"][len(notes):])[:2]
     f = f"v4_tasks_p{k}.txt"
-    for arm, traj, note in (("A", a, ""), ("B", b, " -p handover_note=stop")):
-        rep = f"-p solver_user=dev -p traj={TRAJECTORY / (traj + '.eval')} -p traj_user=dev -p traj_cmd_bug=false"
-        print(line(f"v4-after{arm}-p{k}", n_tasks(f), f, n_tasks(f), f"{rep} -p context=kept{note}",
-                   f"The after-{arm} arm, part {k} of 4: replay {traj}, then the solver continues its chat"))
-        print(line(f"nowork-v4-after{arm}-p{k}", n_tasks(f), f, n_tasks(f), f"{rep} -p solve=false",
-                   f"No-work runs after {traj}, part {k} of 4: H = 0 for the after-{arm} arm, and the replay check"))
+    arms = (("A", a, note_a), ("B", b, note_b))
+    rep = lambda traj: f"-p solver_user=dev -p traj={TRAJECTORY / (traj + '.eval')} -p traj_user=dev -p traj_cmd_bug=false"  # noqa: E731
+    for arm, traj, note in arms:  # the solver runs first: the queue never lets later lines overtake earlier ones
+        hand = "" if note == "none" else f" -p handover_note={note}"
+        print(line(f"v4-after{arm}-p{k}", n_tasks(f), f, n_tasks(f), f"{rep(traj)} -p context=kept{hand}",
+                   f"The after-{arm} arm, part {k}: replay {traj}, then the solver continues its chat (hand-over note: {note})"))
+    for arm, traj, _ in arms:
+        print(line(f"nowork-v4-after{arm}-p{k}", n_tasks(f), f, n_tasks(f), f"{rep(traj)} -p solve=false",
+                   f"No-work runs after {traj}, part {k}: H = 0 for the after-{arm} arm, and the replay check"))
 else:
     sys.exit(__doc__)
