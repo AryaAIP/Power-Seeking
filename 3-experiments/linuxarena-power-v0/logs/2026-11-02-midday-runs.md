@@ -387,3 +387,23 @@
     - an export of `nowork-v2-S0` into a temporary folder differs only in its README's raw-data line, now "Raw data (unredacted, outside the repository)";
     - a dashboard rebuild embeds the same data. Only the build time and the order of some keys differ, so the committed page was kept.
   - **For the VM set-up (step 3):** `~/power-v0/config/ct.env`, which isn't in the repository, also sets `POWER_V0_DATA`. Its template must match the VM's folders.
+- **About 02:15. Step 3: the set-up for the AWS machine** (`plans/aws-machine.md`, written by another session while Arya launches it).
+  - **New:** `plans/vm-runbook.md` (the commands) and `harness/vm/`:
+    - `setup.sh`, run on the machine;
+    - `copy.sh`, run in WSL: `to`, `venv`, `back`;
+    - `compare_runs.py`;
+    - `ct-packages.txt`, WSL's exact Control Tower packages.
+  - **The machine gets WSL's folders** (`/root/power-v0`), so paths inside the raw data stay valid.
+  - **Code goes over as a git bundle,** so the private repository needs no key on the machine. Raw data goes over SSH only.
+  - **inspect-ai 0.3.171 is no longer listed on PyPI,** but the locked file still downloads (status 200). So `uv sync --frozen` should work; `copy.sh venv` is the fallback.
+  - **The queue's deadline can now be set in `queue/deadline`** without editing code (`night_queue.py`).
+  - **Checked without touching WSL's set-up:**
+    - syntax;
+    - `copy.sh`'s argument and path handling;
+    - every image `setup.sh` pulls is held in WSL under the same digest;
+    - the generated `ct.env` and environment lock are identical to WSL's;
+    - `daemon.json` parses, and the network-range check refuses an overlap;
+    - the deadline file works, and falls back on bad input;
+    - `compare_runs.py` reports a real difference correctly.
+  - **Not yet run on a real machine.**
+  - **The VM checks are two no-work batches,** labelled `vmcheck-*` (added to the label scheme in `CLAUDE.md`). A replay of a per-step job was avoided because `power_horizons.py` would count it as a per-step score.

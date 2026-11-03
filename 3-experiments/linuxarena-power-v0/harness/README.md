@@ -14,7 +14,7 @@ The code for LinuxArena power v0. **This folder is the one copy to edit.** `sync
 | --- | --- |
 | `power_v0.py` | The policy `power_v0:power_policy`. It covers: <ul><li>the trajectory replay;</li><li>the `dev` setup: password emptied, test database, read-only login;</li><li>the solver;</li><li>per-step scoring (`prefix_log`, `prefix_turns`);</li><li>the probe;</li><li>the end-of-run snapshot.</li></ul> Every prompt and note is defined here: `ONBOARDING`, `INCLINATIONS` (`gentle`, and `keep` for the re-recorded B), `HANDOVER` and `HANDOVER_NOTES`. Replays wait for the service to be healthy after a restart (`replay_health_gate`) |
 | `launch.sh` | Runs one batch under a new label: `PURPOSE="why" launch.sh <label> tasks/<file>.txt <parallel> -p name=value ...`. It writes the exact configuration and exports the records, and it refuses a label that's already used |
-| `night_queue.py` | Starts jobs from `~/power-v0/queue/jobs.tsv` in order, with a cap on environments and a deadline. **Set `DEADLINE` before each use** |
+| `night_queue.py` | Starts jobs from `~/power-v0/queue/jobs.tsv` in order, with a cap on environments and a deadline. **Set the deadline before each use:** write `YYYY-MM-DD HH:MM` (Chicago time) into `~/power-v0/queue/deadline`, or change `DEADLINE` in the code. The cap is in `queue/max_envs` |
 | `night_stop.sh` | The hard stop: kills runs and removes containers. With `wait`, it waits until the time set in it |
 | `make_hz_jobs.py` | Prints the queue lines for per-step scoring of one batch: `make_hz_jobs.py <label> --horizons 5,10 [--traj <eval>]` |
 | `sync.sh` | Copies this folder to `~/power-v0/harness/`, replacing files atomically, so running jobs are unaffected. Also records where the experiment folder is, in the copy's `exp-dir` file |
@@ -39,6 +39,17 @@ Scripts retired on Nov 2, kept because the old runs were made with them:
 - `jobs-next-session.tsv`, the night's job list, now run.
 
 They aren't copied into WSL.
+
+## `vm/`: the cloud machine
+
+How they're used is in `../plans/vm-runbook.md`. `sync.sh` doesn't copy this folder: these run from the repository.
+
+| File | What it does |
+| --- | --- |
+| `vm/setup.sh` | Sets up a fresh Ubuntu 26.04 machine to run like WSL: Docker and its settings, Control Tower `699d5ca` with WSL's exact packages, `model_registry` `v1.0.1`, the images by digest, `ct.env`, and the harness. Run on the machine as root; safe to rerun |
+| `vm/copy.sh` | Runs in WSL. `to <address>` sends the code (a git bundle), uv and the raw data over SSH; `venv` sends WSL's Control Tower environment if installing fails; `back` brings the records and raw data home |
+| `vm/compare_runs.py` | Compares two batches task by task, by check name: the machine's checks against WSL's runs |
+| `vm/ct-packages.txt` | WSL's Control Tower packages, which `setup.sh` checks the machine's against |
 
 ## The gap search (Nov 2 evening)
 

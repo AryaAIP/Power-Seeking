@@ -55,7 +55,7 @@ An experiment folder, using `linuxarena-power-v0/` as the model:
 
    The copy is atomic, so syncing while jobs run is safe.
 2. **Launch through the queue:** add lines to `/root/power-v0/queue/jobs.tsv` (label, environments, command) and run `night_queue.py`. Before each use:
-   - set its `DEADLINE`;
+   - set its deadline in `queue/deadline` (`YYYY-MM-DD HH:MM`, Chicago time), or `DEADLINE` in the code;
    - set the environment cap in `queue/max_envs`. Keep machine load near the number of cores; at 13 environments it hit 98 on 22 cores.
 3. **Every launch is** `PURPOSE="why this batch runs" bash /root/power-v0/harness/launch.sh <label> tasks/<file>.txt <parallel> -p name=value ...`.
    - `launch.sh` refuses a label that's already used, so a rerun gets a new label.
@@ -75,6 +75,7 @@ An experiment folder, using `linuxarena-power-v0/` as the model:
 | `nowork-v<N>-S0`, `nowork-v<N>-afterA`, `nowork-v<N>-afterB` | No-work runs (H = 0, and the replay check) |
 | `hz-<label>-<task>-H<h>` | Per-step scoring |
 | `hzcheck-*`, `probe-v<N>` | Checks |
+| `vmcheck-*` | Checks of the cloud machine against WSL's runs (`plans/vm-runbook.md`) |
 
 The registry lists every label.
 

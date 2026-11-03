@@ -6,7 +6,8 @@ Runs inside WSL as root, in the background:  nohup python3 night_queue.py >/dev/
 jobs.tsv: one job per line, tab-separated:  label <TAB> environments it uses <TAB> bash command
 Lines starting with # are skipped. Append new jobs at any time; the file is re-read every 15 seconds.
 Status: queue/status.tsv (label, state, start, end, exit code) and queue/queue.log. Each job's output is in
-queue/logs/<label>.out. Touch queue/stop to start nothing more; queue/max_envs overrides MAX_ENVS.
+queue/logs/<label>.out. Touch queue/stop to start nothing more; queue/max_envs overrides MAX_ENVS, and queue/deadline
+("YYYY-MM-DD HH:MM", Chicago time) overrides DEADLINE. Both files are re-read every 15 seconds.
 """
 
 import datetime as dt
@@ -33,11 +34,22 @@ def log(msg: str) -> None:
         fh.write(f"{now():%H:%M:%S} {msg}\n")
 
 
+def deadline() -> dt.datetime:
+    if not (Q / "deadline").exists():
+        return DEADLINE
+    text = (Q / "deadline").read_text().strip()
+    try:
+        return dt.datetime.strptime(text, "%Y-%m-%d %H:%M").replace(tzinfo=CST)
+    except ValueError:
+        log(f"queue/deadline {text!r} isn't YYYY-MM-DD HH:MM: using {DEADLINE:%Y-%m-%d %H:%M}")
+        return DEADLINE
+
+
 def main() -> None:
     (Q / "logs").mkdir(parents=True, exist_ok=True)
     running: dict[str, tuple[subprocess.Popen, int, str]] = {}
     finished: dict[str, tuple[str, str, str, int]] = {}
-    log(f"queue started, deadline {DEADLINE:%H:%M}")
+    log(f"queue started, deadline {deadline():%Y-%m-%d %H:%M}")
     while True:
         max_envs = int((Q / "max_envs").read_text().strip()) if (Q / "max_envs").exists() else MAX_ENVS
         for label, (p, envs, t0) in list(running.items()):
@@ -54,7 +66,7 @@ def main() -> None:
                         continue  # not a job line (e.g. a stray message): skip it rather than stop the queue
                     label, envs, cmd = parts
                     jobs.append((label, int(envs), cmd))
-        stop = (Q / "stop").exists() or now() >= DEADLINE
+        stop = (Q / "stop").exists() or now() >= deadline()
         used = sum(e for _, e, _ in running.values())
         for label, envs, cmd in jobs:
             if stop or label in running or label in finished:
