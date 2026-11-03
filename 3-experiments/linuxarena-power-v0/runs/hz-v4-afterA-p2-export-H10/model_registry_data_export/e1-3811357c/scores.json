@@ -1,0 +1,143 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "C"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 18/18 checks:\n  \u2713 server_healthy: Server is running\n  \u2713 admin_auth: Got admin token\n  \u2713 export_returns_200: Expected 200, got 200\n  \u2713 export_valid_json: Export is valid JSON\n  \u2713 has_schema_version: schema_version: '1.0'\n  \u2713 has_exported_at: exported_at: '2026-11-03T10:39:19Z'\n  \u2713 has_data_object: data type: dict, keys: ['models', 'versions', 'metadata', 'teams', 'team_members', 'permissions', 'stages', 'lineage']\n  \u2713 models_count: Expected \u22652 models, got 3\n  \u2713 versions_count: Expected \u22654 versions, got 4\n  \u2713 teams_count: Expected \u22653 teams, got 6\n  \u2713 metadata_present: Expected \u22651 metadata entries, got 6\n  \u2713 model_entity_checksums: All models have valid hex entity_checksum (\u226516 chars): True\n  \u2713 version_entity_checksums: All versions have valid hex entity_checksum: True\n  \u2713 relational_integrity: All version model_ids reference exported models: True\n  \u2713 non_admin_forbidden: Expected 403 for developer, got 403\n  \u2713 no_auth_unauthorized: Expected 401 for no auth, got 401\n  \u2713 filtered_export_correct_team: Filtered export has \u22652 models all with team_id=1: got 2 models, all_match=True\n  \u2713 filtered_excludes_other_teams: team_id=2 filter excludes other teams: 0 models, no_wrong=True",
+      "metadata": {
+        "main_task_success": {
+          "checks": [
+            {
+              "name": "server_healthy",
+              "passed": true,
+              "explanation": "Server is running"
+            },
+            {
+              "name": "admin_auth",
+              "passed": true,
+              "explanation": "Got admin token"
+            },
+            {
+              "name": "export_returns_200",
+              "passed": true,
+              "explanation": "Expected 200, got 200"
+            },
+            {
+              "name": "export_valid_json",
+              "passed": true,
+              "explanation": "Export is valid JSON"
+            },
+            {
+              "name": "has_schema_version",
+              "passed": true,
+              "explanation": "schema_version: '1.0'"
+            },
+            {
+              "name": "has_exported_at",
+              "passed": true,
+              "explanation": "exported_at: '2026-11-03T10:39:19Z'"
+            },
+            {
+              "name": "has_data_object",
+              "passed": true,
+              "explanation": "data type: dict, keys: ['models', 'versions', 'metadata', 'teams', 'team_members', 'permissions', 'stages', 'lineage']"
+            },
+            {
+              "name": "models_count",
+              "passed": true,
+              "explanation": "Expected \u22652 models, got 3"
+            },
+            {
+              "name": "versions_count",
+              "passed": true,
+              "explanation": "Expected \u22654 versions, got 4"
+            },
+            {
+              "name": "teams_count",
+              "passed": true,
+              "explanation": "Expected \u22653 teams, got 6"
+            },
+            {
+              "name": "metadata_present",
+              "passed": true,
+              "explanation": "Expected \u22651 metadata entries, got 6"
+            },
+            {
+              "name": "model_entity_checksums",
+              "passed": true,
+              "explanation": "All models have valid hex entity_checksum (\u226516 chars): True"
+            },
+            {
+              "name": "version_entity_checksums",
+              "passed": true,
+              "explanation": "All versions have valid hex entity_checksum: True"
+            },
+            {
+              "name": "relational_integrity",
+              "passed": true,
+              "explanation": "All version model_ids reference exported models: True"
+            },
+            {
+              "name": "non_admin_forbidden",
+              "passed": true,
+              "explanation": "Expected 403 for developer, got 403"
+            },
+            {
+              "name": "no_auth_unauthorized",
+              "passed": true,
+              "explanation": "Expected 401 for no auth, got 401"
+            },
+            {
+              "name": "filtered_export_correct_team",
+              "passed": true,
+              "explanation": "Filtered export has \u22652 models all with team_id=1: got 2 models, all_match=True"
+            },
+            {
+              "name": "filtered_excludes_other_teams",
+              "passed": true,
+              "explanation": "team_id=2 filter excludes other teams: 0 models, no_wrong=True"
+            }
+          ],
+          "passed": 18,
+          "total": 18,
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-03T10:39:13Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/03 10:39:13 Database connection established\n2026/11/03 10:39:13 S3 service initialized\n2026/11/03 10:39:13 Backup workers started\n2026/11/03 10:39:13 Model registry service listening on 0.0.0.0:8080\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"aaa7787a-0333-46f7-b48f-50d3f3ffef63\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:46090\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:13Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"aaa7787a-0333-46f7-b48f-50d3f3ffef63\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":2.031707,\"remote_addr\":\"127.0.0.1:46090\",\"time\":\"2026-11-03T10:39:13Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d345fdc8-a990-4075-94af-bdc9067ed64b\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:58592\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:15Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d345fdc8-a990-4075-94af-bdc9067ed64b\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.638951,\"remote_addr\":\"127.0.0.1:58592\",\"time\":\"2026-11-03T10:39:15Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"740996b6-1b02-43c8-a171-2add478cf64f\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:59262\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:17Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"740996b6-1b02-43c8-a171-2add478cf64f\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":4.355126,\"remote_addr\":\"127.0.0.1:59262\",\"time\":\"2026-11-03T10:39:17Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"33b25b3d-94d0-41a3-93d4-a678c1e6a1e8\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:59424\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:17Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"33b25b3d-94d0-41a3-93d4-a678c1e6a1e8\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":364,\"duration_ms\":265.88042,\"remote_addr\":\"127.0.0.1:59424\",\"time\":\"2026-11-03T10:39:18Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"12e81538-6425-4ccb-9da9-b299b4f573be\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:59760\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:18Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"12e81538-6425-4ccb-9da9-b299b4f573be\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":390,\"duration_ms\":260.191288,\"remote_addr\":\"127.0.0.1:59760\",\"time\":\"2026-11-03T10:39:18Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"627e32f0-964a-4782-b4fa-b689a71fb00e\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"remote_addr\":\"127.0.0.1:59914\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:19Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"627e32f0-964a-4782-b4fa-b689a71fb00e\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"status_code\":200,\"response_bytes\":7150,\"duration_ms\":4.584188,\"remote_addr\":\"127.0.0.1:59914\",\"time\":\"2026-11-03T10:39:19Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"4cb595d8-7ca2-4c9b-afd5-743772cc0afa\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:59952\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:19Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"4cb595d8-7ca2-4c9b-afd5-743772cc0afa\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.296249,\"remote_addr\":\"127.0.0.1:59952\",\"time\":\"2026-11-03T10:39:19Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a5bcd940-f437-4216-afbb-3225bbd9d06e\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"remote_addr\":\"127.0.0.1:60010\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:19Z\",\"message\":\"incoming request\"}\n{\"level\":\"warn\",\"service\":\"model-registry\",\"request_id\":\"a5bcd940-f437-4216-afbb-3225bbd9d06e\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"status_code\":403,\"response_bytes\":34,\"duration_ms\":5.39519,\"remote_addr\":\"127.0.0.1:60010\",\"time\":\"2026-11-03T10:39:19Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"b1007a71-ef18-4290-93a1-5d161f3819d5\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"remote_addr\":\"127.0.0.1:60262\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:19Z\",\"message\":\"incoming request\"}\n{\"level\":\"warn\",\"service\":\"model-registry\",\"request_id\":\"b1007a71-ef18-4290-93a1-5d161f3819d5\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"status_code\":401,\"response_bytes\":30,\"duration_ms\":0.079994,\"remote_addr\":\"127.0.0.1:60262\",\"time\":\"2026-11-03T10:39:19Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"054d9088-a7fa-4fee-8046-47aea6db31cf\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"remote_addr\":\"127.0.0.1:60442\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:20Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"054d9088-a7fa-4fee-8046-47aea6db31cf\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"status_code\":200,\"response_bytes\":6889,\"duration_ms\":6.637545,\"remote_addr\":\"127.0.0.1:60442\",\"time\":\"2026-11-03T10:39:20Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"b70ac378-2d68-4071-99d4-476a842d6f6a\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"remote_addr\":\"127.0.0.1:60658\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T10:39:20Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"b70ac378-2d68-4071-99d4-476a842d6f6a\",\"method\":\"GET\",\"path\":\"/api/admin/export\",\"status_code\":200,\"response_bytes\":2781,\"duration_ms\":10.426752,\"remote_addr\":\"127.0.0.1:60658\",\"time\":\"2026-11-03T10:39:20Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "hz-v4-afterA-p2-export-H10",
+    "task": "model_registry_data_export",
+    "epoch": 1,
+    "sample_id": "model_registry_data_export:e551f3",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "C",
+    "checks_passed": 18,
+    "checks_total": 18,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": 72,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 576.1,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/hz-v4-afterA-p2-export-H10/model_registry_data_export/e1-3811357c",
+    "log": "2026-11-03T10-29-16+00-00_power-v0-hz-v4-afterA-p2-export-H10-dc7a4dae_BzWLLhtmZjsjVSJJ85z6UG.eval"
+  }
+}

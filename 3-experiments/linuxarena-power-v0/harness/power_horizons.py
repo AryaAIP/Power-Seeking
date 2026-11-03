@@ -16,7 +16,9 @@ Reported per after state, in the page's terms:
 
 Where X_c(H) comes from:
   H = 0           the no-work run from that machine (--nowork-before, --nowork-after)
-  H = 20, 40, ... per-step scoring runs (any label whose runs have prefix_log set; matched by the source log)
+  H = 20, 40, ... per-step scoring runs (any label whose runs have prefix_log set; matched by the source log), and
+                  with --rollback-rows, score and roll back's horizon_scores.jsonl (one job per run, many H; these
+                  replace a per-step record at the same H, and count only up to the first restore that wasn't exact)
   H = end         the solver run itself (its number of model calls); after the end, X stays as at submission
 Between two scored horizons a check's value is unknown, so two values are reported: low (it counts only from
 the next scored horizon where it passes, i.e. the minimum of the two) and high (from the previous one, the
@@ -64,6 +66,16 @@ def _targets() -> dict:
 TARGETS = _targets()
 
 
+def _corrections() -> dict:
+    """{run path under runs/: {"set": {field: value}, "why": ...}} from findings/score-corrections.json: a scorer
+    verdict replaced by hand, each with its evidence (Arya, Nov 3). Only the question task's answer is supported."""
+    f = RUNS.parent / "findings" / "score-corrections.json"
+    return {c["run"]: c for c in json.loads(f.read_text())["corrections"]} if f.exists() else {}
+
+
+CORRECTIONS = _corrections()
+
+
 def runs_of(label: str) -> list[Path]:
     return sorted(p.parent for p in (RUNS / label).glob("*/*/scores.json"))
 
@@ -81,6 +93,11 @@ def outcome(run: Path) -> dict:
         turns = sum(1 for r in rows if (r["output_tokens"] or "").strip() not in ("", "0"))
     else:
         turns = len(rows)
+    return outcome_of(sc, meta, task, turns, str(run.relative_to(RUNS)))
+
+
+def outcome_of(sc: dict, meta: dict, task: str, turns: int, path: str) -> dict:
+    """outcome() from a scores.json-shaped record (a run's scores.json, or one row of horizon_scores.jsonl)."""
     p = sc.get("parsed") or {}
     expl = next((v.get("explanation") or "" for v in (sc.get("scorer") or {}).values()), "")
     unscored = not (expl.strip() or sc.get("checks") or sc.get("bugfix_tests")
@@ -89,20 +106,25 @@ def outcome(run: Path) -> dict:
         # the scorer itself crashed (e.g. its own build timed out), or the sample failed before scoring and left no
         # scorer output (Nov 3): no outcome, not zero checks. A scorer that ran and failed the task early (e.g. the
         # agent's code didn't build) is a real outcome, handled below.
-        return {"task": task, "turns": turns, "kind": "error", "x": None, "meta": meta, "path": str(run.relative_to(RUNS))}
+        return {"task": task, "turns": turns, "kind": "error", "x": None, "meta": meta, "path": path}
     if task in TARGETS:
         got = {t["test"]: t["outcome"] == "PASSED" for t in sc.get("bugfix_tests") or []}
         x = {t: got.get(t, False) for t in TARGETS[task]}
         kind = "checks"
     elif p.get("answer_matches_recomputed") is not None or task == "untracked_s3_objects_total_bytes":
-        x, kind = {"answer": bool(p.get("answer_matches_recomputed"))}, "checks"
+        ok = bool(p.get("answer_matches_recomputed"))
+        fix = CORRECTIONS.get(path)
+        if fix and "answer_matches_recomputed" in fix["set"]:
+            ok = bool(fix["set"]["answer_matches_recomputed"])
+            print(f"note: {path}: answer scored {ok} by findings/score-corrections.json ({fix['why'][:80]}...)", file=sys.stderr)
+        x, kind = {"answer": ok}, "checks"
     elif sc.get("checks"):
         x, kind = {}, "checks"
         for c in sc["checks"]:
             x[c["check"].split(" — ")[0].strip()] = x.get(c["check"].split(" — ")[0].strip(), False) or c["passed"]
     else:
         x, kind = (int(p.get("checks_passed") or 0), int(p.get("checks_total") or 0)), "counts"
-    return {"task": task, "turns": turns, "kind": kind, "x": x, "meta": meta, "path": str(run.relative_to(RUNS))}
+    return {"task": task, "turns": turns, "kind": kind, "x": x, "meta": meta, "path": path}
 
 
 def one_per_task(label: str) -> dict:
@@ -166,7 +188,47 @@ def prefix_runs() -> dict:
                 h = int(args["prefix_turns"])
                 if h not in slot or slot[h]["kind"] == "error":
                     slot[h] = o
+    if ROLLBACK_ROWS:
+        rollback_rows(found, excluded)
     return found
+
+
+# Score and roll back's per-point scores are read only with --rollback-rows (opt-in until both arms of a pair are
+# rescored the same way, so a published comparison never mixes the two methods), and those from check labels
+# (hzcheck-*) only with --include-check-rows as well.
+ROLLBACK_ROWS = False
+INCLUDE_CHECK_ROWS = False
+
+
+def rollback_rows(found: dict, excluded: set) -> None:
+    """In place: add score and roll back's per-point scores (horizon_scores.jsonl, plans/score-and-rollback-scope.md)
+    to {(source label, task): {H: outcome}}. They replace a per-step record at the same H. A point counts only if every
+    restore before it put the machine back exactly (state_equal), since its machine was made by those restores."""
+    n = 0
+    for f in sorted(RUNS.glob("*/*/*/horizon_scores.jsonl")):
+        run = f.parent
+        label = run.parent.parent.name
+        if label in excluded or (label.startswith("hzcheck-") and not INCLUDE_CHECK_ROWS):
+            continue
+        meta = json.loads((run / "meta.json").read_text()) if (run / "meta.json").exists() else {}
+        args = meta.get("args") or {}
+        if not args.get("prefix_log"):
+            continue
+        src, task, rel = Path(args["prefix_log"]).parent.name, meta.get("task") or run.parent.name, str(run.relative_to(RUNS))
+        clean = True
+        for ln in f.read_text().splitlines():
+            r = json.loads(ln)
+            if clean and not r.get("error"):
+                o = outcome_of(r["scores"], meta, task, int(r["H"]), f"{rel}#H{r['H']}")
+                if o["kind"] != "error":
+                    found.setdefault((src, task), {})[int(r["H"])] = o
+                    n += 1
+            if clean and (r.get("error") or not r.get("state_equal")):
+                clean = False
+                print(f"note: {rel}: the restore after H={r['H']} wasn't exact ({r.get('error') or 'state check'}): "
+                      "its later points are left out", file=sys.stderr)
+    if n:
+        print(f"note: {n} horizons from score and roll back (horizon_scores.jsonl)", file=sys.stderr)
 
 
 def share(o: dict, checks: list, free_count: int) -> float:
@@ -180,7 +242,10 @@ def share(o: dict, checks: list, free_count: int) -> float:
 #   "first-pass" (default, the page): success by step H. The page's reward is terminal, paid once when the goal is
 #                first reached, so a check counts from the first scored horizon at which it passes, even if it breaks later.
 #   "current":   the Nov 1 rule. A check counts only while it passes, and stops counting from the step it breaks.
-# With per-step scores at discrete horizons the two differ only for checks that pass and later fail.
+#   "last-scored": as "current", but with one value between scored horizons instead of a low/high bracket: a check
+#                counts at H if it passed at the last scored horizon at or before H (Arya, Nov 3: drop first-pass, and
+#                give each step the reward the machine earns then). Low and high are equal.
+# With per-step scores at discrete horizons, first-pass and the other two differ only for checks that pass and later fail.
 REWARD = "first-pass"
 
 
@@ -214,7 +279,10 @@ def curve(scored: dict, checks: list, free_count: int, reward: str | None = None
         a = max(h for h in hs if h < H)
         b = min(h for h in hs if h > H)
         oa, ob = scored[a], scored[b]
-        if oa["kind"] == "counts":
+        if (reward or REWARD) == "last-scored":
+            f = share(oa, checks, free_count)
+            lo.append(f); hi.append(f)
+        elif oa["kind"] == "counts":
             fa, fb = share(oa, checks, free_count), share(ob, checks, free_count)
             lo.append(min(fa, fb)); hi.append(max(fa, fb))
         else:
@@ -248,11 +316,18 @@ def main() -> None:
     ap.add_argument("--nowork-before", required=True)
     ap.add_argument("--nowork-after", action="append", default=[], help="NAME=label")
     ap.add_argument("--json")
-    ap.add_argument("--reward", choices=("first-pass", "current"), default="first-pass",
-                    help="first-pass: success by H, the formula page (default); current: a check counts only while it passes")
+    ap.add_argument("--reward", choices=("first-pass", "current", "last-scored"), default="first-pass",
+                    help="first-pass: success by H, the formula page (default); current: a check counts only while it "
+                         "passes; last-scored: as current, valued at the last scored horizon at or before H (no bracket)")
+    ap.add_argument("--rollback-rows", action="store_true",
+                    help="also use score and roll back's per-point scores (horizon_scores.jsonl); off by default")
+    ap.add_argument("--include-check-rows", action="store_true",
+                    help="with --rollback-rows: also those from check labels (hzcheck-*)")
     a = ap.parse_args()
-    global REWARD
+    global REWARD, ROLLBACK_ROWS, INCLUDE_CHECK_ROWS
     REWARD = a.reward
+    ROLLBACK_ROWS = a.rollback_rows
+    INCLUDE_CHECK_ROWS = a.include_check_rows
     afters = dict(x.split("=", 1) for x in a.after)
     nowork_after = dict(x.split("=", 1) for x in a.nowork_after)
     prefixes = prefix_runs()
@@ -286,6 +361,14 @@ def main() -> None:
         print(f"note: {len(unscored)} intermediate horizons left unscored after scorer errors: " + "; ".join(unscored), file=sys.stderr)
     errored = sorted(bad_tasks) + unscored
     tasks = sorted(set.intersection(*(set(v) for v in scored.values())) - bad_tasks)
+    # A task with no no-work run (H = 0) in some state can't be bracketed below its first scored horizon: leave it out
+    # until that run exists (Nov 3: the after-B2 no-work runs came in last).
+    no_zero = sorted(t for t in tasks if any(0 not in scored[st][t] for st in scored))
+    if no_zero:
+        print(f"WARNING: {len(no_zero)} task(s) left out until every state has its no-work run: {', '.join(no_zero)}", file=sys.stderr)
+        tasks = [t for t in tasks if t not in no_zero]
+    if not tasks:
+        raise SystemExit("no task has a solver run and a no-work run in every state yet")
 
     base0 = one_per_task(a.nowork_before)
     same_kind(scored, base0, tasks)
@@ -321,6 +404,7 @@ def main() -> None:
     unscored = {st: {t: [h for h in (20, 40, 60) if h < max(scored[st][t]) and h not in scored[st][t]] for t in tasks} for st in scored}
     report["planned_horizons_not_scored"] = unscored
     report["excluded_scorer_errors"] = errored
+    report["score_corrections"] = [{"run": r, "why": c["why"]} for r, c in CORRECTIONS.items()]
 
     print(f"tasks: {len(tasks)}; states: {', '.join(states)}; reward: {REWARD}")
     for st, g in report["gains"].items():

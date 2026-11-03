@@ -11,6 +11,19 @@ number of model turns is skipped; after arms replay their trajectory first (-p t
   - turns are counted as power_horizons.outcome() counts them: usage rows with output tokens (a failed call isn't a turn);
   - the trajectory comes from the batch's own policy args (summary.json, else a run's config.json), not a fixed path;
   - a label already in the data folder (started or done) or already in queue/jobs.tsv is skipped, and counted on stderr.
+
+Options, all off by default (without them the output is exactly as before):
+  --restore-state     after batches start from their trajectory's saved end state (-p restore_state=<trajectory label>,
+                      plans/replay-free-scope.md) instead of replaying it; the state must be saved first
+  --score-every N, --score-at H1,H2,...
+                      score and roll back (plans/score-and-rollback-scope.md): one job per run instead of one per (run, H),
+                      labelled <prefix>-<label>-<task short name>, which replays the whole run and scores and rolls back
+                      at every N turns and/or the listed turns below its end. Question tasks are skipped: their scorer
+                      reads the submitted answer, so a partway score is always "no answer"
+  --label-prefix P    the per-run label's prefix (default hz; e.g. hzcheck-sr for checks)
+  --min-timeout N, --keep-build-cache
+                      per-run jobs: a floor in seconds on command time limits while scoring; keep root's Go build
+                      cache between points (power_v0's score_min_timeout, score_keep_build_cache)
 """
 
 import argparse
@@ -22,12 +35,13 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from power_paths import DATA, LAUNCH, QUEUE, RUNS  # noqa: E402
+from power_paths import CT, DATA, LAUNCH, QUEUE, RUNS  # noqa: E402
+from rollback import score_points  # noqa: E402
 from task_names import SHORT  # noqa: E402
 
 EVALS = DATA / "evals"
-ARMS = ("before", "afterA", "afterB")
-V4 = re.compile(r"^v4-(before|afterA|afterB)-p(\d+)$")
+ARMS = ("before", "afterA", "afterB", "afterA2", "afterB2")  # A2/B2: the second pair (Nov 3, 04:30)
+V4 = re.compile(r"^v4-(before|afterA2|afterB2|afterA|afterB)-p(\d+)$")
 
 
 def note(msg: str) -> None:
@@ -76,6 +90,12 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--horizons", default="10,20,30,40,5,15,25,35")  # the plan's priority order
 ap.add_argument("--labels", default="", help="comma-separated solver batches instead of this machine's v4 batches")
 ap.add_argument("--include-existing", action="store_true", help="also print labels already in the data folder or queue (for checking)")
+ap.add_argument("--restore-state", action="store_true", help="after batches restore the trajectory's saved state instead of replaying it")
+ap.add_argument("--score-every", type=int, default=0, help="one job per run: score and roll back every N turns")
+ap.add_argument("--score-at", default="", help="one job per run: score and roll back at these turns (comma-separated)")
+ap.add_argument("--label-prefix", default="hz", help="the per-run label's prefix")
+ap.add_argument("--min-timeout", type=int, default=0, help="per-run jobs: -p score_min_timeout=N (a floor on command limits while scoring)")
+ap.add_argument("--keep-build-cache", action="store_true", help="per-run jobs: -p score_keep_build_cache=true")
 a = ap.parse_args()
 labels = [x for x in a.labels.split(",") if x] or batches()
 queued = set()
@@ -100,11 +120,45 @@ for lab in labels:
             continue
         traj = (f" -p traj={pa['traj']} -p traj_user={pa.get('traj_user', 'dev')}"
                 f" -p traj_cmd_bug={pa.get('traj_cmd_bug', 'false')}")
+        if a.restore_state:
+            traj += f" -p restore_state={Path(pa['traj']).stem}"
     runs = [(json.loads(m.read_text())["task"], turns(m.parent)) for m in metas]
     src.append((lab, logs[0], traj, runs))
 
+
+def question_task(task: str) -> bool:
+    """A question task (task_category research): its scorer reads the submitted answer, which a replay never submits."""
+    info = CT / ".environments" / "model_registry" / "main_tasks" / task / "info.yml"
+    return info.is_file() and re.search(r"^task_category:\s*research\s*$", info.read_text(), re.M) is not None
+
+
 n = skipped_done = skipped_queued = 0
-for h in (int(x) for x in a.horizons.split(",")):
+per_run = bool(a.score_every or a.score_at)
+how = (" from the trajectory's saved state" if a.restore_state else " after the trajectory")
+for lab, log, traj, runs in src if per_run else []:
+    for task, t in runs:
+        pts = score_points(a.score_every, a.score_at, t)
+        if not pts or question_task(task):
+            continue
+        hz = f"{a.label_prefix}-{lab}-{SHORT[task]}"
+        if not a.include_existing and ((EVALS / hz).exists() or (DATA / "runs" / hz).exists()):
+            skipped_done += 1
+            continue
+        if not a.include_existing and hz in queued:
+            skipped_queued += 1
+            continue
+        where = (f"every {a.score_every} turns" if a.score_every else "") + (" and " if a.score_every and a.score_at else "") \
+            + (f"H = {a.score_at}" if a.score_at else "")
+        purpose = (f"Score and roll back: all {t} model turns of {lab}'s {task} run, replayed with no model calls"
+                   f"{how if traj else ''} in one machine, scored and restored at {where} ({len(pts)} points), "
+                   f"then scored at its end")
+        score = ((f" -p score_every={a.score_every}" if a.score_every else "") + (f" -p score_at={a.score_at}" if a.score_at else "")
+                 + (f" -p score_min_timeout={a.min_timeout}" if a.min_timeout else "")
+                 + (" -p score_keep_build_cache=true" if a.keep_build_cache else ""))
+        print(f'{hz}\t1\tPURPOSE="{purpose}" bash {LAUNCH} {hz} tasks/one_{task}.txt 1 -p solver_user=dev -p solve=false'
+              f"{traj} -p prefix_log={log} -p prefix_turns={t}{score}")
+        n += 1
+for h in (int(x) for x in a.horizons.split(",")) if not per_run else []:
     for lab, log, traj, runs in src:
         for task, t in runs:
             if h >= t:

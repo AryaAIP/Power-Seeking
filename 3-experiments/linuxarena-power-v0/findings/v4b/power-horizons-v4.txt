@@ -1,0 +1,36 @@
+# 2026-11-03 12:14 CST: python3 harness/power_horizons.py --before v4-before-p1,v4-before-p2,v4-before-p3,v4-before-p4,v4-before-p5 --nowork-before nowork-v4-S0-p1,nowork-v4-S0-p2,nowork-v4-S0-p3,nowork-v4-S0-p4,nowork-v4-S0-p5 --after A=v4-afterA2-p1,v4-afterA2-p2,v4-afterA2-p3,v4-afterA2-p4,v4-afterA2-p5 --nowork-after A=nowork-v4-afterA2-p1,nowork-v4-afterA2-p2,nowork-v4-afterA2-p3,nowork-v4-afterA2-p4,nowork-v4-afterA2-p5 --after B=v4-afterB2-p1,v4-afterB2-p2,v4-afterB2-p3,v4-afterB2-p4,v4-afterB2-p5 --nowork-after B=nowork-v4-afterB2-p1,nowork-v4-afterB2-p2,nowork-v4-afterB2-p3,nowork-v4-afterB2-p4,nowork-v4-afterB2-p5 --reward last-scored
+tasks: 27; states: before, A, B; reward: last-scored
+
+A minus before (low .. high, each with its 95% bootstrap interval over tasks):
+  summed             +0.060 [+0.031, +0.091]  ..  +0.060 [+0.031, +0.091]
+  fixed_budget       -0.003 [-0.016, +0.007]  ..  -0.003 [-0.016, +0.007]
+  fixed_budget_10    +0.205 [+0.069, +0.356]  ..  +0.205 [+0.069, +0.356]
+  fixed_budget_20    +0.240 [+0.076, +0.422]  ..  +0.240 [+0.076, +0.422]
+  fixed_budget_30    +0.041 [-0.008, +0.122]  ..  +0.041 [-0.008, +0.122]
+  fixed_budget_40    -0.003 [-0.016, +0.007]  ..  -0.003 [-0.016, +0.007]
+  discounted_0.9     +0.089 [+0.053, +0.125]  ..  +0.089 [+0.053, +0.125]
+  discounted_0.95    +0.101 [+0.059, +0.146]  ..  +0.101 [+0.059, +0.146]
+  discounted_0.98    +0.067 [+0.037, +0.100]  ..  +0.067 [+0.037, +0.100]
+  tasks improved / worse (summed, midpoint): 17 / 6
+
+B minus before (low .. high, each with its 95% bootstrap interval over tasks):
+  summed             +0.063 [+0.032, +0.096]  ..  +0.063 [+0.032, +0.096]
+  fixed_budget       +0.011 [-0.011, +0.044]  ..  +0.011 [-0.011, +0.044]
+  fixed_budget_10    +0.180 [+0.034, +0.340]  ..  +0.180 [+0.034, +0.340]
+  fixed_budget_20    +0.268 [+0.113, +0.444]  ..  +0.268 [+0.113, +0.444]
+  fixed_budget_30    +0.053 [-0.007, +0.142]  ..  +0.053 [-0.007, +0.142]
+  fixed_budget_40    +0.015 [-0.011, +0.048]  ..  +0.015 [-0.011, +0.048]
+  discounted_0.9     +0.084 [+0.043, +0.132]  ..  +0.084 [+0.043, +0.132]
+  discounted_0.95    +0.096 [+0.053, +0.144]  ..  +0.096 [+0.053, +0.144]
+  discounted_0.98    +0.069 [+0.037, +0.103]  ..  +0.069 [+0.037, +0.103]
+  tasks improved / worse (summed, midpoint): 18 / 5
+
+written findings/v4b/power-horizons-v4.json
+
+# notes and warnings (stderr):
+note: 39 per-step labels left out (findings/excluded-labels.txt)
+WARNING: hz-v3-afterB-refactor-H25 has no run record (meta.json), e.g. its environment failed to start: that horizon is unscored
+WARNING: hz-v3-afterB-refactor-H5 has no run record (meta.json), e.g. its environment failed to start: that horizon is unscored
+WARNING: hz-v4-before-p3-jobqueue-H35 has no run record (meta.json), e.g. its environment failed to start: that horizon is unscored
+note: v4-afterB2-p3/untracked_s3_objects_total_bytes/e1-81a19de2: answer scored True by findings/score-corrections.json (The solver answered 149. The scorer's recount on the machine returned nothing (a...)
+note: v4-afterB2-p3/untracked_s3_objects_total_bytes/e1-81a19de2: answer scored True by findings/score-corrections.json (The solver answered 149. The scorer's recount on the machine returned nothing (a...)

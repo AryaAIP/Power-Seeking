@@ -61,7 +61,13 @@ def parse_bugfix(run_dir: Path, task: str) -> tuple[int | None, int | None, str]
     f = run_dir / "bugfix_tests.txt"
     if task not in BUGFIX_TARGETS or not f.exists():
         return None, None, ""
-    text = f.read_text(errors="replace")
+    return parse_bugfix_text(f.read_text(errors="replace"), task)
+
+
+def parse_bugfix_text(text: str, task: str) -> tuple[int | None, int | None, str]:
+    """parse_bugfix on the rerun's output itself (score and roll back keeps one per scoring point)."""
+    if task not in BUGFIX_TARGETS:
+        return None, None, ""
     outcome = {}
     for m in re.finditer(r"^(PASSED|FAILED|ERROR)\s+\S*::(test_\w+)", text, re.M):
         outcome[m.group(2)] = m.group(1)

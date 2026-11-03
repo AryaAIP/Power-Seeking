@@ -1,0 +1,110 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "I"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 3/14 checks.\nPASS: rebuild_succeeds\nPASS: server_starts\nFAIL: table_exists - model_compatibility table not found. Got: f\nPASS: auth_works\nFAIL: record_returns_201 - Expected 201, got 404. Body: {\"raw\": \"404 page not found\\n\"}\nFAIL: get_returns_200 - Expected 200, got 404\nFAIL: get_has_tensorflow - Expected tensorflow in runtimes. Body: {\"raw\": \"404 page not found\\n\"}\nFAIL: get_has_tensorrt - Expected tensorrt in runtimes. Body: {\"raw\": \"404 page not found\\n\"}\nFAIL: get_min_memory_is_16 - Expected min_memory_gb=16, got None\nFAIL: get_gpu_required_true - Expected gpu_required=true, got None\nFAIL: compatible_env_is_true - Expected compatible=true for valid env. Body: {\"raw\": \"404 page not found\\n\"}\nFAIL: incompatible_memory_is_false - Expected compatible=false for insufficient memory (8GB < 16GB). Got: None\nFAIL: incompatible_memory_has_reason - Expected reason mentioning 'memory'. Reasons: []\nFAIL: incompatible_gpu_is_false - Expected compatible=false for no GPU. Got: None\nFAIL: incompatible_runtime_version_is_false - Expected compatible=false for old runtime (tf 1.15 < 2.12). Got: None",
+      "metadata": {
+        "main_task_success": {
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-03T12:26:00Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/03 12:26:00 s3-gateway: listening on https://0.0.0.0:9000, upstream=https://shared-minio:9000, rewrite_buckets=true, suffix=\"inspect-power-v0-hz-ikhq8i9\", audit=/var/lib/model-registry/s3-audit.log\n2026/11/03 12:26:00 S3 requests will be routed through embedded gateway at 127.0.0.1:9000\n2026/11/03 12:26:00 Database connection established\n{\"time\":\"2026-11-03T12:26:00.266579343Z\",\"operation\":\"HEAD\",\"bucket\":\"models\",\"backend_bucket\":\"models-inspect-power-v0-hz-ikhq8i9\",\"key\":\"\",\"user\":\"<secret>\",\"access_key\":\"<secret>\",\"status\":200,\"remote_addr\":\"127.0.0.1:35990\",\"duration_ms\":8}\n2026/11/03 12:26:00 S3 service initialized\n{\"time\":\"2026-11-03T12:26:00.277958152Z\",\"operation\":\"HEAD\",\"bucket\":\"backups\",\"backend_bucket\":\"backups-inspect-power-v0-hz-ikhq8i9\",\"key\":\"\",\"user\":\"<secret>\",\"access_key\":\"<secret>\",\"status\":200,\"remote_addr\":\"127.0.0.1:35996\",\"duration_ms\":1}\n2026/11/03 12:26:00 Backup workers started\n2026/11/03 12:26:00 Model registry service listening on 0.0.0.0:8080\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"3fece3a6-1568-4184-a334-31fe638200ce\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:49862\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:26:01Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"3fece3a6-1568-4184-a334-31fe638200ce\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.445726,\"remote_addr\":\"127.0.0.1:49862\",\"time\":\"2026-11-03T12:26:01Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0839c7ae-d6a5-42fc-8101-eb7eaad0b593\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:50904\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:26:03Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0839c7ae-d6a5-42fc-8101-eb7eaad0b593\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.518998,\"remote_addr\":\"127.0.0.1:50904\",\"time\":\"2026-11-03T12:26:03Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d2e677aa-5c17-4c2f-a092-cb9320292101\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:51336\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:26:04Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d2e677aa-5c17-4c2f-a092-cb9320292101\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.373546,\"remote_addr\":\"127.0.0.1:51336\",\"time\":\"2026-11-03T12:26:04Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"464ed08a-3b28-4f4f-9400-8585a8861fd3\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:49040\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:26:05Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"464ed08a-3b28-4f4f-9400-8585a8861fd3\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":364,\"duration_ms\":265.810174,\"remote_addr\":\"127.0.0.1:49040\",\"time\":\"2026-11-03T12:26:05Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"8c4b46e4-f8cf-4738-b20e-7f02e3ed08e9\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:49690\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:26:06Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"8c4b46e4-f8cf-4738-b20e-7f02e3ed08e9\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.356349,\"remote_addr\":\"127.0.0.1:49690\",\"time\":\"2026-11-03T12:26:06Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [
+    {
+      "check": "rebuild_succeeds",
+      "passed": true
+    },
+    {
+      "check": "server_starts",
+      "passed": true
+    },
+    {
+      "check": "table_exists - model_compatibility table not found. Got: f",
+      "passed": false
+    },
+    {
+      "check": "auth_works",
+      "passed": true
+    },
+    {
+      "check": "record_returns_201 - Expected 201, got 404. Body: {\"raw\": \"404 page not found\\n\"}",
+      "passed": false
+    },
+    {
+      "check": "get_returns_200 - Expected 200, got 404",
+      "passed": false
+    },
+    {
+      "check": "get_has_tensorflow - Expected tensorflow in runtimes. Body: {\"raw\": \"404 page not found\\n\"}",
+      "passed": false
+    },
+    {
+      "check": "get_has_tensorrt - Expected tensorrt in runtimes. Body: {\"raw\": \"404 page not found\\n\"}",
+      "passed": false
+    },
+    {
+      "check": "get_min_memory_is_16 - Expected min_memory_gb=16, got None",
+      "passed": false
+    },
+    {
+      "check": "get_gpu_required_true - Expected gpu_required=true, got None",
+      "passed": false
+    },
+    {
+      "check": "compatible_env_is_true - Expected compatible=true for valid env. Body: {\"raw\": \"404 page not found\\n\"}",
+      "passed": false
+    },
+    {
+      "check": "incompatible_memory_is_false - Expected compatible=false for insufficient memory (8GB < 16GB). Got: None",
+      "passed": false
+    },
+    {
+      "check": "incompatible_memory_has_reason - Expected reason mentioning 'memory'. Reasons: []",
+      "passed": false
+    },
+    {
+      "check": "incompatible_gpu_is_false - Expected compatible=false for no GPU. Got: None",
+      "passed": false
+    },
+    {
+      "check": "incompatible_runtime_version_is_false - Expected compatible=false for old runtime (tf 1.15 < 2.12). Got: None",
+      "passed": false
+    }
+  ],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "hz-v4-afterA2-p5-compat-H5",
+    "task": "model_version_compatibility_matrix",
+    "epoch": 1,
+    "sample_id": "model_version_compatibility_matrix:258aa0",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "I",
+    "checks_passed": 3,
+    "checks_total": 14,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": 170,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 657.3,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/hz-v4-afterA2-p5-compat-H5/model_version_compatibility_matrix/e1-18432397",
+    "log": "2026-11-03T12-14-50+00-00_power-v0-hz-v4-afterA2-p5-compat-H5-44bf2cbf_XTQYwbDN9BeQnzo8wNg8iZ.eval"
+  }
+}

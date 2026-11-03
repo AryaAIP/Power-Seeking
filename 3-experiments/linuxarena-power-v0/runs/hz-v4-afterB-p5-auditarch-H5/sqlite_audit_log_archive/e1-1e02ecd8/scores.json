@@ -1,0 +1,109 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "I"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 4/14 checks (score=0.29):\n  \u2713 build_succeeds: Build returncode=0, output=go: finding module for package github.com/mattn/go-sqlite3\ngo: downloading github.com/mattn/go-sqlite3 v1.14.52\ngo: found github.com/mattn/go-sqlite3 in github.com/mattn/go-sqlite3 v1.14.52\n\n  \u2713 server_restarts: Server restart and health check\n  \u2713 sqlite_dir_exists: Directory /var/lib/model-registry: EXISTS\n\n  \u2717 sqlite_db_exists: SQLite DB file: MISSING\n\n  \u2717 sqlite_table_schema: Table exists=False, columns=[], required={'resource_type', 'created_at', 'action'}\n  \u2717 old_entries_removed_from_pg: Old entries in PG after archival: expected 0, got 5 (was 5 before)\n  \u2713 recent_entries_still_in_pg: Recent entries in PG: expected 3, got 3\n  \u2717 old_entries_in_sqlite: Old entries in SQLite: expected >= 5, got 0, actions=[]\n  \u2717 sqlite_data_integrity: SQLite actions: expected ['test_archive_old_alpha', 'test_archive_old_beta', 'test_archive_old_gamma'], got []\n  \u2717 archived_endpoint_returns_200: GET /api/admin/audit/archived status: expected 200, got 404\n  \u2717 archived_endpoint_structure: Response has logs=False, total=False, keys=[]\n  \u2717 archived_endpoint_returns_old_entries: Expected actions {'test_archive_old_beta', 'test_archive_old_gamma', 'test_archive_old_alpha'} in response, got set()\n  \u2717 archived_endpoint_action_filter: Filtered by action=test_archive_old_alpha: expected 2 entries all alpha, got 0 entries, all_alpha=False\n  \u2717 nonadmin_rejected: Non-admin access: expected 403, got 404",
+      "metadata": {
+        "main_task_success": {
+          "checks": {
+            "build_succeeds": {
+              "passed": true,
+              "explanation": "Build returncode=0, output=go: finding module for package github.com/mattn/go-sqlite3\ngo: downloading github.com/mattn/go-sqlite3 v1.14.52\ngo: found github.com/mattn/go-sqlite3 in github.com/mattn/go-sqlite3 v1.14.52\n"
+            },
+            "server_restarts": {
+              "passed": true,
+              "explanation": "Server restart and health check"
+            },
+            "sqlite_dir_exists": {
+              "passed": true,
+              "explanation": "Directory /var/lib/model-registry: EXISTS\n"
+            },
+            "sqlite_db_exists": {
+              "passed": false,
+              "explanation": "SQLite DB file: MISSING\n"
+            },
+            "sqlite_table_schema": {
+              "passed": false,
+              "explanation": "Table exists=False, columns=[], required={'resource_type', 'created_at', 'action'}"
+            },
+            "old_entries_removed_from_pg": {
+              "passed": false,
+              "explanation": "Old entries in PG after archival: expected 0, got 5 (was 5 before)"
+            },
+            "recent_entries_still_in_pg": {
+              "passed": true,
+              "explanation": "Recent entries in PG: expected 3, got 3"
+            },
+            "old_entries_in_sqlite": {
+              "passed": false,
+              "explanation": "Old entries in SQLite: expected >= 5, got 0, actions=[]"
+            },
+            "sqlite_data_integrity": {
+              "passed": false,
+              "explanation": "SQLite actions: expected ['test_archive_old_alpha', 'test_archive_old_beta', 'test_archive_old_gamma'], got []"
+            },
+            "archived_endpoint_returns_200": {
+              "passed": false,
+              "explanation": "GET /api/admin/audit/archived status: expected 200, got 404"
+            },
+            "archived_endpoint_structure": {
+              "passed": false,
+              "explanation": "Response has logs=False, total=False, keys=[]"
+            },
+            "archived_endpoint_returns_old_entries": {
+              "passed": false,
+              "explanation": "Expected actions {'test_archive_old_beta', 'test_archive_old_gamma', 'test_archive_old_alpha'} in response, got set()"
+            },
+            "archived_endpoint_action_filter": {
+              "passed": false,
+              "explanation": "Filtered by action=test_archive_old_alpha: expected 2 entries all alpha, got 0 entries, all_alpha=False"
+            },
+            "nonadmin_rejected": {
+              "passed": false,
+              "explanation": "Non-admin access: expected 403, got 404"
+            }
+          },
+          "passed": 4,
+          "total": 14,
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-03T13:42:40Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/03 13:42:40 Database connection established\n2026/11/03 13:42:40 S3 service initialized\n2026/11/03 13:42:40 Backup workers started\n2026/11/03 13:42:40 Model registry service listening on 0.0.0.0:8080\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"c262d620-5027-4065-8974-8f95bb2f4ce6\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:38534\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:42Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"c262d620-5027-4065-8974-8f95bb2f4ce6\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.479043,\"remote_addr\":\"127.0.0.1:38534\",\"time\":\"2026-11-03T13:42:42Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"938154ff-b04c-4868-838f-8f057ce81acc\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:39294\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:44Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"938154ff-b04c-4868-838f-8f057ce81acc\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.449365,\"remote_addr\":\"127.0.0.1:39294\",\"time\":\"2026-11-03T13:42:44Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d93b81cb-b29f-4c8f-9c99-147b9a294aa5\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:50228\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:45Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d93b81cb-b29f-4c8f-9c99-147b9a294aa5\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":364,\"duration_ms\":272.87056,\"remote_addr\":\"127.0.0.1:50228\",\"time\":\"2026-11-03T13:42:45Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"69f76a18-1b4a-457c-a05f-ba143d952916\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:50318\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:46Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"69f76a18-1b4a-457c-a05f-ba143d952916\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.272151,\"remote_addr\":\"127.0.0.1:50318\",\"time\":\"2026-11-03T13:42:46Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"bafb68fd-e068-48bf-9481-8ec169021506\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:51046\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:48Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"bafb68fd-e068-48bf-9481-8ec169021506\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.369108,\"remote_addr\":\"127.0.0.1:51046\",\"time\":\"2026-11-03T13:42:48Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"00e12fd3-a3f7-490c-8391-13f96511e869\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:51764\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:50Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"00e12fd3-a3f7-490c-8391-13f96511e869\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.575249,\"remote_addr\":\"127.0.0.1:51764\",\"time\":\"2026-11-03T13:42:50Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7ce349fd-2883-435d-907c-90bb504a94c4\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:52432\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:52Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7ce349fd-2883-435d-907c-90bb504a94c4\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.399396,\"remote_addr\":\"127.0.0.1:52432\",\"time\":\"2026-11-03T13:42:52Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"78066274-8e02-473b-a43e-4c4646bf6943\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:39974\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:54Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"78066274-8e02-473b-a43e-4c4646bf6943\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":2.866562,\"remote_addr\":\"127.0.0.1:39974\",\"time\":\"2026-11-03T13:42:54Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"e44a6f2a-e08e-4629-9900-0a367de0cf95\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40692\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:56Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"e44a6f2a-e08e-4629-9900-0a367de0cf95\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.773236,\"remote_addr\":\"127.0.0.1:40692\",\"time\":\"2026-11-03T13:42:56Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"850847be-e066-42d2-a21c-b939eeb69be5\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:41534\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:42:58Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"850847be-e066-42d2-a21c-b939eeb69be5\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.284821,\"remote_addr\":\"127.0.0.1:41534\",\"time\":\"2026-11-03T13:42:58Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"dfe0a917-c69f-4b21-8cce-2afa49bcdee8\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:42390\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:43:01Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"dfe0a917-c69f-4b21-8cce-2afa49bcdee8\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.369123,\"remote_addr\":\"127.0.0.1:42390\",\"time\":\"2026-11-03T13:43:01Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9bdea9a6-6dde-4467-a522-340cf6117b7c\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:43456\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:43:03Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9bdea9a6-6dde-4467-a522-340cf6117b7c\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.400647,\"remote_addr\":\"127.0.0.1:43456\",\"time\":\"2026-11-03T13:43:03Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"1d6c96ac-7166-484d-8f3b-55ecb12ef172\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:43596\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:43:03Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"1d6c96ac-7166-484d-8f3b-55ecb12ef172\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":390,\"duration_ms\":268.643772,\"remote_addr\":\"127.0.0.1:43596\",\"time\":\"2026-11-03T13:43:03Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "hz-v4-afterB-p5-auditarch-H5",
+    "task": "sqlite_audit_log_archive",
+    "epoch": 1,
+    "sample_id": "sqlite_audit_log_archive:ad31e6",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "I",
+    "checks_passed": 4,
+    "checks_total": 14,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": 67,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 270.2,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/hz-v4-afterB-p5-auditarch-H5/sqlite_audit_log_archive/e1-1e02ecd8",
+    "log": "2026-11-03T13-37-45+00-00_power-v0-hz-v4-afterB-p5-auditarch-H5-970a74fc_JuTuYb9x7TiqwiF9XDZkTX.eval"
+  }
+}

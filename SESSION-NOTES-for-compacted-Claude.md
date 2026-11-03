@@ -2,30 +2,26 @@
 
 *Written in a hurry at Arya's request before context compaction, by the thread "Read literature and scope LinuxArena experiment". These are the details not already captured elsewhere. Read with: README.md, `5-reading-notes-nov-2026/synthesis.md`, `3-experiments/linuxarena-power-v0/{plans/plan,plans/run-plan,findings/bottlenecks,tasks/task-candidates}.md`, `1-handoff/decisions-log.md`.*
 
-## 0. Current state (Nov 2, 11:25 CST): read this first
+## 0. Current state (Nov 3, 12:05 CST): read this first
 
-- **Read [CLAUDE.md](CLAUDE.md) first.** It has the conventions, the layout, the run workflow, the label scheme and the rules.
-- **Nothing is running.** Arya was leaving, so Arya asked for a repository cleanup instead of runs (Nov 2, about 11:00). That's done: see `CLAUDE.md` and the decisions log, 11:15.
-- **Where things stand:**
-  - [findings/results-night-1.md](3-experiments/linuxarena-power-v0/findings/results-night-1.md): partial results and checks of the method;
-  - [next-steps.md](3-experiments/linuxarena-power-v0/next-steps.md): the remaining steps with exact commands;
-  - [logs/2026-11-01-night-and-morning.md](3-experiments/linuxarena-power-v0/logs/2026-11-01-night-and-morning.md): the full record, with summaries at the top.
-- **Done:**
-  - probe-v2;
-  - `traj2-control` (A) and `traj2-power` (B), 23/26 each;
-  - `v2-before`;
-  - `nowork-v2-S0`, `nowork-v2-afterA` and `nowork-v2-afterB`;
-  - 13 per-step jobs.
-- **Approved by Arya, not yet run:** re-record B as `traj3-power` with the `keep` note (preset in `power_v0.py`). Then run its no-work runs, `v2-afterA`, `v3-afterB`, and per-step scoring every 5 turns. The commands are in `next-steps.md`.
-  - **Why:** the first B sought power during its run but cleaned it all up, from its own habit.
-  - **Arya's go-ahead covered this sequence,** but Arya then asked for the cleanup first, while away. On restart, confirm with Arya before launching the paid runs if there's any doubt.
-- **Code ready, not yet run against an environment:** the replay health wait (`replay_health_gate`) and the `keep` preset.
-- **Paths changed on Nov 2:**
-  - task files are now `harness/tasks/<file>.txt`, so pass `tasks/v0_tasks.txt` to `launch.sh`;
-  - retired scripts are in `harness/old/`;
-  - `results/` is now `pilot-results/`;
-  - the night plan is in `plans/`, and the logs are in `logs/`;
-  - `harness/README.md` lists every harness file.
+- **Read [CLAUDE.md](CLAUDE.md) first.** It has the conventions, the layout, the run workflow, the label scheme and the rules. Two things in it are older than Arya's Nov 3 decisions: results now carry **no confidence intervals** (strict values only), and the label scheme doesn't list `sr-*`, `restorecheck-*` or the `-p<k>` part suffix yet.
+- **The Nov 3 run is done and home** (Lambda, 124 cores, plus WSL, 03:00–08:30; Lambda is terminated):
+  - a search for a power-seeking trajectory: 42 trajectories `traj4-<task>-<note>`;
+  - two pairs, each a power-seeking trajectory and the no-note control on the same task: pair 1 A = `traj4-sharing-none`, B = `traj4-sharing-side`; pair 2 A2 = `traj4-minio-none`, B2 = `traj4-minio-keep`;
+  - 27 future tasks, solver runs from the initial environment state and after each of the four trajectories (the solver continues the trajectory's chat), each scored every 5 turns.
+- **The result:** neither power-seeking trajectory left more power than its control. Mean POWER_H over H = 1..80 under the `last-scored` rule: initial state 0.642; pair 1 A 0.770, B 0.742; pair 2 A2 0.702, B2 0.705. Pair 2's control got root on its own, so it isn't a clean control. Audited and independently recomputed. Everything is in [findings/results-nov3.md](3-experiments/linuxarena-power-v0/findings/results-nov3.md).
+- **Arya's decisions (~10:15):** the reward rule is `last-scored` (a test case counts at H if it passes at the last scored step at or before H); B2's storage answer counts as correct ([findings/score-corrections.json](3-experiments/linuxarena-power-v0/findings/score-corrections.json)). See [1-handoff/decisions-log.md](1-handoff/decisions-log.md).
+- **Running or about to run (Arya away until ~13:30; Arya's goal: score every run at every turn, sync to the pages, clean up the repository, sort the data):**
+  - **every-turn rescoring by score and roll back,** in another session: 130 jobs `sr-v4-<arm>-p<k>-<task>` on WSL, from the trajectories' saved states ([plans/score-and-rollback-scope.md](3-experiments/linuxarena-power-v0/plans/score-and-rollback-scope.md) §11, [its log](3-experiments/linuxarena-power-v0/logs/2026-11-03-score-and-rollback.md)). When it lands: `power_horizons.py --rollback-rows`, then the results table, the figures and the pages;
+  - **a page agent** finishing both pages (`viz/build_dashboard.py`): the `last-scored` wording, the correction, the task filter, the solver triage;
+  - **a redaction fix** for 4 transcripts held back from the repository (`traj4-errors-blockers`, `-lean`, `-roadmap`, `traj4-minio-strong`).
+  Check with `cat /root/power-v0/queue/status.tsv`, `tail /root/power-v0/sr-validate/status.log` and `docker ps -q | wc -l` before launching anything.
+- **Done in the data tidy (12:00):** [findings/results-nov3.md](3-experiments/linuxarena-power-v0/findings/results-nov3.md), [findings/data-map.md](3-experiments/linuxarena-power-v0/findings/data-map.md) (where every piece of data lives), the experiment [README.md](3-experiments/linuxarena-power-v0/README.md) and [next-steps.md](3-experiments/linuxarena-power-v0/next-steps.md).
+- **Where to read:**
+  - [next-steps.md](3-experiments/linuxarena-power-v0/next-steps.md): the steps with exact commands, and the open questions for Arya;
+  - [logs/2026-11-02-midday-runs.md](3-experiments/linuxarena-power-v0/logs/2026-11-02-midday-runs.md): the main session's log; Nov 3 from "02:45" on;
+  - the published pages: pair 1 https://claude.ai/artifact/RxVDZt1SzBfjiX6NcCdf22, pair 2 https://claude.ai/artifact/RfgNfq4BYRN2bfZBXqQwEh.
+- **GitHub:** `AryaAIP/Power-Seeking` (private), branch `initial-import`, last pushed at 0787e62. Tonight's records and docs aren't pushed yet; the main session commits and pushes after a secret scan.
 - **Lesson:** background shells die with the Claude session, but the WSL queue keeps running. So queue dependent jobs ahead of time, or keep the session alive.
 
 *(This section is rewritten at the end of each phase.)*

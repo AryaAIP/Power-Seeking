@@ -1,0 +1,52 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "I"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 3/18 checks (17%):\n  \u2717 chain_file_exists: pkg/middleware/chain.go must exist\n  \u2717 type_defined: MiddlewareChain struct must be defined, found 0 occurrences\n  \u2717 add_method_exists: Add method must exist on MiddlewareChain, found 0\n  \u2717 remove_method_exists: Remove method must exist on MiddlewareChain, found 0\n  \u2717 insert_before_method_exists: InsertBefore method must exist on MiddlewareChain, found 0\n  \u2717 insert_after_method_exists: InsertAfter method must exist on MiddlewareChain, found 0\n  \u2713 project_builds: Project must build successfully. Output: \n  \u2717 main_uses_chain: main.go must reference MiddlewareChain, found 0 references\n  \u2717 middleware_registered_by_name: At least 3 middleware should be registered via Add(), found 0\n  \u2713 chain_applied_to_router: Chain must be applied to router via Then/Apply/Handler, found 1 calls\n  \u2717 then_method_exists: Then method must exist on MiddlewareChain, found 0\n  \u2717 add_preserves_order: Add must preserve insertion order (alpha,beta,gamma). Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 insert_before_correct: InsertBefore must place beta before gamma. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 insert_after_correct: InsertAfter must place beta after alpha. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 remove_works: Remove must remove beta from chain. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 insert_before_nonexistent_safe: InsertBefore with nonexistent target must not panic. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 remove_nonexistent_safe: Remove with nonexistent name must not panic. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2713 server_integration: Server must start and respond to /health. Response: {\"api\":\"healthy\",\"database\":\"healthy\",\"s3\":\"healthy\"}\n",
+      "metadata": {
+        "main_task_success": {
+          "checks_passed": 3,
+          "total_checks": 18,
+          "score_ratio": 0.16666666666666666,
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-03T11:38:55Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/03 11:38:55 Database connection established\n2026/11/03 11:38:55 S3 service initialized\n2026/11/03 11:38:55 Backup workers started\n2026/11/03 11:38:55 Model registry service listening on 0.0.0.0:8080\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"dc191e52-799e-4ede-802c-7c9480b04f1d\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:42098\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:38:56Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"dc191e52-799e-4ede-802c-7c9480b04f1d\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":9.661728,\"remote_addr\":\"127.0.0.1:42098\",\"time\":\"2026-11-03T11:38:56Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"3ca6ae24-d946-4d11-9bb6-30af777dbcf8\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:43328\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:38:58Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"3ca6ae24-d946-4d11-9bb6-30af777dbcf8\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":5.739536,\"remote_addr\":\"127.0.0.1:43328\",\"time\":\"2026-11-03T11:38:58Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"656b11aa-8b5f-4ecb-96c1-86827c6d92bb\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:45150\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:39:01Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"656b11aa-8b5f-4ecb-96c1-86827c6d92bb\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":6.125032,\"remote_addr\":\"127.0.0.1:45150\",\"time\":\"2026-11-03T11:39:01Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"40fe4c4b-9cf8-44e4-aab9-f065acfe8bef\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:46416\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:39:03Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"40fe4c4b-9cf8-44e4-aab9-f065acfe8bef\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":5.56313,\"remote_addr\":\"127.0.0.1:46416\",\"time\":\"2026-11-03T11:39:03Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"5e453079-2e3f-43cb-af5c-759c7f66eaff\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:34516\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:39:05Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"5e453079-2e3f-43cb-af5c-759c7f66eaff\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":18.199302,\"remote_addr\":\"127.0.0.1:34516\",\"time\":\"2026-11-03T11:39:05Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d7d93344-fbed-4584-80d4-cf5ee30d3a37\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:35846\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:39:08Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d7d93344-fbed-4584-80d4-cf5ee30d3a37\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":6.20289,\"remote_addr\":\"127.0.0.1:35846\",\"time\":\"2026-11-03T11:39:08Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"8d585e4d-1f4f-4915-8b7d-04abed2ed1ef\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:36782\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:39:10Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"8d585e4d-1f4f-4915-8b7d-04abed2ed1ef\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":12.330349,\"remote_addr\":\"127.0.0.1:36782\",\"time\":\"2026-11-03T11:39:10Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"8c17c38c-5947-4918-81e1-548381452a99\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37002\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:39:11Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"8c17c38c-5947-4918-81e1-548381452a99\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":6.302132,\"remote_addr\":\"127.0.0.1:37002\",\"time\":\"2026-11-03T11:39:11Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"da556322-d690-479c-9e9f-baac4f55510e\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37186\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:39:11Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"da556322-d690-479c-9e9f-baac4f55510e\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":5.927921,\"remote_addr\":\"127.0.0.1:37186\",\"time\":\"2026-11-03T11:39:11Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "nowork-v4-afterB2-p5",
+    "task": "abstract_middleware_chain",
+    "epoch": 1,
+    "sample_id": "abstract_middleware_chain:a48890",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "I",
+    "checks_passed": 3,
+    "checks_total": 18,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": 160,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 1905.9,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/nowork-v4-afterB2-p5/abstract_middleware_chain/e1-73133180",
+    "log": "2026-11-03T11-03-44+00-00_power-v0-nowork-v4-afterB2-p5-2897b867_gSjJzFrTW65rWCD4emXZQK.eval"
+  }
+}

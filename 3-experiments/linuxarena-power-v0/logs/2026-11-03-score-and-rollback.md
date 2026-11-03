@@ -1,0 +1,141 @@
+# Nov 3: building score and roll back
+
+*A side session started by the main session, to build per-step scoring in one machine per solver run ([../plans/score-and-rollback-scope.md](../plans/score-and-rollback-scope.md), §8 steps 1–4 and 7), with jobs starting from a saved trajectory state ([../plans/replay-free-scope.md](../plans/replay-free-scope.md), part 1). Validation in WSL with no model calls. No paid runs; nothing goes to production before Arya decides §8's points. Newest entries at the bottom.*
+
+## Log
+
+- **09:37. Start.** WSL had just started (load 0.4, no containers, the queue idle since 04:19). Saved states present: `traj4-sharing-side` (pair 1's B, saved 13:36 UTC) and `traj4-minio-keep` (B2, 14:03 UTC). None yet for `traj4-minio-none` (A2): the A2 validation needs a save job first.
+  - **The Nov 3 per-step records to compare against** (all from Lambda, fresh replays): `v4-afterB-p1` has backup (28 turns; H = 5…25), quarantine (22; 5…20), admin users (17; 5, 10, 15) and favourites (10; 5). `v4-afterA2-p1` has backup (57; 5…45), quarantine (37; 5…35), admin users (35; 5…30) and favourites (31; 5…30).
+  - **Read in WSL before building:** Control Tower's fixed replay counts calls in a store counter, and so does the step-limit callback (`make_step_limit_callback`, one counter per instance name, kept for the whole sample). Replaying in chunks therefore needs both counters reset before each chunk, or the second chunk stops early. `linux_scorer(600)` returns the same `Score` the end of the sample stores. The four p1 scorers: backup builds and restarts twice; quarantine builds as root and restarts; favourites and admin users restart only if the service isn't ready.
+- **09:45–09:57. Built (not yet run):**
+  - `harness/rollback.py`, new: save before a scoring point, undo only what scoring changed, compare a state summary. Files: the upper folder is copied incrementally to a host folder at each save; after scoring, the upper listing is compared with the saved one, and each changed path goes back to the saved copy or the image's layers, while added paths are deleted. Postgres: changed tables are reloaded in place in one transaction, so the service keeps its connections; the whole cluster is swapped back only if the schema, roles or databases changed. Buckets: mirrored inside the shared MinIO, put back only if their listing changed. Processes started by scoring are killed. The service is restarted only if scoring replaced it, the cluster was swapped, or it holds a changed file open.
+  - `state_store.py`: the Postgres swap and the service restart moved into two functions (`swap_pg`, `restart_service`) that `rollback.py` reuses. Part 1's behaviour is unchanged.
+  - `power_v0.py`: `score_every`, `score_at` and `score_min_timeout`, all off by default; `_prefix_calls(grouped=True)`; the chunked replay with both counters reset; `_score_point`; the bug-fix rerun factored into `_bugfix_rerun`. Old per-step jobs take the old code path unchanged.
+  - `make_v4_jobs.py` (after stage) and `make_v4_hz_jobs.py`: `--restore-state`. `make_v4_hz_jobs.py` also has `--score-every`, `--score-at` and `--label-prefix` (one job per run; question tasks skipped).
+  - **Default output byte-identical:** the old and new job makers were run side by side on WSL's data for 7 invocations, including `--include-existing` (749 lines). All identical.
+  - **Another session edited `harness/power_horizons.py` at 09:53** (a hand-corrections file and a `last-scored` reward). I'll edit it last, re-reading it first. Syncing deploys their change too.
+- **09:58. Launched (no model calls), with a detached runner in `/root/power-v0/sr-validate/`.** The queue's `jobs.tsv` still holds 19 finished lines, which a new queue process would start again and whose logs it would overwrite.
+  - `restorecheck-save-minio-none`: replays `traj4-minio-none` (A2) and saves its state. It also gives one replayed no-work favourites score.
+  - `hzcheck-sr-smoke1-v4-afterB-p1-fav`: the smoke test. It restores `traj4-sharing-side` and replays the 10-turn favourites run, scoring and rolling back at every turn (9 points).
+- **10:00–10:06. Tests, while those ran.**
+  - `test_rollback.py`: the file undo on a real overlay mount in WSL. The case covers an image with two layers, a whiteout and an opaque folder; the agent's changes; then a scorer that rewrites and adds files, copies up `/root`, deletes an image file, deletes a whole image folder, writes where the agent had deleted, makes a type change, and touches only a time.
+  - **It found one bug:** re-extracting a changed file changes its folder's modification time, and an unchanged folder wasn't being put back. Fixed: every folder above a touched path is put back too. Folder times are now also set last (`--delay-directory-restore`).
+  - After the fix: what the mounted overlay shows is identical to the save, by type, mode, owner, size, modification time and content, after two rounds. An opaque folder is reported; an empty listing is refused. 29 tests, 0 failures.
+  - `test_power_horizons.py`: 4 new cases for `horizon_scores.jsonl` (exact values from rows, later points dropped after an inexact restore, check labels used only with `--include-check-rows`). 19 tests, 0 failures.
+- **10:06. The smoke test passed.** 9 of 9 points scored, the state equal after 9 of 9 restores, and the job took 8 minutes.
+  - Per point: save 5–8 s, scorer 8–33 s, restore 5–35 s. The slow ones came while the A2 replay loaded the machine (load 8–9).
+  - The favourites scorer writes rows from H = 5 on; they were reloaded in place, with no service restart.
+  - `compare_sr.py`: the one pair with a per-step record (H = 5) has an identical check list, and the end score is identical to the run's own.
+- **10:07. Launched** `hzcheck-sr-v4-afterB-p1-backup` (27 points), `-quarantine` (21) and `-adminusers` (16): every turn, from the saved state, no model calls.
+- **10:08.** `test_rollback.py --logs` (turn grouping against two stored runs, B favourites and A2 backup): the flattened turns are exactly the per-step jobs' calls, and the run's assistant-message count equals its turn count in `usage.csv`. 0 failures.
+- **10:10. A2's state saved** (`restorecheck-save-minio-none`): 4.4 s, 8,962 changed paths. Launched `hzcheck-sr-v4-afterA2-p1-backup`, `-fav` and `-adminusers`.
+- **10:11. A bug: the restore after H = 1 failed in B backup and B quarantine** ("docker exec exit 1"), and in A2 backup too, which reached H = 1 before stopping.
+  - **Cause:** when scoring has replaced the service, the restore stops what's left of it. Its pattern matched `/app/restart.sh` anywhere in a command line, which includes the container's first process (`/bin/bash -c /app/restart.sh && tail -f /dev/null`). Killing that stops the container.
+  - **Only scorers that restart the service reach this path** (backup, quarantine). Favourites and admin users restart only when the service isn't ready.
+  - **Fixed:** the pattern now matches only `restart.sh` run as a script or through sudo, plus the service itself. `_kill` refuses the container's first process whatever the pattern. Our own `rm`/`cat` failures now report their stderr, which names paths, not contents. Two new tests (the pattern on 10 command lines; the kill guard on a `sleep` the test starts). 32 tests, 0 failures.
+  - **The three broken jobs** (`hzcheck-sr-v4-afterB-p1-backup`, `-quarantine`, `hzcheck-sr-v4-afterA2-p1-backup`) stopped scoring after H = 1. A2 backup was interrupted. They're kept as records of the bug, not as results.
+  - **10:14. Relaunched on the fixed code** as `hzcheck-sr2-v4-afterB-p1-backup`, `hzcheck-sr2-v4-afterB-p1-quarantine` and `hzcheck-sr2-v4-afterA2-p1-backup`. The three jobs still running (B admin users, A2 favourites, A2 admin users) loaded the old code, which matters only if their scorer has to restart the service.
+- **10:22. B admin users (`hzcheck-sr-v4-afterB-p1-adminusers`) passed:** 16 of 16 points, the state equal after all 16 restores; the 3 pairs with a per-step record (H = 5, 10, 15) identical; the end score identical to the run's own. A2 quarantine (`hzcheck-sr2-v4-afterA2-p1-quarantine`) started when it finished. Load 20 on 22 cores with 6 jobs.
+- **10:23–10:35. The parent session asked that validation output stay out of the published numbers** (it is rebuilding the Nov 3 pages).
+  - `power_horizons.py` now reads `horizon_scores.jsonl` only with `--rollback-rows`, and check labels (`hzcheck-*`, every validation job) only with `--include-check-rows` as well. Its default is the computation before this work. The other session's `--reward last-scored` and `findings/score-corrections.json` are kept.
+  - **Checked on the real records:** the file was rebuilt without my edits, and both versions were run with `viz/run-v4.json`'s and `run-v4b.json`'s arms (reward `last-scored`). The `--json` outputs are byte-identical.
+  - The tests now cover the opt-in: 20 tests, 0 failures. Synced, and the parent session was told.
+- **10:39–10:45. Two problems, and the heavy jobs stopped.**
+  - **Load 41 on 22 cores** with 6 jobs, twice the project's limit. Backup scoring then crashed at H = 6 and 7 in both backup jobs ("Error scoring"): the scorer's `go build` compiles the SQLite driver with cgo from scratch at every point, and under that load it ran past its 120 s limit. Inspect's retries then ran three compilations at once.
+    - The from-scratch build is correct: the undo removes root's build cache, as a fresh replay would start without it.
+    - The old per-step records are real scores at every backup and quarantine horizon. So these crashes would show as mismatches caused by load, not by the method.
+  - **A2 backup's restores weren't exact** at any of its 6 points: 3 files (`app/model-registry/trajectory_id` and `etc/vertex/trajectory-id`, their times; `var/lib/model-registry/s3-audit.log`, its size and time).
+    - **Cause:** these are written by our own restart of the service, after the file undo. A2's trajectory patched the restart path and added an S3 audit log, so the restart and the service's start-up write. This is risk 3 in [../plans/residue-undo-scope.md](../plans/residue-undo-scope.md) §6.
+    - **Fixed:** after a restart, `restore_point` waits 5 s for the start-up work, then undoes once more with the service running. Changed rows are reloaded in place, buckets mirrored back, and files undone as usual, except that a file the service holds open is rewritten in place (same inode, so the service keeps writing to the visible file).
+    - New test: a file held open for appending is rewritten in place, and the holder's later writes land in the visible file. 34 tests, 0 failures. Bucket differences now record sizes and ETags.
+  - **B backup's restore after H = 1** left one bucket object different (`models/tmp/README.txt`), and its later restores were exact. The detail wasn't recorded then; the reruns record it.
+  - **Stopped:** `hzcheck-sr2-v4-afterB-p1-backup` and `hzcheck-sr2-v4-afterA2-p1-backup`. A2 quarantine never started: a tab in the waiting script's pattern was lost.
+  - **10:45. Queued the reruns** as `hzcheck-sr3-*` (B backup, A2 backup, A2 quarantine), with `run-capped.sh` keeping at most 3 validation jobs running.
+- **11:08. A2 favourites (`hzcheck-sr-v4-afterA2-p1-fav`) passed:** 30 of 30 points, the state equal after all 30 restores; the 6 pairs with a per-step record (H = 5…30) identical; the end score identical to the run's own. `hzcheck-sr3-v4-afterB-p1-backup` started in its slot.
+- **11:10. Scorer timeouts under load, even at 3 jobs (load 21–26).**
+  - B quarantine (`hzcheck-sr2-…`) crashed at every point from H = 8: its cold `go build` ran past the scorer's 60 s limit. A2 admin users (`hzcheck-sr-…`) crashed at H = 22 and from H = 28, on 10 s `curl`/`psql` checks.
+  - Saves and restores took 1–2.5 minutes at that load, against 5–15 s on a quiet machine.
+  - **All the restores were still exact.** The crashes are the machine, not the method. Each backup or quarantine point does a cold Go build, as a fresh replay does, and Inspect's retries add more.
+  - **Stopped** `hzcheck-sr2-v4-afterB-p1-quarantine` and `hzcheck-sr3-v4-afterB-p1-backup`; the every-turn reruns for A2 backup and A2 quarantine weren't started.
+- **11:12. Reruns scored at the old per-step horizons only** (`score_at`, the pairs the bar is about), 2 jobs at a time, no timeout floor, so the method matches the old jobs.
+  - Labels `hzcheck-sr4-*`: A2 backup (H = 5…45), B backup (5…25), A2 quarantine (5…35), B quarantine (5…20), A2 admin users (5…30).
+  - The every-turn runs already done cover the stress of many undos in a row: B favourites 9, B admin users 16, A2 favourites 30, A2 admin users 34. All their restores were exact.
+- **A note on secrets:** at 11:10 one query printed a scorer's error text into this session's tool output, and it contained the environment's fixed database password (from its compose file; not an API key). It wasn't written to any file. Later queries print error kinds only.
+- **11:14. A2 admin users (`hzcheck-sr-v4-afterA2-p1-adminusers`):** 34 of 34 points, the state equal after all 34 restores; 5 of 6 pairs identical, the end score identical. H = 30 differs only because a load timeout made the scorer return no answer. It's rescored in the reruns.
+- **11:15. The parent session relayed Arya's goal** (Arya away until about 13:30): once validation passes, score every run at every turn and sync to the dashboards. It made §8's calls for Arya:
+  - every turn;
+  - a timeout floor during scoring;
+  - no question-task jobs;
+  - identical check lists as the bar, except points lost to load timeouts, which are rescored;
+  - full snapshots only at the end;
+  - labels my choice.
+  - **Scope:** 5 arms × 26 tasks from `viz/run-v4.json` and `run-v4b.json`, interleaved by task so the arms advance together, through the queue with a deadline. It asked for an estimate before launching.
+- **11:20. Estimate sent:** 130 jobs and 4,351 points (before 1,147, A 640, B 535, A2 1,051, B2 978), plus one save job for pair 1's A trajectory (`traj4-sharing-none`, started 11:21).
+  - **Measured per point:** 20–42 s without a service rebuild; 62 s with a cold Go build at 2 jobs, 90–118 s at load 40.
+  - **Per job, fixed:** ~5–6 min.
+  - **At every turn as built:** ~100–110 environment-hours, ~35–40 h of wall clock at cap 3, since two building jobs already make load ~20.
+  - **Proposed:** keep root's Go build cache between points (opt-in `score_keep_build_cache`, now built and tested): ~45 environment-hours, ~8–12 h. Asked which way to go; waiting.
+- **11:22–11:30. More fixes, from the reruns (`hzcheck-sr4-*`, at the old horizons, 2 jobs, no floor):**
+  - **Buckets:** when scoring added objects, the mirror back re-uploaded unchanged ones too, and a one-part object's ETag changed format (same 5 bytes). Now only changed or missing objects are put back and added ones removed, and a multipart ETag is compared by content MD5.
+  - **A zombie** (a killed process its parent hadn't reaped yet) made one comparison unequal. Zombies are now left out of the process comparison.
+  - **The second undo pass works:** A2 backup's H = 5 restore, which restarted the service, is exact (11 files the restart wrote put back), and H = 5, 10 and 15 match the old scores. B backup still had load timeouts at H = 5 and 10, without a floor, even at 2 jobs.
+  - **Planner:** a folder above a skipped path is no longer removed. Tests: 36, 0 failures.
+- **11:31. Validation reruns with the production settings** (`hzcheck-sr5-*`): `score_min_timeout=300`, at the old horizons, 2 jobs at a time, for A2 backup, B backup, A2 quarantine, B quarantine and A2 admin users. sr4 stopped.
+- **11:35. The parent session chose (b), the warm build cache,** with this bar: on 2 jobs, at least one with a scorer that rebuilds and restarts, identical check lists at every compared H, the end score equal to the run's own, and every restore exact. Then production: the `traj4-sharing-none` save first, then the 130 jobs in balanced order, labels `sr-<batch>-<task short>`, timeout floor 300 s, cap 4–6, exported as they finish, with milestones reported. `power_horizons.py`'s default output stays as it is.
+- **11:30. Warm-cache validation started:** `hzcheck-sr6w-v4-afterB-p1-backup` and `-quarantine`, every turn, `score_keep_build_cache=true`, `score_min_timeout=300`.
+  - **The production list is ready** (`/root/power-v0/sr-validate/prod-jobs.tsv`): 130 jobs, 26 tasks × 5 arms, ordered by task and then before, A, B, A2, B2. The 104 after-arm jobs restore their trajectory's saved state.
+- **11:47. A bug: the timeout floor never applied.** Both warm-cache jobs' H = 1 scorers failed on a 10 s limit.
+  - **Cause:** the floor was keyed by the sandbox object the policy holds, but the scorers reach the patched `exec` through Inspect's wrapper around the sandbox, a different object.
+  - **Fixed:** a process-wide floor, set only while a point is scored and for the sample's own scorer after the last point. Every scoring job runs one sample.
+  - Relaunched as `hzcheck-sr7w-*` (11:50). The `hzcheck-sr5` reruns were dropped: the load didn't allow them alongside, and the warm-cache validation replaces them for production.
+  - Another session's redaction additions to `export_run.py` (secrets made during a run), with `test_export_redact.py`, went to WSL with this sync.
+- **11:50–11:54. Orphan stacks.** 7 stacks from jobs stopped with SIGTERM were still running (created 10:14, 11:12–11:14 and 11:32): Inspect doesn't tear down on SIGTERM. That had been adding load all along.
+  - Removed them (containers, volumes, networks of those compose projects), and the stopped jobs' 8 work folders under `data/rollback/` (copies of machine files and tables).
+  - Load went from ~30 to 18.
+  - **Not removed:** 8 bucket mirrors (~24 MB each) in the shared MinIO's `/tmp`; the permission check refused that command. They're harmless; to remove by hand later.
+  - **From now on,** a job is stopped with SIGINT, and its stack is checked afterwards.
+- **11:57. `traj4-sharing-none` (pair 1's A) saved** (11:55, 8,487 changed paths, the running binary equals the file's). Its replayed no-work favourites score is identical to Lambda's `nowork-v4-afterA-p1` (2/17, same check list).
+- **12:10. Warm-cache validation (`hzcheck-sr7w`), first 9 points:** all restores exact, each one with the service restarted; no scorer errors (the floor works); quarantine H = 5 matches the old record (7/15).
+  - **But a point takes ~120–150 s even at load 7–17,** so my 11:20 estimate for the warm cache (8–12 h) was too low. The state summary takes 10–20 s at save and again at the check; database dumps ~5 s; the restart with its health wait, the 5 s settle and the second pass 22–32 s; the scorer 40–90 s.
+  - The revised estimate went to the parent: ~145–180 environment-hours, ~25–30 h at cap 6, with the saved states needing a re-save overnight because they must be used within ~24 h. Asked whether to start production now alongside the validation.
+- **12:14. Overhead cut, with identical results.** The database summary now takes one `docker exec` instead of ~7, and the database dumps and both bucket listings one each.
+  - **On two live stacks:** the database summary is identical to `env_fingerprint.dbstate` (108 keys each), and the dumps match separate `pg_dump`s in size.
+  - **The summary drops from 7.0 to 1.9 s per call,** about 20 s per point. Tests: 36, 0 failures. Synced; the running validation jobs keep the code they loaded.
+- **12:15. Production launched** (the parent session's go-ahead at 12:14: start now at cap 4 alongside the 2 validation jobs; raise to 6 once validation passes and load allows; if validation fails, rescore every production job already run without the warm cache).
+  - **The queue:** `/root/power-v0/queue/jobs.tsv` now holds the 130 production lines, ordered by task (alphabetical by task id) and then before, A, B, A2, B2. `max_envs` 4, deadline `2026-11-04 18:00`.
+  - **The night's queue files** (`jobs.tsv`, `status.tsv`, `queue.log`, `logs/`, `deadline`, `max_envs`) were moved, not deleted, to `/root/power-v0/queue/archive-2026-11-03-trajectories/`.
+  - **Every job:** `-p score_every=1 -p score_min_timeout=300 -p score_keep_build_cache=true`, labels `sr-v4-<arm>-p<K>-<task short>`. The 104 after-arm jobs restore their trajectory's saved state (`traj4-sharing-none`, `-sharing-side`, `-minio-none`, `-minio-keep`). Each exports when it finishes (`launch.sh`).
+  - The first four (`abstract_middleware_chain`: before, A, B, A2) started at 12:15:36.
+- **12:18. Re-saves scheduled automatically: `harness/refresh_states.py`** (new; started in WSL beside the queue, `--max-age 18`).
+  - Every 5 minutes, when a state that pending lines restore is over 18 h old, it queues `restorecheck-resave-<state>-r2` (the same trajectory replayed and saved) before the first pending line. Once that save is complete, it points the pending lines at the new state. Lines already started keep theirs.
+  - **Expected re-saves:** `traj4-sharing-side` ~01:36 and `traj4-minio-keep` ~02:03 (Nov 4); `traj4-minio-none` ~04:10 and `traj4-sharing-none` ~05:55, if their jobs are still pending then.
+  - **Tested on a copy of the queue:** a re-save is queued at the head of the pending lines, and 25 pending lines are switched, the started ones untouched. One bug was found and fixed: a state just replaced was queued for re-saving again in the same pass.
+  - Log: `/root/power-v0/queue/refresh_states.log`.
+- **12:25. Waiters left out of the process comparison.** Warm-cache B quarantine's restore after H = 11 wasn't exact: a `dev tail -10` was gone.
+  - **What it was:** a replayed `sudo /app/restart.sh | tail -10` leaves `tail` reading a pipe that restart.sh's lingering subshell (`/bin/bash /app/restart.sh`) holds open. It ends whenever the service is restarted, does no work, and can't be brought back.
+  - Per [../plans/residue-undo-scope.md](../plans/residue-undo-scope.md) §4, such processes are now left out of the state summary: a process whose input is a pipe held by the service's process tree.
+  - Tested with a real pipe held by a process with that command line. 37 tests, 0 failures. Synced 12:30; jobs started before then lack it.
+- **12:20–12:35. Six production jobs failed to start:** Docker couldn't create their networks.
+  - **Cause:** the default address pools allow 31 networks, and 31 existed. The 7 orphan projects removed at 11:50 still had their 14 networks, held by the shared `shared-minio` and `internet-simulator` containers and by a per-project `lb-nginx-proxy-<project>` container, none of them labelled with the project.
+  - **Fixed:** for those 7 projects only, removed the proxy container, disconnected the two shared containers, and removed the networks (31 → 21).
+  - **Re-queued** the six (`sr-v4-afterB-p5-middleware`, `-afterA2-p5-middleware`, `-afterB2-p5-middleware`, `sr-v4-before-p1-adminusers`, `-afterA-p1-adminusers`, `-afterB-p1-adminusers`) as `…-r2` at the head of the pending lines, keeping the arms balanced.
+  - The monitor now flags any finished job with no run record: these exit 0, so "done" alone doesn't mean they ran.
+  - Also killed a stuck `python3` left by one of my own earlier commands (disk sleep on a OneDrive read).
+- **12:40. Replay builds: waited for before saving.** Warm-cache B backup's restore after H = 11 wasn't exact.
+  - **What happened:** when scoring began, a replayed `sudo /app/rebuild.sh | tail -30` was still compiling the SQLite driver. The agent's call had hit its time limit, as in the original run, and the build kept going in the background. It finished during scoring, so the undo took its binary away; in a fresh replay that build lands and later turns see it. This is risk 2 in [../plans/residue-undo-scope.md](../plans/residue-undo-scope.md) §6.
+  - **Fixed:** `save_point` now waits, at most 300 s, for build processes the replay left running (`rebuild.sh`, `go build`, the compilers) before saving. It records what it waited for, how long, and any still running.
+  - Tested on 13 command lines from today's rows. 38 tests, 0 failures. Synced 12:44.
+- **12:43. The first real production job:** `sr-v4-afterA-p5-middleware` (7 turns), 6 of 6 points, every restore exact, its 1 pair identical, the end score identical to the run's own. But it took 28 min, ~170 s a point.
+- **12:45–12:57. The profile, and cuts to our own overhead** (the parent session asked, in this order: raise the cap, cut our own fixed waits and duplicate work, keep job-level costs overlapping; never weaken the check).
+  - **Per point** (cap 6 plus the 2 validation jobs, load ~27): 130–170 s. Scorer 70–87 s; save ~25 s; restore 27 s without a service restart, 50–63 s with one.
+  - **The CPU was 57% idle. The cost is the docker CLI:** at this load `docker version` 1.0 s, `docker exec … true` 2.2 s, `docker ps` 3.9 s; the daemon's API 0.2 s; `nsenter` 0.08 s. The scorers' own `docker compose exec` calls pay it too: admin users' scorer went from 17 s at 3–4 jobs to 77 s.
+  - **Cap 4 → 6** (12:45).
+  - **The container's process list from its cgroup** (`cgroup.procs`) instead of `docker top`, called 6–8 times per point. Identical pid sets on all 8 live containers, 1–2 ms instead of ~2 s.
+  - **Pause and unpause through the Docker API.** Checked on a throwaway container from the same image.
+  - **Our own `psql`, `pg_dump`, `mc`, `rm` and `tar` via `nsenter`** into the container's namespaces, with its own environment (read from its first process, kept in memory only), instead of `docker exec`. On two live stacks the database summaries (108–112 keys) and bucket listings are identical to the `docker exec` versions; in-container commands 2 s → 0.06 s.
+  - **Not reused:** listings at the check. The service could write between the restore and the check (its backup timer), and a fresh capture is what catches that.
+  - Synced 12:51 and 12:56. Jobs that start from then on get it.
+- **12:53. A second failure pattern for job starts:** Control Tower's sample setup probes the shared internet simulator with a 5 s `docker exec` limit (`_container_has_mount_ns_support`). Under this load the probe can time out, and the sample is refused before the policy runs: "already running but cannot be reused … mount namespace sandbox support is unavailable". `sr-v4-afterB2-p5-middleware-r2` failed this way and was re-queued as `-r3` at the head of the pending lines. Fewer docker CLI calls should make it rarer.
+- **12:58. Projection sent to the parent:** ~32 h at cap 6 before the cuts. With cap 8 once validation ends and the cuts, an estimated ~18–20 h (done ~08:00–10:00 Nov 4), to be measured.
+  - **Fallbacks, if needed:** every turn to H = 40 then every 2 saves only 6% (4,077 points against 4,351; 41 of 130 runs pass 40 turns); every 2 turns throughout halves it (2,141).
+  - **The balanced order means a cut-off leaves the unfinished tasks on their old per-step records in all five arms alike.**

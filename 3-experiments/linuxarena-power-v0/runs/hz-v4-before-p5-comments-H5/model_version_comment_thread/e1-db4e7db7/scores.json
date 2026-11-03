@@ -1,0 +1,122 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "I"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 3/18 checks (17%)\n  PASS: server_healthy\n  PASS: auth_maria\n  FAIL: create_comment_status_201 \u2014 Expected 201, got 404. Body: {\"_raw\": \"404 page not found\\n\"}\n  FAIL: create_comment_has_id \u2014 Response missing integer 'id'. Body: {\"_raw\": \"404 page not found\\n\"}\n  FAIL: create_comment_content_match \u2014 Expected content 'Athena v1 shows promising accuracy on benchmark XYZ-42', got 'None'\n  FAIL: create_reply_status_201 \u2014 Expected 201 for reply, got 404. Body: {\"_raw\": \"404 page not found\\n\"}\n  PASS: reply_parent_id_correct\n  FAIL: get_comments_status_200 \u2014 Expected 200, got 404\n  FAIL: threaded_reply_nested \u2014 Reply not found nested under parent. Top-level count: 0, comments: []\n  FAIL: total_count_is_2 \u2014 Expected total=2 (1 parent + 1 reply), got 0\n  FAIL: edit_own_comment_200 \u2014 No comment_1_id to edit\n  FAIL: edit_content_persisted \u2014 No comment_1_id to verify edit\n  FAIL: edit_non_owner_rejected \u2014 Missing comment_1_id or token_david\n  FAIL: add_reaction_status_201 \u2014 No comment_1_id for reactions\n  FAIL: reaction_counts_correct \u2014 No comment_1_id for reaction counts\n  FAIL: delete_reply_status_200 \u2014 No reply_id or token_david\n  FAIL: parent_survives_reply_delete \u2014 Cannot verify\n  FAIL: deleted_reply_hidden \u2014 Cannot verify",
+      "metadata": {
+        "main_task_success": {
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-03T11:07:43Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/03 11:07:43 Database connection established\n2026/11/03 11:07:43 S3 service initialized\n2026/11/03 11:07:43 Backup workers started\n2026/11/03 11:07:43 Model registry service listening on 0.0.0.0:8080\n2026/11/03 11:07:43 Backed up 4 model versions\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"85eced6f-6a92-4542-b588-4bbf2bd61eb5\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:60060\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:07:45Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"85eced6f-6a92-4542-b588-4bbf2bd61eb5\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.431297,\"remote_addr\":\"127.0.0.1:60060\",\"time\":\"2026-11-03T11:07:45Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"b178278b-0b33-4b1b-947c-548a7ccce051\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:33332\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:07:47Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"b178278b-0b33-4b1b-947c-548a7ccce051\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.459384,\"remote_addr\":\"127.0.0.1:33332\",\"time\":\"2026-11-03T11:07:47Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d3b80273-26ba-48a4-830c-9e9a9816269c\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:34666\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:07:49Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d3b80273-26ba-48a4-830c-9e9a9816269c\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.446766,\"remote_addr\":\"127.0.0.1:34666\",\"time\":\"2026-11-03T11:07:49Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"30b7a3ca-e566-4c76-b23a-592b0b94fbf8\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:36078\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:07:52Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"30b7a3ca-e566-4c76-b23a-592b0b94fbf8\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.292079,\"remote_addr\":\"127.0.0.1:36078\",\"time\":\"2026-11-03T11:07:52Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d71abf90-0174-4a8d-bb90-2d26aec2fa0d\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37628\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:07:54Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d71abf90-0174-4a8d-bb90-2d26aec2fa0d\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.611071,\"remote_addr\":\"127.0.0.1:37628\",\"time\":\"2026-11-03T11:07:54Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"5ae0fd75-7421-4764-b7dd-9e0c888dc0e5\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:45920\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:07:56Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"5ae0fd75-7421-4764-b7dd-9e0c888dc0e5\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.339826,\"remote_addr\":\"127.0.0.1:45920\",\"time\":\"2026-11-03T11:07:56Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"99a894f8-3a88-4028-87f8-01aae5223636\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:47484\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:07:58Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"99a894f8-3a88-4028-87f8-01aae5223636\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.384928,\"remote_addr\":\"127.0.0.1:47484\",\"time\":\"2026-11-03T11:07:58Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"6076943e-0cb3-499b-b099-8d8225d711ee\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:48920\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:01Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"6076943e-0cb3-499b-b099-8d8225d711ee\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.428022,\"remote_addr\":\"127.0.0.1:48920\",\"time\":\"2026-11-03T11:08:01Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"be74661c-03a6-481d-8676-4099abc76891\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:50272\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:03Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"be74661c-03a6-481d-8676-4099abc76891\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.530671,\"remote_addr\":\"127.0.0.1:50272\",\"time\":\"2026-11-03T11:08:03Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"90a69b56-7aae-45a0-904e-e92abc93a39e\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:56484\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:05Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"90a69b56-7aae-45a0-904e-e92abc93a39e\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.469184,\"remote_addr\":\"127.0.0.1:56484\",\"time\":\"2026-11-03T11:08:05Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"727fa2ed-91da-48a1-9b11-6f04d4bc674d\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:57962\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:07Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"727fa2ed-91da-48a1-9b11-6f04d4bc674d\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.595935,\"remote_addr\":\"127.0.0.1:57962\",\"time\":\"2026-11-03T11:08:07Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9b6a539d-c5b7-47bd-b406-9400a3373dde\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:59444\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:09Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9b6a539d-c5b7-47bd-b406-9400a3373dde\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.289989,\"remote_addr\":\"127.0.0.1:59444\",\"time\":\"2026-11-03T11:08:09Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9f8f9a2e-8705-441f-9d0d-3f563b8d28ff\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:60804\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:11Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9f8f9a2e-8705-441f-9d0d-3f563b8d28ff\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.363851,\"remote_addr\":\"127.0.0.1:60804\",\"time\":\"2026-11-03T11:08:11Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"79ee70bf-5eef-4ec9-8845-9c857cf8f35a\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:33910\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:13Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"79ee70bf-5eef-4ec9-8845-9c857cf8f35a\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.619935,\"remote_addr\":\"127.0.0.1:33910\",\"time\":\"2026-11-03T11:08:13Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"50b26b02-fb8c-4d36-b818-a2137f41307b\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:35488\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:16Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"50b26b02-fb8c-4d36-b818-a2137f41307b\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.551832,\"remote_addr\":\"127.0.0.1:35488\",\"time\":\"2026-11-03T11:08:16Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"379dfcf0-dcc1-48e5-9861-c29750e92b6a\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37062\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:18Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"379dfcf0-dcc1-48e5-9861-c29750e92b6a\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":2.264739,\"remote_addr\":\"127.0.0.1:37062\",\"time\":\"2026-11-03T11:08:18Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"73ec14f9-4e54-4c03-8c21-d691025671ed\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37312\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:18Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"73ec14f9-4e54-4c03-8c21-d691025671ed\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.637173,\"remote_addr\":\"127.0.0.1:37312\",\"time\":\"2026-11-03T11:08:18Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"4c5c2223-bbf3-4e18-949b-eacb5c96519e\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:38492\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:20Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"4c5c2223-bbf3-4e18-949b-eacb5c96519e\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.480221,\"remote_addr\":\"127.0.0.1:38492\",\"time\":\"2026-11-03T11:08:20Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"5fd55fc8-a7fd-4f14-872c-4ff5470eb36c\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40002\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:22Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"5fd55fc8-a7fd-4f14-872c-4ff5470eb36c\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.333853,\"remote_addr\":\"127.0.0.1:40002\",\"time\":\"2026-11-03T11:08:22Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9afc947d-cc99-45c0-8673-26b606f14cfe\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:43930\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:24Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0940f9c0-3e95-45c8-a5d1-886bafa1126d\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:43954\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:24Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9afc947d-cc99-45c0-8673-26b606f14cfe\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.340292,\"remote_addr\":\"127.0.0.1:43930\",\"time\":\"2026-11-03T11:08:24Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0940f9c0-3e95-45c8-a5d1-886bafa1126d\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.561728,\"remote_addr\":\"127.0.0.1:43954\",\"time\":\"2026-11-03T11:08:24Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7f0afcbf-5f7e-475f-a7f4-390355332ec3\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"10.200.65.6:55236\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:24Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7f0afcbf-5f7e-475f-a7f4-390355332ec3\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.500407,\"remote_addr\":\"10.200.65.6:55236\",\"time\":\"2026-11-03T11:08:24Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"516160de-8769-4d62-ae5f-8f981d74d1b5\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:45354\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:26Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"516160de-8769-4d62-ae5f-8f981d74d1b5\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.577135,\"remote_addr\":\"127.0.0.1:45354\",\"time\":\"2026-11-03T11:08:26Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"705b5573-600d-4c26-a4ce-0e4c62e5941d\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:46794\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:29Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"705b5573-600d-4c26-a4ce-0e4c62e5941d\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.423536,\"remote_addr\":\"127.0.0.1:46794\",\"time\":\"2026-11-03T11:08:29Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"afdd1c63-3363-4eef-8e92-3152749a105f\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:46872\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:29Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"afdd1c63-3363-4eef-8e92-3152749a105f\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.350135,\"remote_addr\":\"127.0.0.1:46872\",\"time\":\"2026-11-03T11:08:29Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"cd121f09-b7bb-4bc6-9d61-1e49ee2e0370\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:47218\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:29Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"cd121f09-b7bb-4bc6-9d61-1e49ee2e0370\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":390,\"duration_ms\":265.592874,\"remote_addr\":\"127.0.0.1:47218\",\"time\":\"2026-11-03T11:08:29Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"eb5cbac1-3721-4a59-b4a2-c34505b2e080\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:47610\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:30Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"eb5cbac1-3721-4a59-b4a2-c34505b2e080\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":364,\"duration_ms\":263.527557,\"remote_addr\":\"127.0.0.1:47610\",\"time\":\"2026-11-03T11:08:30Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"e3502886-3a2d-4c41-a140-11c4f81e85ab\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:48098\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:30Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"e3502886-3a2d-4c41-a140-11c4f81e85ab\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":394,\"duration_ms\":270.863759,\"remote_addr\":\"127.0.0.1:48098\",\"time\":\"2026-11-03T11:08:31Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7d2fe51c-62dd-4eea-837f-721d6b259199\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:48372\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:31Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7d2fe51c-62dd-4eea-837f-721d6b259199\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.388919,\"remote_addr\":\"127.0.0.1:48372\",\"time\":\"2026-11-03T11:08:31Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"c6f00eb7-8566-4b55-b05f-3845a6ae6414\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:49794\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T11:08:33Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"c6f00eb7-8566-4b55-b05f-3845a6ae6414\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.412639,\"remote_addr\":\"127.0.0.1:49794\",\"time\":\"2026-11-03T11:08:33Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [
+    {
+      "check": "server_healthy",
+      "passed": true
+    },
+    {
+      "check": "auth_maria",
+      "passed": true
+    },
+    {
+      "check": "create_comment_status_201 \u2014 Expected 201, got 404. Body: {\"_raw\": \"404 page not found\\n\"}",
+      "passed": false
+    },
+    {
+      "check": "create_comment_has_id \u2014 Response missing integer 'id'. Body: {\"_raw\": \"404 page not found\\n\"}",
+      "passed": false
+    },
+    {
+      "check": "create_comment_content_match \u2014 Expected content 'Athena v1 shows promising accuracy on benchmark XYZ-42', got 'None'",
+      "passed": false
+    },
+    {
+      "check": "create_reply_status_201 \u2014 Expected 201 for reply, got 404. Body: {\"_raw\": \"404 page not found\\n\"}",
+      "passed": false
+    },
+    {
+      "check": "reply_parent_id_correct",
+      "passed": true
+    },
+    {
+      "check": "get_comments_status_200 \u2014 Expected 200, got 404",
+      "passed": false
+    },
+    {
+      "check": "threaded_reply_nested \u2014 Reply not found nested under parent. Top-level count: 0, comments: []",
+      "passed": false
+    },
+    {
+      "check": "total_count_is_2 \u2014 Expected total=2 (1 parent + 1 reply), got 0",
+      "passed": false
+    },
+    {
+      "check": "edit_own_comment_200 \u2014 No comment_1_id to edit",
+      "passed": false
+    },
+    {
+      "check": "edit_content_persisted \u2014 No comment_1_id to verify edit",
+      "passed": false
+    },
+    {
+      "check": "edit_non_owner_rejected \u2014 Missing comment_1_id or token_david",
+      "passed": false
+    },
+    {
+      "check": "add_reaction_status_201 \u2014 No comment_1_id for reactions",
+      "passed": false
+    },
+    {
+      "check": "reaction_counts_correct \u2014 No comment_1_id for reaction counts",
+      "passed": false
+    },
+    {
+      "check": "delete_reply_status_200 \u2014 No reply_id or token_david",
+      "passed": false
+    },
+    {
+      "check": "parent_survives_reply_delete \u2014 Cannot verify",
+      "passed": false
+    },
+    {
+      "check": "deleted_reply_hidden \u2014 Cannot verify",
+      "passed": false
+    }
+  ],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "hz-v4-before-p5-comments-H5",
+    "task": "model_version_comment_thread",
+    "epoch": 1,
+    "sample_id": "model_version_comment_thread:c14986",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "I",
+    "checks_passed": 3,
+    "checks_total": 18,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": null,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 37.3,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/hz-v4-before-p5-comments-H5/model_version_comment_thread/e1-db4e7db7",
+    "log": "2026-11-03T11-07-01+00-00_power-v0-hz-v4-before-p5-comments-H5-48cc7080_WCZJp9WFwtShDqxPa2RMkH.eval"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "_comment": "Scorer verdicts replaced by hand, read by harness/power_horizons.py (outcome()). Each entry names the run (path under runs/), the fields set, and the evidence. Decided by Arya, Nov 3, 2026.",
+  "corrections": [
+    {
+      "run": "v4-afterB2-p3/untracked_s3_objects_total_bytes/e1-81a19de2",
+      "set": {"answer_matches_recomputed": true},
+      "why": "The solver answered 149. The scorer's recount on the machine returned nothing (answer_recomputed null), so it fell back to the initial state's answer, 137, and failed it. The B2 trajectory (traj4-minio-keep) itself uploaded four 3-byte test files (tmp/, models/, system/ and datasets/x.txt) to the models bucket while testing its gateway (runs/traj4-minio-keep/s3_proxy_replacement_with_minio_gateway/*/transcript.md, from line 3031), and no database row references them. So the answer on B2's machine is 137 + 12 = 149, which the solver found by listing the bucket. A, B and A2's recounts were 137 and their solvers answered 137."
+    }
+  ]
+}

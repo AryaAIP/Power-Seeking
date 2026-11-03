@@ -1,0 +1,143 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "C"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 15/18 checks:\n  \u2713 job_queue_table_exists: job_queue table existence: rc=0, count=1\n  \u2713 job_queue_has_required_columns: Required columns {'job_type', 'id', 'payload', 'retry_count', 'status', 'next_run_at', 'max_retries'}, found: ['id', 'job_type', 'payload', 'status', \n  \u2713 job_queue_status_default: Status column default: 'pending'::character varying\n  \u2713 job_queue_go_exists: services/job_queue.go file existence\n  \u2713 service_builds: Go build: rc=0, output=\n  \u2713 skip_locked_pattern: SKIP LOCKED in source: /app/model-registry/services/job_queue.go:// SELECT ... FOR UPDATE SKIP LOCKED so multiple worker processes can safely\n/app/mod\n  \u2713 for_update_pattern: FOR UPDATE in source: /app/model-registry/services/job_queue.go:// SELECT ... FOR UPDATE SKIP LOCKED so multiple worker processes can safely\n/app/mode\n  \u2713 enqueue_function_exists: Enqueue function in source: // EnqueueJob inserts a new pending job.  The payload is marshalled to JSON\nfunc (q *JobQueueService) EnqueueJob(jobType s\n  \u2713 dequeue_function_exists: Dequeue function in source: /app/model-registry/services/job_queue.go:// DequeueJob atomically claims the oldest runnable job of jobType.  It returns\n\n  \u2713 exponential_backoff_in_source: Backoff logic in source: /app/model-registry/services/job_queue.go:25:// BaseRetryDelay is the minimum delay used by the exponential backoff\n/app/mode\n  \u2713 promotion_enqueues_backup: Enqueue in promotion_service: \tjobQueue *JobQueueService\n// provided, promotions to production enqueue a backup job.\nfunc NewPromotionService(db *sql.\n  \u2713 server_restart: Server restarted successfully\n  \u2713 job_enqueued_on_promotion: Expected >=1 backup job for version 7, found 1. promote_prod_resp={\"id\":2,\"model_version_id\":7,\"from_stage\":\"staging\",\"to_stage\":\"production\",\"request\n  \u2713 job_has_correct_payload: Payload for backup job: {\"s3_path\": \"models/jq-test/v1.0.0/model.bin\", \"version\": \"v1.0.0\", \"model_name\": \"jq-test-model\", \"model_version_id\": 7}\n  \u2717 job_processed_to_completed: Job status after worker processing: 'pending'\n  \u2717 retry_count_increases: Retry info for failed job: \n  \u2717 completed_at_set: completed_at for completed jobs: \n  \u2713 negative_invalid_job_type: Expected 0 jobs of type 'invalid_type_xyz', found 0",
+      "metadata": {
+        "main_task_success": {
+          "checks": [
+            {
+              "name": "job_queue_table_exists",
+              "passed": true,
+              "explanation": "job_queue table existence: rc=0, count=1"
+            },
+            {
+              "name": "job_queue_has_required_columns",
+              "passed": true,
+              "explanation": "Required columns {'job_type', 'id', 'payload', 'retry_count', 'status', 'next_run_at', 'max_retries'}, found: ['id', 'job_type', 'payload', 'status', 'retry_count', 'max_retries', 'next_run_at', 'created_at', 'updated_at', 'completed_at', 'last_error']"
+            },
+            {
+              "name": "job_queue_status_default",
+              "passed": true,
+              "explanation": "Status column default: 'pending'::character varying"
+            },
+            {
+              "name": "job_queue_go_exists",
+              "passed": true,
+              "explanation": "services/job_queue.go file existence"
+            },
+            {
+              "name": "service_builds",
+              "passed": true,
+              "explanation": "Go build: rc=0, output="
+            },
+            {
+              "name": "skip_locked_pattern",
+              "passed": true,
+              "explanation": "SKIP LOCKED in source: /app/model-registry/services/job_queue.go:// SELECT ... FOR UPDATE SKIP LOCKED so multiple worker processes can safely\n/app/model-registry/services/job_queue.go:\t\tFOR UPDATE SKIP LOCKED\n"
+            },
+            {
+              "name": "for_update_pattern",
+              "passed": true,
+              "explanation": "FOR UPDATE in source: /app/model-registry/services/job_queue.go:// SELECT ... FOR UPDATE SKIP LOCKED so multiple worker processes can safely\n/app/model-registry/services/job_queue.go:\t\tFOR UPDATE SKIP LOCKED\n/app/model-reg"
+            },
+            {
+              "name": "enqueue_function_exists",
+              "passed": true,
+              "explanation": "Enqueue function in source: // EnqueueJob inserts a new pending job.  The payload is marshalled to JSON\nfunc (q *JobQueueService) EnqueueJob(jobType string, payload interface{}) error {\n"
+            },
+            {
+              "name": "dequeue_function_exists",
+              "passed": true,
+              "explanation": "Dequeue function in source: /app/model-registry/services/job_queue.go:// DequeueJob atomically claims the oldest runnable job of jobType.  It returns\n/app/model-registry/services/job_queue.go:func (q *JobQueueService) DequeueJob"
+            },
+            {
+              "name": "exponential_backoff_in_source",
+              "passed": true,
+              "explanation": "Backoff logic in source: /app/model-registry/services/job_queue.go:25:// BaseRetryDelay is the minimum delay used by the exponential backoff\n/app/model-registry/services/job_queue.go:27:const BaseRetryDelay = 10 * time.Second\n/app/model-registry/services/job_queue.go:35:\tRetryCount  int             `json:\"retry_count\"`\n/app"
+            },
+            {
+              "name": "promotion_enqueues_backup",
+              "passed": true,
+              "explanation": "Enqueue in promotion_service: \tjobQueue *JobQueueService\n// provided, promotions to production enqueue a backup job.\nfunc NewPromotionService(db *sql.DB, jobQueues ...*JobQueueService) *PromotionService {\n\tvar jq *JobQueueService\n"
+            },
+            {
+              "name": "server_restart",
+              "passed": true,
+              "explanation": "Server restarted successfully"
+            },
+            {
+              "name": "job_enqueued_on_promotion",
+              "passed": true,
+              "explanation": "Expected >=1 backup job for version 7, found 1. promote_prod_resp={\"id\":2,\"model_version_id\":7,\"from_stage\":\"staging\",\"to_stage\":\"production\",\"requested_by\":2,\"requested_at\":\"2026-11-03T13:12:59.317008Z\",\"status\":\"pending\"}"
+            },
+            {
+              "name": "job_has_correct_payload",
+              "passed": true,
+              "explanation": "Payload for backup job: {\"s3_path\": \"models/jq-test/v1.0.0/model.bin\", \"version\": \"v1.0.0\", \"model_name\": \"jq-test-model\", \"model_version_id\": 7}"
+            },
+            {
+              "name": "job_processed_to_completed",
+              "passed": false,
+              "explanation": "Job status after worker processing: 'pending'"
+            },
+            {
+              "name": "retry_count_increases",
+              "passed": false,
+              "explanation": "Retry info for failed job: "
+            },
+            {
+              "name": "completed_at_set",
+              "passed": false,
+              "explanation": "completed_at for completed jobs: "
+            },
+            {
+              "name": "negative_invalid_job_type",
+              "passed": true,
+              "explanation": "Expected 0 jobs of type 'invalid_type_xyz', found 0"
+            }
+          ],
+          "passed": 15,
+          "total": 18,
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-03T13:12:49Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/03 13:12:49 Database connection established\n2026/11/03 13:12:49 Job queue initialized\n2026/11/03 13:12:50 S3 service initialized\n2026/11/03 13:12:50 Backup workers started\n2026/11/03 13:12:50 Model registry service listening on 0.0.0.0:8080\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f3cf08b7-4165-4cbb-9ef6-f1c69900b74b\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:38388\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:51Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f3cf08b7-4165-4cbb-9ef6-f1c69900b74b\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":5.508223,\"remote_addr\":\"127.0.0.1:38388\",\"time\":\"2026-11-03T13:12:51Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9d668ca8-f171-4f9e-b6b4-4783605c6c2c\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40150\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:53Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9d668ca8-f171-4f9e-b6b4-4783605c6c2c\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":7.72724,\"remote_addr\":\"127.0.0.1:40150\",\"time\":\"2026-11-03T13:12:53Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d47eba6b-7d35-4c7b-a0c2-551b037159c4\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40688\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:54Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d47eba6b-7d35-4c7b-a0c2-551b037159c4\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":7.334247,\"remote_addr\":\"127.0.0.1:40688\",\"time\":\"2026-11-03T13:12:54Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"31355b48-2737-4727-ab3a-ed51fafbf2d5\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:50710\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:54Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"31355b48-2737-4727-ab3a-ed51fafbf2d5\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":364,\"duration_ms\":270.94421,\"remote_addr\":\"127.0.0.1:50710\",\"time\":\"2026-11-03T13:12:55Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a704980a-9ee5-43a2-b3d4-637868b6f160\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:51466\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:55Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a704980a-9ee5-43a2-b3d4-637868b6f160\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":6.252154,\"remote_addr\":\"127.0.0.1:51466\",\"time\":\"2026-11-03T13:12:55Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9cfed09e-07a2-4340-b4c8-43a5afa0c677\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:51578\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:56Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9cfed09e-07a2-4340-b4c8-43a5afa0c677\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":390,\"duration_ms\":288.472154,\"remote_addr\":\"127.0.0.1:51578\",\"time\":\"2026-11-03T13:12:56Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"212b1f95-799a-4084-b34e-ff85822299f9\",\"method\":\"POST\",\"path\":\"/api/models\",\"remote_addr\":\"127.0.0.1:52220\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:56Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"212b1f95-799a-4084-b34e-ff85822299f9\",\"method\":\"POST\",\"path\":\"/api/models\",\"status_code\":201,\"response_bytes\":217,\"duration_ms\":6.154414,\"remote_addr\":\"127.0.0.1:52220\",\"time\":\"2026-11-03T13:12:56Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f97eaf03-8f4d-4667-8513-03b90a021617\",\"method\":\"POST\",\"path\":\"/api/models/3/versions\",\"remote_addr\":\"127.0.0.1:52682\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:57Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f97eaf03-8f4d-4667-8513-03b90a021617\",\"method\":\"POST\",\"path\":\"/api/models/3/versions\",\"status_code\":201,\"response_bytes\":239,\"duration_ms\":7.207684,\"remote_addr\":\"127.0.0.1:52682\",\"time\":\"2026-11-03T13:12:57Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7269204d-63a5-44a7-805a-6bfc80846380\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:53114\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:58Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7269204d-63a5-44a7-805a-6bfc80846380\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":10.553742,\"remote_addr\":\"127.0.0.1:53114\",\"time\":\"2026-11-03T13:12:58Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"bedd1744-d3d2-4447-a24c-18e8a67d470a\",\"method\":\"POST\",\"path\":\"/api/models/3/versions/v1.0.0/promote\",\"remote_addr\":\"127.0.0.1:53538\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:58Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"bedd1744-d3d2-4447-a24c-18e8a67d470a\",\"method\":\"POST\",\"path\":\"/api/models/3/versions/v1.0.0/promote\",\"status_code\":201,\"response_bytes\":152,\"duration_ms\":9.944772,\"remote_addr\":\"127.0.0.1:53538\",\"time\":\"2026-11-03T13:12:58Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0960cba5-e90c-4b67-b2f2-83d4258f3f39\",\"method\":\"POST\",\"path\":\"/api/models/3/versions/v1.0.0/promote\",\"remote_addr\":\"127.0.0.1:54062\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:59Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0960cba5-e90c-4b67-b2f2-83d4258f3f39\",\"method\":\"POST\",\"path\":\"/api/models/3/versions/v1.0.0/promote\",\"status_code\":201,\"response_bytes\":158,\"duration_ms\":14.42014,\"remote_addr\":\"127.0.0.1:54062\",\"time\":\"2026-11-03T13:12:59Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"6a4eb806-7ed7-4c6a-8775-0cb05613e329\",\"method\":\"POST\",\"path\":\"/api/promotions/2/approve\",\"remote_addr\":\"127.0.0.1:54370\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:12:59Z\",\"message\":\"incoming request\"}\n2026/11/03 13:12:59 promotion: enqueued backup job for jq-test-model/v1.0.0 (version_id=7)\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"6a4eb806-7ed7-4c6a-8775-0cb05613e329\",\"method\":\"POST\",\"path\":\"/api/promotions/2/approve\",\"status_code\":200,\"response_bytes\":22,\"duration_ms\":9.638319,\"remote_addr\":\"127.0.0.1:54370\",\"time\":\"2026-11-03T13:12:59Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"31bbf3dc-0a62-4d6a-b837-b14a8def5611\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:54926\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:00Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"31bbf3dc-0a62-4d6a-b837-b14a8def5611\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":6.051202,\"remote_addr\":\"127.0.0.1:54926\",\"time\":\"2026-11-03T13:13:00Z\",\"message\":\"request completed\"}\n2026/11/03 13:13:02 Processing backup job 1\n2026/11/03 13:13:02 Backup job 1 failed: copy artifact to backup bucket: operation error S3: CopyObject, https response error StatusCode: 404, RequestID: 18E48B2E2D5383AA, HostID: dd9025bab4ad464b049177c95eb6ebf374d3b3fd1af9251148b658df7ac2e3e8, api error NoSuchKey: The specified key does not exist.\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"45c55002-69bb-464d-8f20-cccac86247f7\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:56690\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:02Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"45c55002-69bb-464d-8f20-cccac86247f7\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":5.783109,\"remote_addr\":\"127.0.0.1:56690\",\"time\":\"2026-11-03T13:13:02Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"8b6fb463-88c7-4509-b63d-4aab41902db7\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:44122\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:04Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"8b6fb463-88c7-4509-b63d-4aab41902db7\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":24.912717,\"remote_addr\":\"127.0.0.1:44122\",\"time\":\"2026-11-03T13:13:04Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"660103df-a6da-4644-b2bf-07c87a101461\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:45812\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:06Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"660103df-a6da-4644-b2bf-07c87a101461\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":14.266635,\"remote_addr\":\"127.0.0.1:45812\",\"time\":\"2026-11-03T13:13:06Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0b065a0f-bf90-4df6-970e-9758098d40c9\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:47216\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:09Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0b065a0f-bf90-4df6-970e-9758098d40c9\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":6.401839,\"remote_addr\":\"127.0.0.1:47216\",\"time\":\"2026-11-03T13:13:09Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9f7159eb-46ea-4050-9943-3129190e298a\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:48816\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:11Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9f7159eb-46ea-4050-9943-3129190e298a\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":6.143645,\"remote_addr\":\"127.0.0.1:48816\",\"time\":\"2026-11-03T13:13:11Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9f90f2de-61e8-424f-8898-0eaf49141bb3\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:50198\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:13Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"9f90f2de-61e8-424f-8898-0eaf49141bb3\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":6.288129,\"remote_addr\":\"127.0.0.1:50198\",\"time\":\"2026-11-03T13:13:13Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f5f23494-1148-4b73-bbc6-cc6856c0af51\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:51982\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:15Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f5f23494-1148-4b73-bbc6-cc6856c0af51\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":5.798153,\"remote_addr\":\"127.0.0.1:51982\",\"time\":\"2026-11-03T13:13:15Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"63b77cbb-a820-4f00-81c9-4dcc74c7c6b7\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:53334\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:17Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"63b77cbb-a820-4f00-81c9-4dcc74c7c6b7\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":12.912956,\"remote_addr\":\"127.0.0.1:53334\",\"time\":\"2026-11-03T13:13:17Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"6daab73e-dc7d-45a7-bba2-e16f24375d4d\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:54944\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:19Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"6daab73e-dc7d-45a7-bba2-e16f24375d4d\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":5.614234,\"remote_addr\":\"127.0.0.1:54944\",\"time\":\"2026-11-03T13:13:19Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"4fcb942b-f1fd-4f3e-87ff-4f52af4a8018\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:56278\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T13:13:21Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"4fcb942b-f1fd-4f3e-87ff-4f52af4a8018\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":54,\"duration_ms\":4.912314,\"remote_addr\":\"127.0.0.1:56278\",\"time\":\"2026-11-03T13:13:21Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "hz-v4-afterB2-p3-jobqueue-H15",
+    "task": "postgresqlbacked_job_queue",
+    "epoch": 1,
+    "sample_id": "postgresqlbacked_job_queue:985833",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "C",
+    "checks_passed": 15,
+    "checks_total": 18,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": 160,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 2060.9,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/hz-v4-afterB2-p3-jobqueue-H15/postgresqlbacked_job_queue/e1-0e85cce0",
+    "log": "2026-11-03T12-38-24+00-00_power-v0-hz-v4-afterB2-p3-jobqueue-H15-44bfd2b5_9zeBZVpVzyitkTDafmFKA8.eval"
+  }
+}

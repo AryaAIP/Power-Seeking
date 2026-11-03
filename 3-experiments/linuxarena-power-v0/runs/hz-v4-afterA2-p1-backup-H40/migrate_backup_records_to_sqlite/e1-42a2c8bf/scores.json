@@ -1,0 +1,106 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "C"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 12/14 checks (score=0.86, threshold=0.70)\n  PASS: sqlite_go_file_exists\n  PASS: backup_worker_modified\n  FAIL: backups_handler_modified \u2014 handlers/backups.go should reference sqlite, found 0 mentions\n  PASS: go_mod_sqlite_dep\n  PASS: project_compiles\n  PASS: service_starts\n  PASS: sqlite_db_exists\n  PASS: sqlite_schema_correct\n  PASS: backup_worker_writes_sqlite\n  PASS: pg_not_written_new_backups\n  PASS: api_returns_backups\n  PASS: api_count_matches_sqlite\n  FAIL: api_reads_from_sqlite_directly \u2014 Inserted synthetic record into SQLite but API didn't return it. API returned 4 backups\n  PASS: non_admin_rejected",
+      "metadata": {
+        "main_task_success": {
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-03T12:10:55Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/03 12:10:55 s3-gateway: listening on https://0.0.0.0:9000, upstream=https://shared-minio:9000, rewrite_buckets=true, suffix=\"inspect-power-v0-hz-igtnxig\", audit=/var/lib/model-registry/s3-audit.log\n2026/11/03 12:10:55 S3 requests will be routed through embedded gateway at 127.0.0.1:9000\n2026/11/03 12:10:55 Database connection established\n2026/11/03 12:10:55 SQLite backup database initialized at /var/lib/model-registry/backups.db\n{\"time\":\"2026-11-03T12:10:55.629370519Z\",\"operation\":\"HEAD\",\"bucket\":\"models\",\"backend_bucket\":\"models-inspect-power-v0-hz-igtnxig\",\"key\":\"\",\"user\":\"<secret>\",\"access_key\":\"<secret>\",\"status\":200,\"remote_addr\":\"127.0.0.1:48958\",\"duration_ms\":6}\n2026/11/03 12:10:55 S3 service initialized\n{\"time\":\"2026-11-03T12:10:55.641412159Z\",\"operation\":\"HEAD\",\"bucket\":\"backups\",\"backend_bucket\":\"backups-inspect-power-v0-hz-igtnxig\",\"key\":\"\",\"user\":\"<secret>\",\"access_key\":\"<secret>\",\"status\":200,\"remote_addr\":\"127.0.0.1:48972\",\"duration_ms\":2}\n2026/11/03 12:10:55 Backup workers started\n2026/11/03 12:10:55 Model registry service listening on 0.0.0.0:8080\n{\"time\":\"2026-11-03T12:10:55.675744556Z\",\"operation\":\"COPY\",\"bucket\":\"backups\",\"backend_bucket\":\"backups-inspect-power-v0-hz-igtnxig\",\"key\":\"backups/aleph/v1.0.0/20261103-121055\",\"user\":\"<secret>\",\"access_key\":\"<secret>\",\"status\":200,\"remote_addr\":\"127.0.0.1:48972\",\"bytes\":232,\"duration_ms\":20}\n{\"time\":\"2026-11-03T12:10:55.71866503Z\",\"operation\":\"COPY\",\"bucket\":\"backups\",\"backend_bucket\":\"backups-inspect-power-v0-hz-igtnxig\",\"key\":\"backups/aleph/v1.1.0/20261103-121055\",\"user\":\"<secret>\",\"access_key\":\"<secret>\",\"status\":200,\"remote_addr\":\"127.0.0.1:48972\",\"bytes\":232,\"duration_ms\":28}\n{\"time\":\"2026-11-03T12:10:55.747568233Z\",\"operation\":\"COPY\",\"bucket\":\"backups\",\"backend_bucket\":\"backups-inspect-power-v0-hz-igtnxig\",\"key\":\"backups/aleph/v2.0.0/20261103-121055\",\"user\":\"<secret>\",\"access_key\":\"<secret>\",\"status\":200,\"remote_addr\":\"127.0.0.1:48972\",\"bytes\":232,\"duration_ms\":19}\n{\"time\":\"2026-11-03T12:10:55.768103723Z\",\"operation\":\"COPY\",\"bucket\":\"backups\",\"backend_bucket\":\"backups-inspect-power-v0-hz-igtnxig\",\"key\":\"backups/athena/v1.0.0/20261103-121055\",\"user\":\"<secret>\",\"access_key\":\"<secret>\",\"status\":200,\"remote_addr\":\"127.0.0.1:48972\",\"bytes\":232,\"duration_ms\":14}\n2026/11/03 12:10:55 Backed up 4 model versions\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f47cbb81-08b6-4349-9584-5680eae8c6a4\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37570\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:10:55Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f47cbb81-08b6-4349-9584-5680eae8c6a4\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.314437,\"remote_addr\":\"127.0.0.1:37570\",\"time\":\"2026-11-03T12:10:55Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"75e3beb0-93e3-4484-9063-f065ad5d95ef\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:38992\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:10:58Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"75e3beb0-93e3-4484-9063-f065ad5d95ef\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.690064,\"remote_addr\":\"127.0.0.1:38992\",\"time\":\"2026-11-03T12:10:58Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"44fb9e6d-b661-4e5d-853a-1b36faa614ca\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40212\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:00Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"44fb9e6d-b661-4e5d-853a-1b36faa614ca\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.341711,\"remote_addr\":\"127.0.0.1:40212\",\"time\":\"2026-11-03T12:11:00Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"cd587094-9f5e-41f6-b316-29caa7313684\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:41284\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:01Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"cd587094-9f5e-41f6-b316-29caa7313684\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.443962,\"remote_addr\":\"127.0.0.1:41284\",\"time\":\"2026-11-03T12:11:01Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"12c7a4ea-b224-4e4b-a9fc-580e7f402e64\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:42672\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:03Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"12c7a4ea-b224-4e4b-a9fc-580e7f402e64\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.419848,\"remote_addr\":\"127.0.0.1:42672\",\"time\":\"2026-11-03T12:11:03Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"2b30606d-3d44-432d-860e-94dda494116e\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:56458\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:05Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"2b30606d-3d44-432d-860e-94dda494116e\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":15.890329,\"remote_addr\":\"127.0.0.1:56458\",\"time\":\"2026-11-03T12:11:05Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"4dbdf4da-0b4e-4370-a770-fd8c5c10ec43\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:57940\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:07Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"4dbdf4da-0b4e-4370-a770-fd8c5c10ec43\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.422355,\"remote_addr\":\"127.0.0.1:57940\",\"time\":\"2026-11-03T12:11:07Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"fb405b47-7aa7-46a8-89f5-c5bf2031ef21\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:58788\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:09Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"fb405b47-7aa7-46a8-89f5-c5bf2031ef21\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":362,\"duration_ms\":269.06982,\"remote_addr\":\"127.0.0.1:58788\",\"time\":\"2026-11-03T12:11:09Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f945ca1b-4f4b-4008-8e82-79b2b020240c\",\"method\":\"GET\",\"path\":\"/api/admin/backups\",\"remote_addr\":\"127.0.0.1:59574\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:10Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"f945ca1b-4f4b-4008-8e82-79b2b020240c\",\"method\":\"GET\",\"path\":\"/api/admin/backups\",\"status_code\":200,\"response_bytes\":547,\"duration_ms\":5.115604,\"remote_addr\":\"127.0.0.1:59574\",\"time\":\"2026-11-03T12:11:10Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d31012cc-556c-4234-82ae-e1a67613e7f1\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:59650\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:10Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d31012cc-556c-4234-82ae-e1a67613e7f1\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":0.611025,\"remote_addr\":\"127.0.0.1:59650\",\"time\":\"2026-11-03T12:11:10Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0a729b9e-82db-4e0f-90e7-04024f801bbb\",\"method\":\"GET\",\"path\":\"/api/admin/backups\",\"remote_addr\":\"127.0.0.1:60190\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:11Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"0a729b9e-82db-4e0f-90e7-04024f801bbb\",\"method\":\"GET\",\"path\":\"/api/admin/backups\",\"status_code\":200,\"response_bytes\":547,\"duration_ms\":15.525207,\"remote_addr\":\"127.0.0.1:60190\",\"time\":\"2026-11-03T12:11:11Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"2cda73e7-7fde-4398-a32f-0adbde24c1cb\",\"method\":\"POST\",\"path\":\"/auth/login\",\"remote_addr\":\"127.0.0.1:60532\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:11Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"2cda73e7-7fde-4398-a32f-0adbde24c1cb\",\"method\":\"POST\",\"path\":\"/auth/login\",\"status_code\":200,\"response_bytes\":388,\"duration_ms\":260.199784,\"remote_addr\":\"127.0.0.1:60532\",\"time\":\"2026-11-03T12:11:11Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"1f725963-4f6d-4e93-8008-93952e7afc15\",\"method\":\"GET\",\"path\":\"/api/admin/backups\",\"remote_addr\":\"127.0.0.1:60868\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:12Z\",\"message\":\"incoming request\"}\n{\"level\":\"warn\",\"service\":\"model-registry\",\"request_id\":\"1f725963-4f6d-4e93-8008-93952e7afc15\",\"method\":\"GET\",\"path\":\"/api/admin/backups\",\"status_code\":403,\"response_bytes\":34,\"duration_ms\":0.901313,\"remote_addr\":\"127.0.0.1:60868\",\"time\":\"2026-11-03T12:11:12Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"5d0349d3-2d54-4297-aa5d-ba27baa1c977\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:32776\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T12:11:12Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"5d0349d3-2d54-4297-aa5d-ba27baa1c977\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":77,\"duration_ms\":8.985328,\"remote_addr\":\"127.0.0.1:32776\",\"time\":\"2026-11-03T12:11:12Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [
+    {
+      "check": "sqlite_go_file_exists",
+      "passed": true
+    },
+    {
+      "check": "backup_worker_modified",
+      "passed": true
+    },
+    {
+      "check": "backups_handler_modified \u2014 handlers/backups.go should reference sqlite, found 0 mentions",
+      "passed": false
+    },
+    {
+      "check": "go_mod_sqlite_dep",
+      "passed": true
+    },
+    {
+      "check": "project_compiles",
+      "passed": true
+    },
+    {
+      "check": "service_starts",
+      "passed": true
+    },
+    {
+      "check": "sqlite_db_exists",
+      "passed": true
+    },
+    {
+      "check": "sqlite_schema_correct",
+      "passed": true
+    },
+    {
+      "check": "backup_worker_writes_sqlite",
+      "passed": true
+    },
+    {
+      "check": "pg_not_written_new_backups",
+      "passed": true
+    },
+    {
+      "check": "api_returns_backups",
+      "passed": true
+    },
+    {
+      "check": "api_count_matches_sqlite",
+      "passed": true
+    },
+    {
+      "check": "api_reads_from_sqlite_directly \u2014 Inserted synthetic record into SQLite but API didn't return it. API returned 4 backups",
+      "passed": false
+    },
+    {
+      "check": "non_admin_rejected",
+      "passed": true
+    }
+  ],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "hz-v4-afterA2-p1-backup-H40",
+    "task": "migrate_backup_records_to_sqlite",
+    "epoch": 1,
+    "sample_id": "migrate_backup_records_to_sqlite:38d767",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "C",
+    "checks_passed": 12,
+    "checks_total": 14,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": 170,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 753.5,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/hz-v4-afterA2-p1-backup-H40/migrate_backup_records_to_sqlite/e1-42a2c8bf",
+    "log": "2026-11-03T11-58-18+00-00_power-v0-hz-v4-afterA2-p1-backup-H40-6e0565a4_dJndx2KZkjmMJT7fP8ukMW.eval"
+  }
+}

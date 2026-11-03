@@ -29,7 +29,7 @@ from pathlib import Path
 from inspect_ai.log import read_eval_log
 
 sys.path.insert(0, str(Path(__file__).parent))
-from extract import DATA, find_run_dir, rows_for_label  # noqa: E402
+from extract import DATA, find_run_dir, parse_bugfix_text, parse_checks, rows_for_label  # noqa: E402
 from power_paths import CONFIG as CONFIG_DIR, CT, RUNS as OUT_DEFAULT  # noqa: E402
 
 COMPOSE = CT / ".environments" / "model_registry" / "codebase" / "compose.yml"
@@ -57,10 +57,35 @@ def _secrets() -> list[str]:
 SECRETS = _secrets()
 
 
+# Secrets made while a run was going (storage keys, key files, tokens), which the known values can't contain.
+_NL = r"(?:\r?\n|(?:\\+r)?\\+n)"  # a line break, real or escaped inside JSON
+_PATTERNS = [
+    # a whole private key block, BEGIN to END
+    re.compile(r"-----BEGIN ([A-Z0-9 ]*)PRIVATE KEY-----(?:(?!-----BEGIN )[\s\S]){0,20000}?-----END \1PRIVATE KEY-----"),
+    # a block cut short (by head, say) with no END line: BEGIN and the base64 lines after it
+    re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----(?:[ \t]*" + _NL + r"[ \t]*[A-Za-z0-9+/]+=*(?=[ \t]*(?:" + _NL + r"|$|[\"'`])))*"),
+    re.compile(r"(?:AKIA|ASIA)[0-9A-Z]{16}"),  # AWS-style access key ids
+    re.compile(r"sk-(?:or-v1-[A-Za-z0-9]{20,}|(?:ant|proj)-[A-Za-z0-9_-]{20,})|(?<![\w-])sk-[A-Za-z0-9]{32,}"),  # API keys
+    re.compile(r"gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{22,}"),  # GitHub tokens
+]
+# The secret key after its label (aws_secret_access_key, secret_key, secretKey, SecretAccessKey, MINIO_SECRET_KEY,
+# MINIO_ROOT_PASSWORD), quoted or not, also inside JSON strings; and the secret in `mc alias set NAME URL ACCESS SECRET`.
+_LABELLED = re.compile(r"((?i:secret[_-]?(?:access[_-]?)?key|minio_root_password)(?:\\*[\"'])?\s*[:=]\s*(?:\\*[\"'])?)"
+                       r"([A-Za-z0-9/+=_-]{8,})(?![\w/+=.(\[-])")
+_MC_SECRET = re.compile(r"(\bmc\s+(?:alias\s+set|config\s+host\s+add)\s+\S+\s+\S*(?:://|\$)\S*\s+\S+\s+(?:\\*[\"'])?)"
+                        r"(?![$<{])([^\s\"'\\]{8,})")
+_VAR = re.compile(r"[A-Za-z_]\w*")  # a variable holding the secret, as in `SecretKey: secretKey`, is kept
+_VAR_WORDS = re.compile(r"(?i)secret|key|password|token|cred|env")
+
+
 def redact(s: str | None) -> str:
     s = s or ""
     for v in SECRETS:
         s = s.replace(v, "<secret>")
+    for rx in _PATTERNS:
+        s = rx.sub("<secret>", s)
+    s = _LABELLED.sub(lambda m: m[0] if _VAR.fullmatch(m[2]) and _VAR_WORDS.search(m[2]) else m[1] + "<secret>", s)
+    s = _MC_SECRET.sub(r"\1<secret>", s)
     s = re.sub(r"eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}", "<token>", s)  # tokens the service issued during a run
     return re.sub(r"(://[^:/\s\"'@]+:)([^@\s\"']+)@", r"\1<secret>@", s)
 
@@ -107,8 +132,34 @@ def _bugfix_tests(run_dir: Path | None) -> list[dict]:
     f = run_dir / "bugfix_tests.txt" if run_dir else None
     if not f or not f.exists():
         return []
+    return _bugfix_tests_text(f.read_text(errors="replace"))
+
+
+def _bugfix_tests_text(text: str) -> list[dict]:
     return [{"test": m.group(2), "outcome": m.group(1)}
-            for m in re.finditer(r"^(PASSED|FAILED|ERROR|SKIPPED)\s+\S*::(test_\w+)", f.read_text(errors="replace"), re.M)]
+            for m in re.finditer(r"^(PASSED|FAILED|ERROR|SKIPPED)\s+\S*::(test_\w+)", text or "", re.M)]
+
+
+def _horizon_rows(run_dir: Path, task: str) -> list[dict]:
+    """Score and roll back's horizon_scores.jsonl (rollback.py), one row per scoring point, each score shaped like a
+    run's scores.json (scorer, checks, bugfix_tests, parsed) so power_horizons reads both the same way."""
+    out = []
+    for ln in (run_dir / "horizon_scores.jsonl").read_text().splitlines():
+        r = json.loads(ln)
+        sc = (r.get("score") or {}).get("linux_scorer") or {}
+        expl, value = sc.get("explanation") or "", sc.get("value")
+        cp, ct, method = parse_checks(expl)
+        bp, bt, bnote = parse_bugfix_text(r.get("bugfix_tests") or "", task)
+        parsed = {"verdict": value.get("main_task_success") if isinstance(value, dict) else value,
+                  "checks_passed": cp, "checks_total": ct, "checks_parse": method,
+                  "bugfix_passed": bp, "bugfix_total": bt, "bugfix_note": bnote}
+        row = {"H": r["H"], "started": r.get("started"),
+               "scores": {"scorer": {"linux_scorer": sc} if sc else {}, "checks": _checks(expl),
+                          "bugfix_tests": _bugfix_tests_text(r.get("bugfix_tests") or ""), "parsed": parsed},
+               "state_equal": r.get("state_equal"), "error": r.get("error") or r.get("score_error"),
+               "seconds": r.get("seconds"), "save": r.get("save"), "restore": r.get("restore")}
+        out.append(row)
+    return out
 
 
 def export_sample(label: str, log_path: Path, log, s, index_row: dict | None, out_root: Path) -> Path:
@@ -154,6 +205,9 @@ def export_sample(label: str, log_path: Path, log, s, index_row: dict | None, ou
     for extra in ("probe.txt", "bugfix_tests.txt"):  # small outputs of our own checks, kept as they are
         if run_dir and (run_dir / extra).exists():
             (out / extra).write_text(redact((run_dir / extra).read_text(errors="replace")))
+    hz_rows = _horizon_rows(run_dir, task) if run_dir and (run_dir / "horizon_scores.jsonl").exists() else []
+    if hz_rows:  # score and roll back: one score per scoring point
+        (out / "horizon_scores.jsonl").write_text("".join(redact(json.dumps(r, default=str)) + "\n" for r in hz_rows))
 
     # scores
     scores = {name: {"value": sc.value, "answer": sc.answer, "explanation": sc.explanation,
@@ -241,6 +295,9 @@ def export_sample(label: str, log_path: Path, log, s, index_row: dict | None, ou
         f"| Tokens | in {u.get('input_tokens')} (cached {u.get('input_tokens_cache_read')}), out {u.get('output_tokens')}, "
         f"reasoning {r_tok} ({r_chars} characters of reasoning text, {round(r_chars / r_tok, 2) if r_tok else '-'} per token) |",
         f"| Error | {redact(str(u.get('error'))) if u.get('error') else 'none'} |",
+        *([f"| Scored partway (score and roll back) | {len(hz_rows)} of {len(info.get('score_points') or [])} points, "
+           f"H = {', '.join(str(r['H']) for r in hz_rows)}; state equal after {sum(1 for r in hz_rows if r['state_equal'])} "
+           f"of {len(hz_rows)} restores; scores in horizon_scores.jsonl |"] if info.get("score_points") is not None else []),
         f"| Raw data | see raw-paths.txt |", "",
         "## Prompts as sent\n",
         "### System prompt\n", _block(system),
@@ -264,6 +321,10 @@ def check(out: Path) -> list[str]:
     info = json.loads((out / "meta.json").read_text()) if (out / "meta.json").exists() else {}
     if info.get("context") == "kept" and not (out / "prompts/handover.txt").exists():
         missing.append("prompts/handover.txt")
+    if info.get("score_points"):  # score and roll back: one row per scoring point
+        rows = (out / "horizon_scores.jsonl").read_text().splitlines() if (out / "horizon_scores.jsonl").exists() else []
+        if len(rows) != len(info["score_points"]):
+            missing.append(f"horizon scores ({len(rows)} of {len(info['score_points'])} points)")
     t = (out / "transcript.md").read_text() if (out / "transcript.md").exists() else ""
     if info.get("solve") is not False and "**Reasoning**" not in t:
         missing.append("reasoning in transcript")

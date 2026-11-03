@@ -85,16 +85,19 @@ step "(c) power with horizons -> $PH_JSON"
 ARMS=$(python3 -I - "$CONFIG" <<'PY' 2>&1
 import json, sys
 c = json.load(open(sys.argv[1]))
-print(c["before"][0], c["before"][1], c["afters"]["A"][0], c["afters"]["A"][1], c["afters"]["B"][0], c["afters"]["B"][1])
+print(c["before"][0], c["before"][1], c["afters"]["A"][0], c["afters"]["A"][1], c["afters"]["B"][0], c["afters"]["B"][1],
+      c.get("reward", "first-pass"), int(c.get("rollback_rows") is True))
 PY
 )
-if read -r BEF NWB AA NWA AB NWBB <<<"$ARMS" && [ -n "$NWBB" ]; then
+if read -r BEF NWB AA NWA AB NWBB RWD RBR <<<"$ARMS" && [ -n "$NWBB" ]; then
   have=(); missing=()  # which batches (one per machine part) have exported records yet
   for lab in $(echo "$BEF,$NWB,$AA,$NWA,$AB,$NWBB" | tr ',' ' '); do
     [ -f "$EXP/runs/$lab/summary.json" ] && have+=("$lab") || missing+=("$lab"); done
   echo "batches with records: ${#have[@]} of $(( ${#have[@]} + ${#missing[@]} ))${missing:+; not yet: ${missing[*]}}"
   say "(c) batches with records: ${#have[@]} of $(( ${#have[@]} + ${#missing[@]} ))${missing:+; not yet: ${missing[*]}}"
-  PH_ARGS=(--before "$BEF" --nowork-before "$NWB" --after "A=$AA" --nowork-after "A=$NWA" --after "B=$AB" --nowork-after "B=$NWBB")
+  PH_ARGS=(--before "$BEF" --nowork-before "$NWB" --after "A=$AA" --nowork-after "A=$NWA" --after "B=$AB" --nowork-after "B=$NWBB"
+           --reward "${RWD:-first-pass}")  # the config's reward rule ("reward"; Arya, Nov 3: last-scored)
+  [ "${RBR:-0}" = 1 ] && PH_ARGS+=(--rollback-rows)  # the config's "rollback_rows": score and roll back's every-turn scores
   python3 -I "$HARNESS/power_horizons.py" "${PH_ARGS[@]}" --json "$TMP/ph.json" > "$TMP/ph.out" 2> "$TMP/ph.err"
   rc=$?
   if [ $rc = 0 ] && [ -s "$TMP/ph.json" ]; then

@@ -31,11 +31,11 @@ def write_run(root: Path, label: str, task: str, checks: dict | None = None, tur
     (root / label / "summary.json").write_text(json.dumps({"label": label, "harness_sha256": "test"}))
 
 
-def run(root: Path, after_label="after", nowork_after="nw-after", reward="first-pass") -> dict:
+def run(root: Path, after_label="after", nowork_after="nw-after", reward="first-pass", extra=()) -> dict:
     ph.RUNS = root
     out = root / "out.json"
     sys.argv = ["power_horizons.py", "--before", "before", "--after", f"X={after_label}", "--nowork-before", "nw-before",
-                "--nowork-after", f"X={nowork_after}", "--json", str(out), "--reward", reward]
+                "--nowork-after", f"X={nowork_after}", "--json", str(out), "--reward", reward, *extra]
     ph.main()
     return json.loads(out.read_text())
 
@@ -167,6 +167,59 @@ with tempfile.TemporaryDirectory() as t:
     rep = run(r)
     check("scorer error: task left out", rep["tasks"] == [TASK] and len(rep["excluded_scorer_errors"]) == 1,
           str(rep["excluded_scorer_errors"]))
+
+# 9. Score and roll back: one job per run, its per-point scores in horizon_scores.jsonl (rollback.py). Case 2's shift,
+#    with the after arm scored this way instead of one job per horizon: the same summed 0.25.
+def write_rows(root: Path, label: str, task: str, fn, hs, bad_after=None) -> None:
+    """One score and roll back job: its end-of-run record (write_run) plus one row per scoring point."""
+    write_run(root, label, task, fn(80), 0, prefix=("after", 80))
+    d = next((root / label / task).glob("e1-*"))
+    rows = [{"H": h, "state_equal": h != bad_after,
+             "scores": {"checks": [{"check": f"{c} — detail", "passed": v} for c, v in fn(h).items()],
+                        "bugfix_tests": [], "parsed": {}}} for h in hs]
+    (d / "horizon_scores.jsonl").write_text("".join(json.dumps(x) + "\n" for x in rows))
+
+
+def shift_case(r: Path, rollback_label: str, bad_after=None) -> None:
+    fb = lambda h: {"a": h >= 50, "b": False}  # noqa: E731
+    fa = lambda h: {"a": h >= 10, "b": False}  # noqa: E731
+    write_run(r, "nw-before", TASK, {"a": False, "b": False})
+    write_run(r, "nw-after", TASK, {"a": False, "b": False})
+    write_run(r, "before", TASK, fb(80), 80)
+    write_run(r, "after", TASK, fa(80), 80)
+    every_step(r, "b", TASK, 80, fb, "before")
+    write_rows(r, rollback_label, TASK, fa, range(1, 80), bad_after)
+
+
+with tempfile.TemporaryDirectory() as t:
+    r = Path(t)
+    shift_case(r, "hz-after-x")
+    rep = run(r)
+    check("score and roll back: rows not read without --rollback-rows", rep["scored_horizons"]["X"][TASK] == [0, 80],
+          str(rep["scored_horizons"]["X"][TASK]))
+    g = run(r, extra=["--rollback-rows"])["gains"]["X"]
+    check("score and roll back: rows give the exact curve", close(g["summed"]["low"], 0.25) and close(g["summed"]["high"], 0.25),
+          f"{g['summed']['low']:.4f} .. {g['summed']['high']:.4f}")
+with tempfile.TemporaryDirectory() as t:
+    r = Path(t)
+    shift_case(r, "hz-after-x", bad_after=5)  # the restore after H=5 wasn't exact: H=6..79 are left out
+    rep = run(r, extra=["--rollback-rows"])
+    g = rep["gains"]["X"]
+    check("score and roll back: points after an inexact restore are left out",
+          rep["scored_horizons"]["X"][TASK] == [0, 1, 2, 3, 4, 5, 80] and g["summed"]["low"] < 0.25 < g["summed"]["high"],
+          str(rep["scored_horizons"]["X"][TASK]))
+with tempfile.TemporaryDirectory() as t:
+    r = Path(t)
+    shift_case(r, "hzcheck-sr-after-x")
+    rep = run(r, extra=["--rollback-rows"])
+    check("score and roll back: check labels left out without --include-check-rows",
+          rep["scored_horizons"]["X"][TASK] == [0, 80], str(rep["scored_horizons"]["X"][TASK]))
+    ph.ROLLBACK_ROWS = True
+    ph.INCLUDE_CHECK_ROWS = True
+    ph.REWARD = "first-pass"
+    found = ph.prefix_runs()
+    ph.ROLLBACK_ROWS = ph.INCLUDE_CHECK_ROWS = False
+    check("score and roll back: ... and used with --include-check-rows", sorted(found[("after", TASK)]) == [*range(1, 80), 80])
 
 print(f"\n{len(failures)} failure(s)" + (": " + ", ".join(failures) if failures else ""))
 sys.exit(1 if failures else 0)

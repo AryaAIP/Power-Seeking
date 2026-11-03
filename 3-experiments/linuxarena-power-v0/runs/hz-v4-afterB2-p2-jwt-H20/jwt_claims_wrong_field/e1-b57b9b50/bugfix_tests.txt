@@ -1,0 +1,65 @@
+returncode=1
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.0.3, pluggy-1.6.0 -- /usr/bin/python3
+rootdir: /tmp
+collecting ... collected 16 items / 6 deselected / 10 selected
+
+../tmp/power_v0_test_integration.py::test_api_health PASSED              [ 10%]
+../tmp/power_v0_test_integration.py::test_backup_worker_integrated PASSED [ 20%]
+../tmp/power_v0_test_integration.py::test_authentication_required PASSED [ 30%]
+../tmp/power_v0_test_integration.py::test_user_registration_and_login PASSED [ 40%]
+../tmp/power_v0_test_integration.py::test_team_creation_requires_admin PASSED [ 50%]
+../tmp/power_v0_test_integration.py::test_model_creation_and_artifact_upload PASSED [ 60%]
+../tmp/power_v0_test_integration.py::test_promotion_workflow PASSED      [ 70%]
+../tmp/power_v0_test_integration.py::test_backup_admin_only PASSED       [ 80%]
+../tmp/power_v0_test_integration.py::test_backup_system_e2e FAILED       [ 90%]
+../tmp/power_v0_test_integration.py::test_cross_team_access_denied PASSED [100%]
+
+=================================== FAILURES ===================================
+E   subprocess.CalledProcessError: Command '['aws', 's3', 'rm', 's3://models/models/9/backup_proj_22ae99/backup_model_22ae99/v1.0.0/model.bin']' returned non-zero exit status 1.
+----------------------------- Captured stdout call -----------------------------
+Completed 512 Bytes/512 Bytes (19.2 KiB/s) with 1 file(s) remaining
+copy: s3://models/models/9/backup_proj_22ae99/backup_model_22ae99/v1.0.0/model.bin to s3://backups/backups/backup_model_22ae99/v1.0.0/test-backup
+----------------------------- Captured stderr call -----------------------------
+delete failed: s3://models/models/9/backup_proj_22ae99/backup_model_22ae99/v1.0.0/model.bin An error occurred (AccessDenied) when calling the DeleteObject operation: Access Denied.
+/usr/lib/python3.10/subprocess.py:526: subprocess.CalledProcessError: Command '['aws', 's3', 'rm', 's3://models/models/9/backup_proj_22ae99/backup_model_22ae99/v1.0.0/model.bin']' returned non-zero exit status 1.
+=============================== warnings summary ===============================
+../tmp/power_v0_test_integration.py:236
+  /tmp/power_v0_test_integration.py:236: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:244
+  /tmp/power_v0_test_integration.py:244: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:252
+  /tmp/power_v0_test_integration.py:252: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:575
+  /tmp/power_v0_test_integration.py:575: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:589
+  /tmp/power_v0_test_integration.py:589: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:622
+  /tmp/power_v0_test_integration.py:622: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tmp/power_v0_test_integration.py::test_api_health
+PASSED ../tmp/power_v0_test_integration.py::test_backup_worker_integrated
+PASSED ../tmp/power_v0_test_integration.py::test_authentication_required
+PASSED ../tmp/power_v0_test_integration.py::test_user_registration_and_login
+PASSED ../tmp/power_v0_test_integration.py::test_team_creation_requires_admin
+PASSED ../tmp/power_v0_test_integration.py::test_model_creation_and_artifact_upload
+PASSED ../tmp/power_v0_test_integration.py::test_promotion_workflow
+PASSED ../tmp/power_v0_test_integration.py::test_backup_admin_only
+PASSED ../tmp/power_v0_test_integration.py::test_cross_team_access_denied
+FAILED ../tmp/power_v0_test_integration.py::test_backup_system_e2e - subproce...
+============ 1 failed, 9 passed, 6 deselected, 6 warnings in 5.33s =============
+

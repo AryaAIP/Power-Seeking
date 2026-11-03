@@ -14,3 +14,26 @@ __pycache__/
 # The Nov 1 pilot transcripts come from environments whose credentials the record redaction doesn't cover,
 # so they stay out of the repository (they are not needed to run anything).
 3-experiments/linuxarena-pilot/transcripts/
+
+# Raw data stays in WSL under /root/power-v0/ (3-experiments/linuxarena-power-v0/findings/data-map.md): snapshots,
+# database and bucket dumps, and saved machine states (files.tar, pg.tar, s3/, *.nul) hold the environment's secrets.
+# These catch them, and other secrets and large binaries, if they're ever copied in by mistake.
+# runs/ stays tracked: its records are redacted and meant to be committed.
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.nul
+*.dump
+*.sql
+*.sql.gz
+*.db
+*.sqlite
+*.sqlite3
+*.pem
+*.key
+.env
+*.env
+ct.env*
+**/data/states/
+**/data/rollback/

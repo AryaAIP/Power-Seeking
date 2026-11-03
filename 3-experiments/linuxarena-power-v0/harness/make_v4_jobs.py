@@ -5,6 +5,9 @@ raw data on the same machine; the 30 trajectories are dealt out in turn. Append 
   python3 -I make_v4_jobs.py K before            the before arm
   python3 -I make_v4_jobs.py K after A B [noteA noteB]  the after arms, then their no-work runs; A and B are trajectory labels,
                                                  the notes are HANDOVER_NOTES keys or none (default: none for A, use for B)
+  --restore-state (after stage only, anywhere on the line): every after-arm job starts from its trajectory's saved end
+  state (states/<trajectory label>, made once by a save_state= job) instead of replaying it (plans/replay-free-scope.md).
+  Without it the output is exactly as before.
 """
 
 import subprocess
@@ -15,7 +18,11 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from power_paths import LAUNCH, TRAJECTORY  # noqa: E402
 
-k, stage, rest = int(sys.argv[1]), sys.argv[2], sys.argv[3:]
+restore = "--restore-state" in sys.argv
+argv = [x for x in sys.argv[1:] if x != "--restore-state"]
+k, stage, rest = int(argv[0]), argv[1], argv[2:]
+if restore and stage != "after":
+    sys.exit("--restore-state is for the after stage only")
 n_tasks = lambda f: sum(1 for ln in (HERE / "tasks" / f).read_text().splitlines() if ln.startswith("model_registry"))  # noqa: E731
 
 
@@ -42,13 +49,16 @@ elif stage == "after":
     note_a, note_b = (notes + ["none", "use"][len(notes):])[:2]
     f = f"v4_tasks_p{k}.txt"
     arms = (("A", a, note_a), ("B", b, note_b))
-    rep = lambda traj: f"-p solver_user=dev -p traj={TRAJECTORY / (traj + '.eval')} -p traj_user=dev -p traj_cmd_bug=false"  # noqa: E731
+    rep = lambda traj: (f"-p solver_user=dev -p traj={TRAJECTORY / (traj + '.eval')} -p traj_user=dev -p traj_cmd_bug=false"  # noqa: E731
+                        + (f" -p restore_state={traj}" if restore else ""))
+    how = lambda traj: f"restore {traj}'s saved state" if restore else f"replay {traj}"  # noqa: E731
     for arm, traj, note in arms:  # the solver runs first: the queue never lets later lines overtake earlier ones
         hand = "" if note == "none" else f" -p handover_note={note}"
         print(line(f"v4-after{arm}-p{k}", n_tasks(f), f, n_tasks(f), f"{rep(traj)} -p context=kept{hand}",
-                   f"The after-{arm} arm, part {k}: replay {traj}, then the solver continues its chat (hand-over note: {note})"))
+                   f"The after-{arm} arm, part {k}: {how(traj)}, then the solver continues its chat (hand-over note: {note})"))
     for arm, traj, _ in arms:
         print(line(f"nowork-v4-after{arm}-p{k}", n_tasks(f), f, n_tasks(f), f"{rep(traj)} -p solve=false",
-                   f"No-work runs after {traj}, part {k}: H = 0 for the after-{arm} arm, and the replay check"))
+                   f"No-work runs after {traj}, part {k}: H = 0 for the after-{arm} arm, and the "
+                   f"{'restore' if restore else 'replay'} check"))
 else:
     sys.exit(__doc__)
