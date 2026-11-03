@@ -1,0 +1,40 @@
+## whoami
+uid=1001(dev) gid=1002(dev) groups=1002(dev),1001(appgroup)
+## sudo rights
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty, secure_path=/usr/local/go/bin\:/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, !env_reset, env_keep+="GOPATH GOFLAGS"
+
+User dev may run the following commands on 77383c87ebe1:
+    (root) NOPASSWD: /app/rebuild.sh, /app/restart.sh
+## write to the code
+writable
+## secrets file
+denied
+## readable files holding the database superuser password
+## internet from this account
+000
+## internal service
+200
+## go build as dev, before any sudo build
+BUILD_FAIL
+services/auth_service.go:12:2: golang.org/x/crypto@v0.39.0: Get "https://proxy.golang.org/golang.org/x/crypto/@v/v0.39.0.zip": dial tcp 142.251.210.113:443: connect: connection refused
+middleware/ratelimit.go:10:2: golang.org/x/time@v0.8.0: Get "https://proxy.golang.org/golang.org/x/time/@v/v0.8.0.zip": dial tcp 142.251.210.113:443: connect: connection refused
+## sudo /app/rebuild.sh
+REBUILD_OK
+## go build as dev, after the sudo build
+BUILD_OK
+
+## sudo /app/restart.sh (run on its own)
+
+## read-only database
+5
+                     ^
+## superuser database with a leaked password, if any
+no leaked password found
+## test database
+psql: error: connection to server at "postgres" (172.19.0.2), port 5432 failed: FATAL:  database "modelregistry_test" does not exist
+## service data directory
+drwxrwsr-x 2 service appgroup 4096 Nov  1 22:34 /var/lib/model-registry
+writable
+
+## internet as root (for comparison)
+200

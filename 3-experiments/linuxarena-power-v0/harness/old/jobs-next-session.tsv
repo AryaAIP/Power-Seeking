@@ -1,0 +1,18 @@
+# Job list for the next session (next-steps.md, steps 1 to 4). Every line is commented out, so nothing here
+# can start by accident. To use it: set a new DEADLINE in night_queue.py, uncomment the lines Arya has approved,
+# copy them to /root/power-v0/queue/jobs.tsv, and start the queue. Format: label <TAB> environments <TAB> command.
+# Free jobs (no model calls):
+#probe-v2	1	bash /root/power-v0/harness/launch.sh probe-v2 probe_task1.txt 1 -p solver_user=dev -p probe=true -p solve=false
+#nowork-v2-S0	6	bash /root/power-v0/harness/launch.sh nowork-v2-S0 v0_tasks.txt 6 -p solver_user=dev -p solve=false
+# The replay check, with the old setup (fill in the pilotdev-S0 eval path; 34 and the dashboard run's turns are from usage.csv):
+#hzcheck-fav	1	bash /root/power-v0/harness/launch.sh hzcheck-fav v0_fav.txt 1 -p solver_user=dev -p solve=false -p dev_strip_env= -p test_db=false -p prefix_log=EVAL -p prefix_turns=34
+#hzcheck-dash	1	bash /root/power-v0/harness/launch.sh hzcheck-dash v0_dash.txt 1 -p solver_user=dev -p solve=false -p dev_strip_env= -p test_db=false -p prefix_log=EVAL -p prefix_turns=TURNS
+# Paid jobs, only after Arya's go-ahead:
+#traj2-control	1	bash /root/power-v0/harness/launch.sh traj2-control rbac_task.txt 1 -p solver_user=dev -p max_steps=200
+#traj2-power	1	bash /root/power-v0/harness/launch.sh traj2-power rbac_task.txt 1 -p solver_user=dev -p max_steps=200 -p incline=gentle
+#v2-before	6	bash /root/power-v0/harness/launch.sh v2-before v0_tasks.txt 6 -p solver_user=dev
+# After both trajectories pass their checks (no-work after runs first, then the after runs):
+#nowork-v2-afterA	6	bash /root/power-v0/harness/launch.sh nowork-v2-afterA v0_tasks.txt 6 -p solver_user=dev -p solve=false -p traj=/root/power-v0/trajectory/traj2-control.eval -p traj_user=dev -p traj_cmd_bug=false
+#nowork-v2-afterB	6	bash /root/power-v0/harness/launch.sh nowork-v2-afterB v0_tasks.txt 6 -p solver_user=dev -p solve=false -p traj=/root/power-v0/trajectory/traj2-power.eval -p traj_user=dev -p traj_cmd_bug=false
+#v2-afterA	6	bash /root/power-v0/harness/launch.sh v2-afterA v0_tasks.txt 6 -p solver_user=dev -p traj=/root/power-v0/trajectory/traj2-control.eval -p traj_user=dev -p traj_cmd_bug=false -p context=kept
+#v2-afterB	6	bash /root/power-v0/harness/launch.sh v2-afterB v0_tasks.txt 6 -p solver_user=dev -p traj=/root/power-v0/trajectory/traj2-power.eval -p traj_user=dev -p traj_cmd_bug=false -p context=kept -p handover_note=stop

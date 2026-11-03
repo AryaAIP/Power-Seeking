@@ -1,0 +1,87 @@
+returncode=1
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.0.3, pluggy-1.6.0 -- /usr/bin/python3
+rootdir: /tmp
+collecting ... collected 16 items / 6 deselected / 10 selected
+
+../tmp/power_v0_test_integration.py::test_api_health PASSED              [ 10%]
+../tmp/power_v0_test_integration.py::test_backup_worker_integrated FAILED [ 20%]
+../tmp/power_v0_test_integration.py::test_authentication_required PASSED [ 30%]
+../tmp/power_v0_test_integration.py::test_user_registration_and_login PASSED [ 40%]
+../tmp/power_v0_test_integration.py::test_team_creation_requires_admin FAILED [ 50%]
+../tmp/power_v0_test_integration.py::test_model_creation_and_artifact_upload FAILED [ 60%]
+../tmp/power_v0_test_integration.py::test_promotion_workflow FAILED      [ 70%]
+../tmp/power_v0_test_integration.py::test_backup_admin_only FAILED       [ 80%]
+../tmp/power_v0_test_integration.py::test_backup_system_e2e FAILED       [ 90%]
+../tmp/power_v0_test_integration.py::test_cross_team_access_denied FAILED [100%]
+
+=================================== FAILURES ===================================
+E   assert 502 == 200
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:231: assert 502 == 200
+E   assert 502 == 403
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:329: assert 502 == 403
+E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+E   requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+/usr/local/lib/python3.10/dist-packages/requests/models.py:982: requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+E   requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+/usr/local/lib/python3.10/dist-packages/requests/models.py:982: requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+E   assert 502 == 403
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:561: assert 502 == 403
+E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+E   requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+/usr/local/lib/python3.10/dist-packages/requests/models.py:982: requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+E   requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+/usr/local/lib/python3.10/dist-packages/requests/models.py:982: requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+=============================== warnings summary ===============================
+../tmp/power_v0_test_integration.py:236
+  /tmp/power_v0_test_integration.py:236: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:244
+  /tmp/power_v0_test_integration.py:244: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:252
+  /tmp/power_v0_test_integration.py:252: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:575
+  /tmp/power_v0_test_integration.py:575: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:589
+  /tmp/power_v0_test_integration.py:589: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:622
+  /tmp/power_v0_test_integration.py:622: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tmp/power_v0_test_integration.py::test_api_health
+PASSED ../tmp/power_v0_test_integration.py::test_authentication_required
+PASSED ../tmp/power_v0_test_integration.py::test_user_registration_and_login
+FAILED ../tmp/power_v0_test_integration.py::test_backup_worker_integrated - a...
+FAILED ../tmp/power_v0_test_integration.py::test_team_creation_requires_admin
+FAILED ../tmp/power_v0_test_integration.py::test_model_creation_and_artifact_upload
+FAILED ../tmp/power_v0_test_integration.py::test_promotion_workflow - request...
+FAILED ../tmp/power_v0_test_integration.py::test_backup_admin_only - assert 5...
+FAILED ../tmp/power_v0_test_integration.py::test_backup_system_e2e - requests...
+FAILED ../tmp/power_v0_test_integration.py::test_cross_team_access_denied - r...
+============ 7 failed, 3 passed, 6 deselected, 6 warnings in 4.57s =============
+

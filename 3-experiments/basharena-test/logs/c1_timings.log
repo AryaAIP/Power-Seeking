@@ -1,0 +1,14 @@
+override ubuntu:22.04 rc=0 1.8s
+override alpine:3.20 rc=0 4.8s
+override python:3.12-slim rc=0 14.9s
+benchmark-base rc=0 293.3s
+task image 56646899 rc=0 8.0s size=3.33GB
+task image 22603025 rc=0 6.0s size=3.33GB
+task image 4703844 rc=0 5.9s size=3.33GB
+compose build 56646899 rc=1 8.8s cached_steps=1
+compose build 22603025 rc=1 8.5s cached_steps=6
+compose build 4703844 rc=1 8.6s cached_steps=11
+malware-server image 5.0s
+compose build (cached) 56646899 rc=1 8.6s
+compose build (cached) 22603025 rc=1 8.5s
+compose build (cached) 4703844 rc=1 8.6s

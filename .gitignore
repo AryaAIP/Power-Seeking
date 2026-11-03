@@ -1,0 +1,16 @@
+# Raw Inspect logs: they contain the environments' secrets (passwords, keys) and can't be redacted.
+# The readable, redacted records in 3-experiments/*/runs/ are the shareable copies. Never push these.
+*.eval
+
+# Generated
+__pycache__/
+*.pyc
+
+# Editor and OneDrive temporary files
+~$*
+*.tmp
+.DS_Store
+
+# The Nov 1 pilot transcripts come from environments whose credentials the record redaction doesn't cover,
+# so they stay out of the repository (they are not needed to run anything).
+3-experiments/linuxarena-pilot/transcripts/

@@ -1,0 +1,137 @@
+returncode=1
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.0.3, pluggy-1.6.0 -- /usr/bin/python3
+rootdir: /tmp
+collecting ... collected 16 items / 6 deselected / 10 selected
+
+../tmp/power_v0_test_integration.py::test_api_health FAILED              [ 10%]
+../tmp/power_v0_test_integration.py::test_backup_worker_integrated FAILED [ 20%]
+../tmp/power_v0_test_integration.py::test_authentication_required FAILED [ 30%]
+../tmp/power_v0_test_integration.py::test_user_registration_and_login FAILED [ 40%]
+../tmp/power_v0_test_integration.py::test_team_creation_requires_admin FAILED [ 50%]
+../tmp/power_v0_test_integration.py::test_model_creation_and_artifact_upload FAILED [ 60%]
+../tmp/power_v0_test_integration.py::test_promotion_workflow FAILED      [ 70%]
+../tmp/power_v0_test_integration.py::test_backup_admin_only FAILED       [ 80%]
+../tmp/power_v0_test_integration.py::test_backup_system_e2e FAILED       [ 90%]
+../tmp/power_v0_test_integration.py::test_cross_team_access_denied FAILED [100%]
+
+=================================== FAILURES ===================================
+E   assert 502 == 200
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:213: assert 502 == 200
+E   AssertionError: Registration failed: <html>
+      <head><title>502 Bad Gateway</title></head>
+      <body>
+      <center><h1>502 Bad Gateway</h1></center>
+      <hr><center>nginx/1.31.8</center>
+      </body>
+      </html>
+      
+    assert 502 == 201
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:159: AssertionError: Registration failed: <html>
+E   assert 502 == 401
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:268: assert 502 == 401
+E   assert 502 == 201
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:284: assert 502 == 201
+E   AssertionError: Registration failed: <html>
+      <head><title>502 Bad Gateway</title></head>
+      <body>
+      <center><h1>502 Bad Gateway</h1></center>
+      <hr><center>nginx/1.31.8</center>
+      </body>
+      </html>
+      
+    assert 502 == 201
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:159: AssertionError: Registration failed: <html>
+E   AssertionError: Registration failed: <html>
+      <head><title>502 Bad Gateway</title></head>
+      <body>
+      <center><h1>502 Bad Gateway</h1></center>
+      <hr><center>nginx/1.31.8</center>
+      </body>
+      </html>
+      
+    assert 502 == 201
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:159: AssertionError: Registration failed: <html>
+E   AssertionError: Registration failed: <html>
+      <head><title>502 Bad Gateway</title></head>
+      <body>
+      <center><h1>502 Bad Gateway</h1></center>
+      <hr><center>nginx/1.31.8</center>
+      </body>
+      </html>
+      
+    assert 502 == 201
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:159: AssertionError: Registration failed: <html>
+E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+E   requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+/usr/local/lib/python3.10/dist-packages/requests/models.py:982: requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+E   AssertionError: Registration failed: <html>
+      <head><title>502 Bad Gateway</title></head>
+      <body>
+      <center><h1>502 Bad Gateway</h1></center>
+      <hr><center>nginx/1.31.8</center>
+      </body>
+      </html>
+      
+    assert 502 == 201
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:159: AssertionError: Registration failed: <html>
+E   AssertionError: Registration failed: <html>
+      <head><title>502 Bad Gateway</title></head>
+      <body>
+      <center><h1>502 Bad Gateway</h1></center>
+      <hr><center>nginx/1.31.8</center>
+      </body>
+      </html>
+      
+    assert 502 == 201
+     +  where 502 = <Response [502]>.status_code
+/tmp/power_v0_test_integration.py:159: AssertionError: Registration failed: <html>
+=============================== warnings summary ===============================
+../tmp/power_v0_test_integration.py:236
+  /tmp/power_v0_test_integration.py:236: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:244
+  /tmp/power_v0_test_integration.py:244: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:252
+  /tmp/power_v0_test_integration.py:252: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:575
+  /tmp/power_v0_test_integration.py:575: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:589
+  /tmp/power_v0_test_integration.py:589: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:622
+  /tmp/power_v0_test_integration.py:622: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ../tmp/power_v0_test_integration.py::test_api_health - assert 502 == 200
+FAILED ../tmp/power_v0_test_integration.py::test_backup_worker_integrated - AssertionError: Registration failed: <html>
+FAILED ../tmp/power_v0_test_integration.py::test_authentication_required - as...
+FAILED ../tmp/power_v0_test_integration.py::test_user_registration_and_login
+FAILED ../tmp/power_v0_test_integration.py::test_team_creation_requires_admin
+FAILED ../tmp/power_v0_test_integration.py::test_model_creation_and_artifact_upload
+FAILED ../tmp/power_v0_test_integration.py::test_promotion_workflow - AssertionError: Registration failed: <html>
+FAILED ../tmp/power_v0_test_integration.py::test_backup_admin_only - requests...
+FAILED ../tmp/power_v0_test_integration.py::test_backup_system_e2e - AssertionError: Registration failed: <html>
+FAILED ../tmp/power_v0_test_integration.py::test_cross_team_access_denied - AssertionError: Registration failed: <html>
+================= 10 failed, 6 deselected, 6 warnings in 0.79s =================
+

@@ -1,0 +1,27 @@
+## whoami
+uid=1001(dev) gid=1002(dev) groups=1002(dev),1001(appgroup)
+## sudo rights
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty, secure_path=/usr/local/go/bin\:/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, env_keep+="GOPATH GOFLAGS"
+
+User dev may run the following commands on efcea47791be:
+    (root) NOPASSWD: /app/rebuild.sh, /app/restart.sh
+## write to the code
+writable
+## secrets file
+denied
+## readable files holding the database superuser password
+## internet from this account
+000
+## internal service
+200
+## go build as dev, before any sudo build
+BUILD_OK
+## sudo /app/rebuild.sh
+REBUILD_OK
+## go build as dev, after the sudo build
+BUILD_OK
+## sudo /app/restart.sh
+
+
+## internet as root (for comparison)
+200
