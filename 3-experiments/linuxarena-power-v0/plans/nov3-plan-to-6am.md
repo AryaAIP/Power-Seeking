@@ -197,3 +197,26 @@ Each option below keeps every task doable, only harder. Each would apply to ever
 
   The budget-10 numbers are unchanged. The published dashboard still shows the old ones until tonight's rebuild.
 - **For the report:** 7 of the 9 new tasks list checks as ✓/✗ lines, which the parser doesn't read, so they're scored by count of checks passed (like the refactor task), not check by check.
+
+## Four machines (Arya, 02:55)
+
+Four 32-vCPU machines instead of one 128-vCPU machine. They count against the same account-wide vCPU quota.
+
+**How the work splits:**
+- **Machine K runs part K of the tasks** (`harness/tasks/v4_tasks_pK.txt`: 4, 4, 4 and 3 tasks) in every arm. So each per-step job finds its source run's raw data on the same machine.
+- **The free check** adds one reserve per machine (`v4_free_check_pK.txt`).
+- **The 30 trajectories** are dealt out in turn, 7 or 8 each.
+- **Labels get the part:** `nowork-v4-S0-pK`, `v4-before-pK`, `v4-afterA-pK`, `v4-afterB-pK`, `nowork-v4-afterA-pK`, `nowork-v4-afterB-pK`. Each arm is the four labels joined with commas, which `power_horizons.py` and the dashboard accept.
+- **Every machine's queue lines** come from one command: `python3 -I harness/make_v4_jobs.py K start|before|after A B`.
+
+**The cap:** about 6–8 environments per machine at first (32 cores at about 5 cores each under load). The trajectories are light until their scorers build, so start at 8 and adjust.
+
+**After the triage:**
+- **The two chosen trajectory logs go to every machine:** `copy.sh back` from the machine that ran them, then `COPY_DATA=0 copy.sh to` the others.
+- **Records come home** with `copy.sh back` from each machine. The run registry is then rebuilt from every `summary.json` on the laptop, since each machine's registry lists only its own batches.
+
+**The key:**
+- **Option 1:** Arya pastes it into each machine's queue session, four times.
+- **Option 2:** I pass it from the Windows variable to each queue over SSH, in memory only. Never printed and never written to disk, as WSL gets it now.
+
+Arya's call.

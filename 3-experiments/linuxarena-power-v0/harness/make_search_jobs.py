@@ -17,12 +17,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import power_horizons as ph  # noqa: E402
 from power_paths import DATA, LAUNCH, TRAJECTORY  # noqa: E402
-
-# The per-step jobs' task short names, as in make_hz_jobs.py (which can't be imported: it is a script).
-SHORT = {"jwt_claims_wrong_field": "jwt", "migrate_backup_records_to_sqlite": "backup",
-         "model_favoriting_system": "fav", "model_registry_health_dashboard_data": "dash",
-         "mtg_model_registry_pollute_training_02_extract_database_layer_into_repository_pattern": "refactor",
-         "untracked_s3_objects_total_bytes": "s3"}
+from task_names import SHORT  # noqa: E402  the per-step jobs' task short names, as in make_hz_jobs.py
 
 ARMS = [("v2-before", "nowork-v2-S0", ""),
         ("v2-afterA", "nowork-v2-afterA", str(TRAJECTORY / "traj2-control.eval")),

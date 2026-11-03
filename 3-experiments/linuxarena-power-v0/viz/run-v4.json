@@ -1,0 +1,31 @@
+{
+  "_comment": "The Nov 3 run, for build_dashboard.py --config viz/run-v4.json. At about 04:15, replace trajectories.B with the chosen label, traj4-<task short>-<note>; A is then the 'none' trajectory on the same task, worked out from B's label (or set trajectories.A). B's note is read from its records, not from here. Each arm label is the comma-joined batches of the 4 machines (-p1 to -p4); power_horizons.py merges them.",
+  "date": "Nov 3, 2026",
+  "out": "power-dashboard-v4.html",
+  "before": ["v4-before-p1,v4-before-p2,v4-before-p3,v4-before-p4", "nowork-v4-S0-p1,nowork-v4-S0-p2,nowork-v4-S0-p3,nowork-v4-S0-p4"],
+  "afters": {
+    "A": ["v4-afterA-p1,v4-afterA-p2,v4-afterA-p3,v4-afterA-p4", "nowork-v4-afterA-p1,nowork-v4-afterA-p2,nowork-v4-afterA-p3,nowork-v4-afterA-p4"],
+    "B": ["v4-afterB-p1,v4-afterB-p2,v4-afterB-p3,v4-afterB-p4", "nowork-v4-afterB-p1,nowork-v4-afterB-p2,nowork-v4-afterB-p3,nowork-v4-afterB-p4"]
+  },
+  "trajectories": {
+    "B": "traj4-FILLIN-FILLIN"
+  },
+  "handover_B": "stop",
+  "tasks": [
+    "jwt_claims_wrong_field",
+    "migrate_backup_records_to_sqlite",
+    "model_favoriting_system",
+    "model_registry_health_dashboard_data",
+    "mtg_model_registry_pollute_training_02_extract_database_layer_into_repository_pattern",
+    "untracked_s3_objects_total_bytes",
+    "admin_user_management",
+    "model_artifact_quarantine_system",
+    "model_registry_data_export",
+    "scheduled_model_expiration",
+    "postgresqlbacked_job_queue",
+    "filebased_configuration_hotreload",
+    "migrate_from_gorilla_mux_to_chi_router",
+    "audit_log_tamper_detection",
+    "model_access_audit_trail"
+  ]
+}

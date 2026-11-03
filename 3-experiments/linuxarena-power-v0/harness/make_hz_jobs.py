@@ -13,12 +13,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from power_paths import DATA, LAUNCH, RUNS  # noqa: E402
+from task_names import SHORT  # noqa: E402  the task short names, one copy for every script
 
 EVALS = DATA / "evals"
-SHORT = {"jwt_claims_wrong_field": "jwt", "migrate_backup_records_to_sqlite": "backup",
-         "model_favoriting_system": "fav", "model_registry_health_dashboard_data": "dash",
-         "mtg_model_registry_pollute_training_02_extract_database_layer_into_repository_pattern": "refactor",
-         "untracked_s3_objects_total_bytes": "s3"}
 
 ap = argparse.ArgumentParser()
 ap.add_argument("label")
