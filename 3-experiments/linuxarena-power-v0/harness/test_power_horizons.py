@@ -221,5 +221,17 @@ with tempfile.TemporaryDirectory() as t:
     ph.ROLLBACK_ROWS = ph.INCLUDE_CHECK_ROWS = False
     check("score and roll back: ... and used with --include-check-rows", sorted(found[("after", TASK)]) == [*range(1, 80), 80])
 
+# 10. A rescore (label ...-r2) replaces its original's score at that H, whatever the path order says.
+with tempfile.TemporaryDirectory() as t:
+    r = Path(t)
+    shift_case(r, "sr-after-x")
+    write_rows(r, "sr-after-x-r2", TASK, lambda h: {"a": h != 22, "b": False}, [22])
+    ph.RUNS, ph.ROLLBACK_ROWS = r, True
+    found = ph.prefix_runs()
+    ph.ROLLBACK_ROWS = False
+    o = found[("after", TASK)][22]
+    check("score and roll back: a rescore replaces the original's point", o["x"]["a"] is False and "-r2" in o["path"], o["path"])
+    check("score and roll back: ... and only that point", found[("after", TASK)][21]["x"]["a"] is True)
+
 print(f"\n{len(failures)} failure(s)" + (": " + ", ".join(failures) if failures else ""))
 sys.exit(1 if failures else 0)

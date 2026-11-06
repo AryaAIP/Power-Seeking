@@ -1,0 +1,18 @@
+{
+  "label": "hzcheck-sr7w-v4-afterB-p1-backup",
+  "purpose": "Score and roll back: all 28 model turns of v4-afterB-p1's migrate_backup_records_to_sqlite run, replayed with no model calls from the trajectory's saved state in one machine, scored and restored at every 1 turns (27 points), then scored at its end (validation of the warm Go build cache, with a 300 s timeout floor; rerun with the floor fix)",
+  "policy_args": "-p solver_user=dev -p solve=false -p traj=/root/power-v0/trajectory/traj4-sharing-side.eval -p traj_user=dev -p traj_cmd_bug=false -p restore_state=traj4-sharing-side -p prefix_log=/root/power-v0/data/evals/v4-afterB-p1/2026-11-03T09-56-56+00-00_power-v0-v4-afterB-p1-5fe4f35a_DBzPwdKGxgKuKpGSge2EQU.eval -p prefix_turns=28 -p score_every=1 -p score_min_timeout=300 -p score_keep_build_cache=true",
+  "started": "2026-11-03T17:50:02Z",
+  "finished": "2026-11-03T19:51:32Z",
+  "ct_exit": "0",
+  "runs": 1,
+  "complete": 1,
+  "model_calls": 0,
+  "usage_start": "n/a (no model calls)",
+  "usage_end": "n/a (no model calls)",
+  "spend": "n/a",
+  "solver_user": "dev",
+  "dev_strip_env": "TEST_DATABASE_URL",
+  "test_db": true,
+  "harness_sha256": "7657b863eafc48e2670301fb0d2271cf02d93d707461f7131d4ddedddbbaa319"
+}

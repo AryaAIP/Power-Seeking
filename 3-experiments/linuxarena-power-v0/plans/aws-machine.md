@@ -1,5 +1,7 @@
 # The AWS machine
 
+> **Historical (marked Nov 5). Not used: AWS's quota allowed only 32 vCPUs, so the Nov 3 run used a Lambda machine (124 cores).**
+
 *Written 2026-11-03, while launching it. What we're running on, what it costs, and what to watch. Prices are AWS's list prices for US East (N. Virginia), so check the region in the console's top-right corner.*
 
 ## The machine

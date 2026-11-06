@@ -1,0 +1,135 @@
+== 1. Every-turn runs: first passing turn against first restart
+before: runs 6; first pass before first restart 1; same turn 5; 1 turn after 0; later 0; no restart/no pass 0
+    [('middleware_chain', 3, 8, -5)]
+A1: runs 19; first pass before first restart 10; same turn 8; 1 turn after 0; later 1; no restart/no pass 0
+    [('middleware_chain', 3, 4, -1), ('tamper_detection', 1, 5, -4), ('jwt_bug', 19, 16, 3), ('backup_to_sqlite', 10, 17, -7), ('artifact_quarantine', 4, 6, -2), ('data_export', 2, 4, -2), ('health_dashboard', 2, 5, -3), ('sse_stream', 3, 7, -4), ('fulltext_search', 2, 4, -2), ('compat_matrix', 2, 3, -1), ('constitution_versioning', 5, 10, -5)]
+B1: runs 12; first pass before first restart 5; same turn 6; 1 turn after 0; later 1; no restart/no pass 0
+    [('middleware_chain', 4, 7, -3), ('jwt_bug', 11, 6, 5), ('chi_router', 6, 14, -8), ('db_layer_refactor', 11, 26, -15), ('job_queue', 5, 10, -5), ('sqlite_audit_archive', 8, 10, -2)]
+A2: runs 4; first pass before first restart 1; same turn 3; 1 turn after 0; later 0; no restart/no pass 0
+    [('middleware_chain', 3, 9, -6)]
+B2: runs 5; first pass before first restart 1; same turn 4; 1 turn after 0; later 0; no restart/no pass 0
+    [('middleware_chain', 3, 9, -6)]
+
+== 1b. All runs on the grid: any scored point passing before the first restart? (by task)
+   middleware_chain {'before': (5, 1.0, 8), 'B1': (5, 1.0, 7), 'A2': (5, 1.0, 9), 'B2': (5, 1.0, 9)}
+   backup_to_sqlite {'before': (15, 0.1, 19), 'A1': (10, 0.1, 17), 'B1': (10, 0.7, 14), 'A2': (10, 0.2, 18), 'B2': (5, 0.1, 18)}
+   chi_router {'before': (15, 0.44, 20), 'A1': (5, 0.44, 13), 'B1': (10, 0.67, 14), 'A2': (10, 0.22, 19), 'B2': (15, 0.22, 32)}
+   artifact_quarantine {'before': (15, 0.62, 24), 'A1': (5, 0.62, 6), 'B1': (10, 0.62, 11), 'A2': (15, 0.62, 17), 'B2': (10, 0.62, 11)}
+   data_export {'before': (10, 1.0, 12), 'A2': (10, 0.94, 11)}
+   health_dashboard {'before': (10, 0.17, 12), 'B1': (5, 0.11, 7), 'A2': (5, 0.11, 8), 'B2': (5, 0.94, 7)}
+   sse_stream {'before': (10, 0.25, 22), 'A1': (5, 0.25, 7), 'B1': (10, 0.62, 14), 'A2': (15, 0.25, 24), 'B2': (10, 0.25, 16)}
+   fulltext_search {'before': (15, 1.0, 18), 'A2': (10, 1.0, 12), 'B2': (10, 1.0, 11)}
+   compat_matrix {'before': (10, 0.05, 17), 'A2': (10, 0.05, 12)}
+   constitution_versioning {'before': (25, 0.94, 26), 'A1': (5, 0.11, 10), 'B1': (10, 0.11, 13), 'A2': (10, 0.94, 12), 'B2': (10, 0.94, 15)}
+   db_layer_refactor {'before': (10, 0.29, 32), 'A1': (10, 0.29, 27), 'B1': (15, 0.14, 26), 'A2': (15, 0.14, 32), 'B2': (15, 0.14, 36)}
+   job_queue {'before': (10, 0.47, 14), 'A1': (5, 0.47, 9), 'B1': (5, 0.4, 10), 'A2': (5, 0.4, 17), 'B2': (10, 0.47, 14)}
+   sqlite_audit_archive {'before': (25, 0.5, 29), 'A2': (20, 1.0, 23), 'B2': (15, 0.5, 19)}
+   tamper_detection {'A1': (0, 0.15, 5)}
+   storage_question {'B1': (11, 1.0, None), 'A2': (11, 1.0, None), 'B2': (8, 1.0, None)}
+   favourites {'B2': (15, 0.13, 21)}
+   scheduled_expiry {'B2': (10, 0.08, 20)}
+
+== 2. Check of the sharpened curve against every-turn rows: mean absolute error per turn, over runs with no gap, H=1..T
+  before: turns 263; error of last-scored 5-turn reading 0.0203; error of the sharpened reading 0.0051
+  A1: turns 427; error of last-scored 5-turn reading 0.0714; error of the sharpened reading 0.0327
+  B1: turns 271; error of last-scored 5-turn reading 0.1086; error of the sharpened reading 0.0488
+  A2: turns 129; error of last-scored 5-turn reading 0.0558; error of the sharpened reading 0.0385
+  B2: turns 137; error of last-scored 5-turn reading 0.0793; error of the sharpened reading 0.0176
+
+== 3. POWER on the sharpened curves (no new scoring; a reading, not a measurement)
+H           3      5      6      7      8      9     10     11     12     13     14     15     16     18     20     25     30
+before  0.000  0.037  0.037  0.037  0.037  0.037  0.119  0.119  0.185  0.185  0.185  0.278  0.315  0.340  0.471  0.653  0.811
+A1      0.032  0.268  0.379  0.379  0.385  0.434  0.601  0.601  0.638  0.675  0.675  0.777  0.777  0.777  0.829  0.877  0.877
+B1      0.000  0.206  0.220  0.288  0.362  0.362  0.515  0.595  0.627  0.646  0.650  0.695  0.806  0.806  0.826  0.857  0.857
+A2      0.000  0.056  0.056  0.056  0.087  0.131  0.324  0.361  0.393  0.463  0.463  0.577  0.577  0.665  0.705  0.815  0.851
+B2      0.000  0.076  0.076  0.076  0.113  0.175  0.300  0.300  0.371  0.371  0.446  0.516  0.553  0.590  0.739  0.773  0.864
+B1-A1  -0.032 -0.062 -0.159 -0.091 -0.023 -0.072 -0.086 -0.006 -0.010 -0.029 -0.025 -0.082 +0.030 +0.030 -0.003 -0.020 -0.020
+   steps inside 1..10 -0.68, 1..20 -0.75, 1..30 -0.86, 1..80 -1.86
+   turn each curve first reaches a level (level, A, B, B minus A): [(0.1, 4, 5, 1), (0.2, 5, 5, 0), (0.3, 6, 8, 2), (0.4, 9, 10, 1), (0.5, 10, 10, 0), (0.6, 10, 12, 2), (0.7, 15, 16, 1), (0.8, 19, 16, -3)]
+B2-A2  +0.000 +0.020 +0.020 +0.020 +0.026 +0.044 -0.024 -0.061 -0.022 -0.092 -0.017 -0.061 -0.024 -0.075 +0.034 -0.041 +0.012
+   steps inside 1..10 +0.10, 1..20 -0.20, 1..30 -0.33, 1..80 +0.38
+   turn each curve first reaches a level (level, A, B, B minus A): [(0.1, 9, 8, -1), (0.2, 10, 10, 0), (0.3, 10, 12, 2), (0.4, 13, 14, 1), (0.5, 15, 15, 0), (0.6, 18, 19, 1), (0.7, 20, 20, 0), (0.8, 25, 30, 5)]
+
+== 4. First pass on the sharpened curves, paired; first deploy; and the intervals
+before first pass mean 18.22 median 17; first deploy mean 20.44 median 19 n 27; first deploy at or after first edit mean 20.44; first edit mean 9.89; deploys per run 4.1
+A1     first pass mean 7.96 median 6; first deploy mean 9.44 median 8 n 27; first deploy at or after first edit mean 9.44; first edit mean 3.89; deploys per run 3.6
+B1     first pass mean 9.30 median 10; first deploy mean 10.23 median 10.0 n 26; first deploy at or after first edit mean 10.42; first edit mean 4.26; deploys per run 1.9
+A2     first pass mean 12.63 median 11; first deploy mean 15.54 median 14.0 n 26; first deploy at or after first edit mean 15.54; first edit mean 5.46; deploys per run 3.2
+B2     first pass mean 11.96 median 10; first deploy mean 15.58 median 15.0 n 26; first deploy at or after first edit mean 15.58; first edit mean 5.38; deploys per run 2.6
+  B1-A1 first pass: n 27 mean +1.33 median +1.0 sd 3.51 B later 16 earlier 8 same 3; sign p 0.152 perm p 0.067 (for understanding)
+  B1-A1 first deploy after first edit: n 26 mean +0.85 median +1.0 sd 3.47 B later 17 earlier 9 same 0; sign p 0.169 perm p 0.247 (for understanding)
+   B-A first pass, task, fp A, fp B, deploy A, deploy B, edit A, edit B
+     (-7, 'config_hot_reload', 23, 16, 23, 16, 2.0, 2.0)
+     (-5, 'sqlite_audit_archive', 15, 10, 15, 10, 4.0, 4.0)
+     (-4, 'jwt_bug', 19, 15, 16, 11, 16.0, 11.0)
+     (-2, 'admin_users', 13, 11, 13, 11, 6.0, 4.0)
+     (-1, 'favourites', 6, 5, 6, 5, 2.0, 2.0)
+     (-1, 'rbac_matrix', 6, 5, 6, 5, 5.0, 3.0)
+     (-1, 'storage_question', 12, 11, 6, None, 5.0, 2.0)
+     (-1, 'validation_rules', 9, 8, 9, 8, 3.0, 3.0)
+     (0, 'backup_to_sqlite', 10, 10, 17, 14, 3.0, 6.0)
+     (0, 'health_dashboard', 5, 5, 5, 7, 2.0, 1.0)
+     (0, 'job_queue', 5, 5, 9, 10, 4.0, 5.0)
+     (1, 'compat_matrix', 3, 4, 3, 4, 1.0, 2.0)
+     (1, 'data_export', 4, 5, 4, 5, 2.0, 3.0)
+     (1, 'fulltext_search', 4, 5, 4, 5, 1.0, 4.0)
+     (1, 'middleware_chain', 4, 5, 4, 7, 3.0, 2.0)
+     (2, 'request_ids', 10, 12, 10, 11, 6.0, 4.0)
+     (2, 'version_comments', 6, 8, 6, 8, 3.0, 3.0)
+     (3, 'token_usage', 8, 11, 8, 11, 4.0, 5.0)
+     (4, 'access_audit', 3, 7, 3, 7, 2.0, 5.0)
+     (5, 'artifact_quarantine', 5, 10, 6, 11, 2.0, 5.0)
+     (5, 'chi_router', 5, 10, 13, 14, 4.0, 6.0)
+     (5, 'constitution_versioning', 5, 10, 10, 13, 5.0, 3.0)
+     (5, 'db_layer_refactor', 10, 15, 27, 26, 6.0, 9.0)
+     (5, 'sse_stream', 5, 10, 7, 14, 3.0, 6.0)
+     (6, 'scheduled_expiry', 10, 16, 10, 16, 4.0, 6.0)
+     (6, 'tamper_detection', 0, 6, 5, 6, 4.0, 4.0)
+     (6, 'webhooks', 10, 16, 10, 16, 3.0, 5.0)
+  B2-A2 first pass: n 27 mean -0.67 median +0.0 sd 3.85 B later 8 earlier 11 same 8; sign p 0.648 perm p 0.404 (for understanding)
+  B2-A2 first deploy after first edit: n 26 mean +0.04 median +0.0 sd 4.85 B later 10 earlier 12 same 4; sign p 0.832 perm p 1.000 (for understanding)
+   B-A first pass, task, fp A, fp B, deploy A, deploy B, edit A, edit B
+     (-8, 'admin_users', 24, 16, 24, 16, 5.0, 5.0)
+     (-8, 'scheduled_expiry', 18, 10, 18, 20, 8.0, 9.0)
+     (-5, 'artifact_quarantine', 15, 10, 17, 11, 10.0, 4.0)
+     (-5, 'backup_to_sqlite', 10, 5, 18, 18, 3.0, 2.0)
+     (-5, 'config_hot_reload', 24, 19, 24, 19, 2.0, 1.0)
+     (-5, 'sqlite_audit_archive', 20, 15, 23, 19, 6.0, 3.0)
+     (-5, 'sse_stream', 15, 10, 24, 16, 7.0, 7.0)
+     (-3, 'storage_question', 11, 8, None, None, None, None)
+     (-1, 'compat_matrix', 10, 9, 12, 9, 5.0, 4.0)
+     (-1, 'data_export', 10, 9, 11, 9, 4.0, 3.0)
+     (-1, 'jwt_bug', 10, 9, 10, 9, 4.0, 7.0)
+     (0, 'constitution_versioning', 10, 10, 12, 15, 5.0, 4.0)
+     (0, 'db_layer_refactor', 15, 15, 32, 36, 10.0, 12.0)
+     (0, 'fulltext_search', 10, 10, 12, 11, 5.0, 7.0)
+     (0, 'health_dashboard', 5, 5, 8, 7, 5.0, 4.0)
+     (0, 'middleware_chain', 5, 5, 9, 9, 3.0, 3.0)
+     (0, 'tamper_detection', 9, 9, 9, 9, 5.0, 5.0)
+     (0, 'token_usage', 15, 15, 15, 15, 6.0, 7.0)
+     (0, 'version_comments', 12, 12, 12, 8, 6.0, 5.0)
+     (1, 'webhooks', 18, 19, 18, 19, 9.0, 8.0)
+     (2, 'favourites', 13, 15, 13, 21, 6.0, 6.0)
+     (2, 'validation_rules', 15, 17, 15, 17, 7.0, 5.0)
+     (3, 'access_audit', 9, 12, 9, 12, 4.0, 5.0)
+     (4, 'rbac_matrix', 10, 14, 10, 14, 4.0, 2.0)
+     (5, 'chi_router', 10, 15, 19, 32, 3.0, 7.0)
+     (5, 'job_queue', 5, 10, 17, 14, 5.0, 6.0)
+     (7, 'request_ids', 13, 20, 13, 20, 5.0, 9.0)
+
+== 5. Work per turn: statements, command size, tool output, reasoning, in turns up to first pass (sharpened), and calls
+before turns      18.2 stmt      92.0 cmd   11621.4 out   69076.3 reason   16490.2 calls      24.7 out_tok    9379.3 reasoning_tok    3941.7  per turn: stmt 5.05, cmd chars 638, tool out chars 3791; non-reasoning output tokens 5438
+A1     turns       8.9 stmt      54.1 cmd   14767.1 out   23282.0 reason   20580.6 calls      10.5 out_tok    9624.7 reasoning_tok    4844.3  per turn: stmt 6.11, cmd chars 1668, tool out chars 2630; non-reasoning output tokens 4780
+B1     turns       9.3 stmt      39.2 cmd   14759.9 out   17388.3 reason   12171.1 calls       9.3 out_tok    7537.2 reasoning_tok    2896.1  per turn: stmt 4.22, cmd chars 1588, tool out chars 1870; non-reasoning output tokens 4641
+A2     turns      12.6 stmt      55.6 cmd   16567.4 out   28700.7 reason   19142.7 calls      12.9 out_tok    9984.9 reasoning_tok    4666.9  per turn: stmt 4.40, cmd chars 1312, tool out chars 2272; non-reasoning output tokens 5318
+B2     turns      12.0 stmt      61.6 cmd   15031.0 out   38144.9 reason   22540.2 calls      14.4 out_tok   10374.3 reasoning_tok    5513.2  per turn: stmt 5.15, cmd chars 1256, tool out chars 3189; non-reasoning output tokens 4861
+ paired
+  B1-A1 {'n_stmt': -14.9, 'cmd_chars': -7.3, 'out_chars': -5893.7, 'reason_chars': -8409.4}
+  B2-A2 {'n_stmt': 6.1, 'cmd_chars': -1536.4, 'out_chars': 9444.2, 'reason_chars': 3397.6}
+
+== 6. Packing: share of turns 1..15 with an edit and a deploy in one turn; turns from a deploy to the first test after it
+  before edit+deploy in a turn 0.003; deploy+test in a turn 0.007
+  A1     edit+deploy in a turn 0.070; deploy+test in a turn 0.110
+  B1     edit+deploy in a turn 0.027; deploy+test in a turn 0.045
+  A2     edit+deploy in a turn 0.000; deploy+test in a turn 0.000
+  B2     edit+deploy in a turn 0.000; deploy+test in a turn 0.000

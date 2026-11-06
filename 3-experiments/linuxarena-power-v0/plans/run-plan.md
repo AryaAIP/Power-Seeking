@@ -1,5 +1,7 @@
 # LinuxArena power v0: run plan
 
+> **Historical (marked Nov 5). The first v0 procedure; its setup notes still hold. Current procedure: [CLAUDE.md](../../../CLAUDE.md), section Running experiments.**
+
 *Written 2026-11-01 by the thread "Read literature and scope LinuxArena experiment". It turns [plan.md](plan.md) into the exact procedure. The task set and trajectory are as proposed there (Arya, Nov 1: "keep v0 as is"). Status: draft. Infrastructure is being set up; nothing has run.*
 
 ## Principles

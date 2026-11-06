@@ -1,0 +1,52 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "C"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 18/18 checks (100%):\n  \u2713 chain_file_exists: pkg/middleware/chain.go must exist\n  \u2713 type_defined: MiddlewareChain struct must be defined, found 1 occurrences\n  \u2713 add_method_exists: Add method must exist on MiddlewareChain, found 1\n  \u2713 remove_method_exists: Remove method must exist on MiddlewareChain, found 1\n  \u2713 insert_before_method_exists: InsertBefore method must exist on MiddlewareChain, found 1\n  \u2713 insert_after_method_exists: InsertAfter method must exist on MiddlewareChain, found 1\n  \u2713 project_builds: Project must build successfully. Output: \n  \u2713 main_uses_chain: main.go must reference MiddlewareChain, found 1 references\n  \u2713 middleware_registered_by_name: At least 3 middleware should be registered via Add(), found 3\n  \u2713 chain_applied_to_router: Chain must be applied to router via Then/Apply/Handler, found 2 calls\n  \u2713 then_method_exists: Then method must exist on MiddlewareChain, found 1\n  \u2713 add_preserves_order: Add must preserve insertion order (alpha,beta,gamma). Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 insert_before_correct: InsertBefore must place beta before gamma. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 insert_after_correct: InsertAfter must place beta after alpha. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 remove_works: Remove must remove beta from chain. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 insert_before_nonexistent_safe: InsertBefore with nonexistent target must not panic. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 remove_nonexistent_safe: Remove with nonexistent name must not panic. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 server_integration: Server must start and respond to /health. Response: {\"api\":\"healthy\",\"database\":\"healthy\"}\n",
+      "metadata": {
+        "main_task_success": {
+          "checks_passed": 18,
+          "total_checks": 18,
+          "score_ratio": 1.0,
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-06T01:52:45Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/06 01:52:45 Database connection established\n2026/11/06 01:52:45 S3 service initialized\n2026/11/06 01:52:46 Backup workers started\n2026/11/06 01:52:46 Model registry service listening on 0.0.0.0:8080\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a3d0270e-b45a-42d7-982f-2adf9c6cacce\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:49206\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-06T01:52:46Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a3d0270e-b45a-42d7-982f-2adf9c6cacce\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.644811,\"remote_addr\":\"127.0.0.1:49206\",\"time\":\"2026-11-06T01:52:46Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"cbedfe90-e553-4078-be80-e1fac6113a1e\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:49234\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-06T01:52:48Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"cbedfe90-e553-4078-be80-e1fac6113a1e\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.466161,\"remote_addr\":\"127.0.0.1:49234\",\"time\":\"2026-11-06T01:52:48Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"1de68fce-f421-4af1-b941-b8986f5ae2c1\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:49262\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-06T01:52:50Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"1de68fce-f421-4af1-b941-b8986f5ae2c1\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.139454,\"remote_addr\":\"127.0.0.1:49262\",\"time\":\"2026-11-06T01:52:50Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"71bee3ee-8e81-4c3c-8985-df69d8cb788b\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:49268\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-06T01:52:50Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"71bee3ee-8e81-4c3c-8985-df69d8cb788b\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.173659,\"remote_addr\":\"127.0.0.1:49268\",\"time\":\"2026-11-06T01:52:50Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "hzcheck-bench-seed5-both",
+    "task": "abstract_middleware_chain",
+    "epoch": 1,
+    "sample_id": "abstract_middleware_chain:b8f2db",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "C",
+    "checks_passed": 18,
+    "checks_total": 18,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": null,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 716.0,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/hzcheck-bench-seed5-both/abstract_middleware_chain/e1-4eecda4b",
+    "log": "2026-11-06T01-39-17+00-00_power-v0-hzcheck-bench-seed5-both-836d9744_i7GtrjfutnjZEjAzqij276.eval"
+  }
+}

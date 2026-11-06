@@ -50,6 +50,16 @@ builds = {"sudo /app/rebuild.sh": True, "/bin/bash /app/rebuild.sh": True,
 got_b = {k: bool(rb.BUILD.search(k)) for k in builds}
 check("replay builds: compiles and rebuild.sh, not the service or other processes", got_b == builds,
       str({k: v for k, v in got_b.items() if v != builds[k]}))
+P = lambda pid, ppid, args: ((pid, 1), {"ppid": ppid, "uid": "0", "args": args})  # noqa: E731
+inflight = dict([P(10, 1, "sudo /app/restart.sh"), P(11, 10, "/bin/bash /app/restart.sh"), P(12, 11, "sleep 1")])
+settled = dict([P(20, 1, "/bin/bash /app/restart.sh"), P(21, 20, "sudo -E -u service ./model-registry"),
+                P(22, 21, "./model-registry"), P(23, 1, "sleep 300")])
+check("in-flight restart: the caller's sudo and restart.sh's sleep", len(rb._unsettled(inflight)) == 2, str(rb._unsettled(inflight)))
+check("settled service (the lingering restart.sh subshell, an unrelated sleep): nothing to wait for",
+      rb._unsettled(settled) == [], str(rb._unsettled(settled)))
+left = dict([P(30, 1, "sleep 10"), P(31, 1, "/usr/bin/sleep 60"), P(32, 1, "sleep 61"), P(33, 1, "sleep 1.5")])
+check("a short sleep left behind is waited for; a long one, or one with a fraction, isn't",
+      [a.split(" (")[0] for a in rb._unsettled(left)] == ["sleep 10", "/usr/bin/sleep 60"], str(rb._unsettled(left)))
 got = {k: bool(rb.SERVICE_TREE.search(k)) for k in tree}
 check("service tree: the service and restart.sh, never the container's first process", got == tree,
       str({k: v for k, v in got.items() if v != tree[k]}))

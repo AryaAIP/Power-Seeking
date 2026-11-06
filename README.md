@@ -1,8 +1,8 @@
 # Power-seeking project: start here
 
-*Updated 2026-11-01, after the LinuxArena pilot; folder layout and current state updated Nov 2, and the current work on Nov 3. Read this first. It lists every source behind the project, every doc and thread it has produced, where things stand, and what to read next. If you're a new Claude or agent picking this up, read [CLAUDE.md](CLAUDE.md) (the project's conventions) and [working-with-arya.md](1-handoff/working-with-arya.md) before you write anything to Arya.*
+*Updated 2026-11-01, after the LinuxArena pilot; folder layout and current state updated Nov 2, and the current work on Nov 3 and Nov 5. Read this first. It lists every source behind the project, every doc and thread it has produced, where things stand, and what to read next. If you're a new Claude or agent picking this up, read [CLAUDE.md](CLAUDE.md) (the project's conventions) and [working-with-arya.md](1-handoff/working-with-arya.md) before you write anything to Arya.*
 
-**Current work (Nov 3):** the first power measurement, in [3-experiments/linuxarena-power-v0/](3-experiments/linuxarena-power-v0/README.md).
+**Current work (Nov 5):** the first power measurement, in [3-experiments/linuxarena-power-v0/](3-experiments/linuxarena-power-v0/README.md). Its README has a start-here table and every file's status. Every-turn rescoring is paused at 48 of 130 runs; the Nov 5 research reports are listed by question in [findings/README.md](3-experiments/linuxarena-power-v0/findings/README.md).
 - The Nov 3 results (two pairs of trajectories, 27 tasks) are in [findings/results-nov3.md](3-experiments/linuxarena-power-v0/findings/results-nov3.md). The Nov 2 results, now superseded, are in [findings/results-night-1.md](3-experiments/linuxarena-power-v0/findings/results-night-1.md).
 - Where every piece of data lives: [findings/data-map.md](3-experiments/linuxarena-power-v0/findings/data-map.md).
 - What's next is in [next-steps.md](3-experiments/linuxarena-power-v0/next-steps.md).
@@ -27,7 +27,7 @@ SESSION-NOTES-for-compacted-Claude.md   live state (section 0) and infrastructur
   linuxarena-power-v0/     Nov 1- the first power measurement (current): plans, logs, findings, runs, harness
 4-background-oct-2026/     the earlier thread's Oct 19-30 notes (mostly out of date), incl. testbed-research/
 5-reading-notes-nov-2026/  Nov 1 reading notes on every source in section 1, plus synthesis.md (start there)
-tools/                     check_links.py: reports broken relative links (run after moving files)
+tools/                     power.sh (the common commands), check_links.py (broken relative links), record_cache.py (read cache)
 ```
 
 The live Claude Docs, the doc snapshots and `1-handoff/handoff-scope.md` still use the old paths, such as `power-seeking/basharena-test/` and `power-seeking/linuxarena-pilot/`. Those folders are now under `3-experiments/`, and the older notes are under `4-background-oct-2026/`.
@@ -185,8 +185,9 @@ Read during the environment comparison. Some were read by research subagents. De
 | `linuxarena-power-v0/findings/results-night-1.md` | The Nov 2 results (6 tasks) and checks of the method | Same thread, Nov 2 | Historical, superseded by `results-nov3.md` |
 | `linuxarena-power-v0/plans/nov3-plan-to-6am.md`, `logs/2026-11-02-midday-runs.md` | The plan for the Nov 3 run (the search for a power-seeking trajectory, then two pairs on 27 tasks) and the main session's running log from Nov 2 midday through Nov 3 | Main session, Nov 2–3 | Done; the log is current |
 | `linuxarena-power-v0/findings/results-nov3.md`, `findings/data-map.md`, `next-steps.md` | The Nov 3 results, audit and caveats; where every piece of data lives; what's next, with commands | Main session, Nov 3 | Current. The numbers are replaced when the every-turn rescoring lands |
-| `linuxarena-power-v0/plans/score-and-rollback-scope.md`, `logs/2026-11-03-score-and-rollback.md` | Scoring each solver run at every turn in one machine: the scope, and the side session that built and validated it | Side session, Nov 3 | Built; production running |
-| `linuxarena-power-v0/README.md` | That folder's own index: every file and its status, old and new runs, and the run registry in `runs/` | Folder tidy-ups, Nov 1, 2 and 3 | Current |
+| `linuxarena-power-v0/plans/score-and-rollback-scope.md`, `logs/2026-11-03-score-and-rollback.md` | Scoring each solver run at every turn in one machine: the scope, and the side session that built and validated it | Side session, Nov 3 | Built and validated; production paused at 48 of 130 runs |
+| `linuxarena-power-v0/plans/nov5-research-plan.md`, `findings/README.md`, `findings/nov5-*`, `findings/task-power/`, `analysis/`, `logs/2026-11-05-power-research.md` | The Nov 5 research stretch: what power looks like here, from stored records | Main session and its agents, Nov 5 | Current |
+| `linuxarena-power-v0/README.md` | That folder's own index: every file and its status, old and new runs, and the run registry in `runs/` | Folder tidy-ups, Nov 1, 2, 3 and 5 | Current |
 
 ### `4-background-oct-2026/` (earlier thread "Power-seeking environment plan")
 

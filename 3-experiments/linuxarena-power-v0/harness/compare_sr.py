@@ -11,12 +11,15 @@ For the bug fix the checks are the target tests of our rerun; for a scorer with 
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from power_paths import RUNS  # noqa: E402
 from task_names import SHORT  # noqa: E402
+
+MARKED = re.compile(r"^\s*(✓|✗) (\w+):", re.M)
 
 
 def check_list(sc: dict) -> dict:
@@ -28,6 +31,8 @@ def check_list(sc: dict) -> dict:
         out["checks"] = [(t["test"], t["outcome"]) for t in sc["bugfix_tests"]]
     elif sc.get("checks"):
         out["checks"] = [(c["check"].split(" — ")[0].strip(), c["passed"]) for c in sc["checks"]]
+    elif MARKED.search(expl):  # scorers that list their checks as "  ✓ name: ..."
+        out["checks"] = [(m.group(2), m.group(1) == "✓") for m in MARKED.finditer(expl)]
     else:
         out["checks"] = [("passed/total", f"{p.get('checks_passed')}/{p.get('checks_total')}")]
     return out
@@ -49,12 +54,47 @@ def scores_of(label_glob: str, task: str) -> list[tuple[str, dict]]:
             for p in sorted(RUNS.glob(f"{label_glob}/{task}/*/scores.json"))]
 
 
+def against(labels: list[str], ref: str) -> int:
+    """--against: each label's point against the same H in another score-and-roll-back job. Prints check names only."""
+    bad = 0
+    for label in labels:
+        for f in sorted(RUNS.glob(f"{label}/*/*/horizon_scores.jsonl")):
+            task = f.parent.parent.name
+            refs = sorted(RUNS.glob(f"{ref}/{task}/*/horizon_scores.jsonl"))
+            if not refs:
+                print(f"{label} {task}: no rows in {ref}")
+                continue
+            old = {r["H"]: r for r in map(json.loads, refs[0].read_text().splitlines())}
+            same, total = 0, 0
+            for r in map(json.loads, f.read_text().splitlines()):
+                o = old.get(r["H"])
+                if not o or not r.get("scores") or not o.get("scores"):
+                    continue
+                total += 1
+                d = differences(check_list(o["scores"]), check_list(r["scores"]))
+                if d:
+                    bad += 1
+                    print(f"  H={r['H']} differs from {ref}: {'; '.join(d)}")
+                else:
+                    same += 1
+            e0, e1 = refs[0].parent / "scores.json", f.parent / "scores.json"
+            end = differences(check_list(json.loads(e0.read_text())), check_list(json.loads(e1.read_text()))) \
+                if e0.exists() and e1.exists() else ["no end score"]
+            bad += 1 if end else 0
+            print(f"{label} against {ref}: {same} of {total} points identical; end score "
+                  + ("identical" if not end else "DIFFERENT: " + "; ".join(end)))
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("labels", nargs="+")
     ap.add_argument("--json")
+    ap.add_argument("--against", help="also compare each point with this other score-and-roll-back label's same H")
     a = ap.parse_args()
     report, bad = [], 0
+    if a.against:
+        bad += against(a.labels, a.against)
     for label in a.labels:
         for f in sorted(RUNS.glob(f"{label}/*/*/horizon_scores.jsonl")):
             run = f.parent
@@ -69,6 +109,9 @@ def main() -> int:
                                      "differences": (r.get("restore") or {}).get("differences"),
                                      "service_restarted": (r.get("restore") or {}).get("service_restarted"),
                                      "db": (r.get("restore") or {}).get("db")})
+                if r.get("reused_from") or r.get("skipped"):  # not scored here: nothing to compare
+                    job["not_scored"] = job.get("not_scored", 0) + 1
+                    continue
                 new = check_list(r["scores"])
                 for path, sc in scores_of(f"hz-{src}-{SHORT[task]}-H{r['H']}", task) + \
                         scores_of(f"hz-{src}-{SHORT[task]}-H{r['H']}-*", task):
@@ -77,15 +120,26 @@ def main() -> int:
                     job["pairs"].append({"H": r["H"], "old": path, "same": not d, "differences": d,
                                          "old_scorer_error": old["error"], "new_scorer_error": new["error"],
                                          "passed": sum(1 for _, v in new["checks"] if v in (True, "PASSED"))})
+            by_h = {r["H"]: r for r in rows}
+            for r in rows:  # state dedup's audit: a point scored anyway must match the point whose state it equalled
+                ref = by_h.get(r.get("dedup_audit_of"))
+                if ref is not None and r.get("scores") and ref.get("scores"):
+                    d = differences(check_list(ref["scores"]), check_list(r["scores"]))
+                    job.setdefault("dedup_audits", []).append({"H": r["H"], "of": ref["H"], "same": not d, "differences": d})
             own = scores_of(src, task)
             end = json.loads((run / "scores.json").read_text())
             if own:
                 d = differences(check_list(own[0][1]), check_list(end))
                 job["end"] = {"own": own[0][0], "same": not d, "differences": d}
             bad += sum(1 for p in job["pairs"] if not p["same"]) + (0 if job.get("end", {}).get("same", True) else 1)
+            bad += sum(1 for au in job.get("dedup_audits", []) if not au["same"])
+            for au in job.get("dedup_audits", []):
+                print(f"  dedup audit: H={au['H']} scored again, same state as H={au['of']}: "
+                      + ("identical" if au["same"] else "DIFFERENT: " + "; ".join(au["differences"])))
             report.append(job)
             n_same = sum(1 for p in job["pairs"] if p["same"])
-            print(f"{label} {task}: {job['points']} of {job['planned_points']} points scored; "
+            print(f"{label} {task}: {job['points']} of {job['planned_points']} points"
+                  f"{' (' + str(job['not_scored']) + ' reused or skipped)' if job.get('not_scored') else ''}; "
                   f"{n_same} of {len(job['pairs'])} pairs with a per-step record identical; "
                   f"end score {'identical to' if job.get('end', {}).get('same') else 'DIFFERENT from'} the run's own; "
                   f"state equal after {sum(1 for s in job['state'] if s['state_equal'])} of {len(rows)} restores")

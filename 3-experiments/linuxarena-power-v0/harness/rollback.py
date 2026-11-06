@@ -63,6 +63,28 @@ TAR_POSIX = ["--format=posix", "--pax-option=delete=atime,delete=ctime"]  # keep
 BUILD = re.compile(r"(^|[ /])(go|gcc|cc|cc1|cc1plus|as|ld|collect2|compile|link|asm|cgo|vet)( |$)|/app/rebuild\.sh|"
                    r"go-build|\bgo (build|install|test|mod)\b")
 BUILD_WAIT = 300
+# A restart the replay left in flight (a replayed `sudo /app/restart.sh` still between its pkill and the new service):
+# its `sudo … restart.sh`, or a `sleep` restart.sh is running. save_point waits for it too, so the service the restart
+# starts is part of the saved state, not taken for one the scorer started.
+RESTART_CALL = re.compile(r"^sudo( -\S+)* /app/restart\.sh$|^(\S*/)?(ba)?sh /app/restart\.sh$")
+SHORT_SLEEP = 60  # a sleep of at most this many seconds is waited for too; a longer one is the agent's own business
+
+
+def _unsettled(procs: dict) -> list[str]:
+    """Builds and restarts the replay left running (see BUILD and RESTART_CALL)."""
+    out = [p["args"] for p in procs.values() if BUILD.search(p["args"]) and not SERVICE_TREE.search(p["args"].strip())]
+    pids = {k[0]: p for k, p in procs.items()}
+    for (pid, _), p in procs.items():
+        a = p["args"].strip()
+        if re.match(r"^sudo( -\S+)* /app/restart\.sh$", a):
+            out.append(a)  # the caller's sudo exits only when restart.sh's foreground part is done
+        elif re.match(r"^(\S*/)?sleep \d+$", a) and RESTART_CALL.search(pids.get(p["ppid"], {}).get("args", "").strip()):
+            out.append(f"{a} (in restart.sh)")
+        elif (m := re.match(r"^(\S*/)?sleep (\d+)$", a)) and int(m.group(2)) <= SHORT_SLEEP:
+            # e.g. `cd /app/model-registry && sudo /app/restart.sh & sleep 10`: restart.sh's pkill -f model-registry kills
+            # the agent's own call, as it did in the run, and its sleep lives on. It would end during scoring.
+            out.append(f"{a} (left behind)")
+    return out
 
 
 class Entry(NamedTuple):
@@ -676,8 +698,13 @@ _DB_SCRIPT = (
 
 
 def dbstate_fast(st: Stack) -> dict:
-    """{key: value} exactly as env_fingerprint.dbstate gives it, from one `docker exec`."""
-    r = _in(st.pg_pid(), ["docker", "exec", "-i", st.pg], ["sh", "-s"], input=_DB_SCRIPT, text=True, timeout=300)
+    """{key: value} exactly as env_fingerprint.dbstate gives it, from one `docker exec`. Retried: under load a psql
+    can fail to connect (exit 2)."""
+    for attempt in range(3):
+        r = _in(st.pg_pid(), ["docker", "exec", "-i", st.pg], ["sh", "-s"], input=_DB_SCRIPT, text=True, timeout=300)
+        if r.returncode == 0:
+            break
+        time.sleep(3)
     if r.returncode:
         return {"_error": f"database summary exit {r.returncode}"}
     out, dbs, sec, db, schema = {}, [], None, None, {}
@@ -754,7 +781,40 @@ def service_waiters(procs) -> set:
     return out
 
 
-def summary(st: Stack) -> dict:
+# Opt-in (bench.py's db_detect, off by default): skip a full database hash when a cheap detector says nothing moved since
+# the last full hash. The final check of every restore always takes the full hash, so a detector that misses a change
+# shows up there as an inexact restore. A detector that moves without a real change only costs the full hash.
+DB_DETECT = False
+_DETECT_SCRIPT = (
+    'T=$(printf "\\t"); P() { psql -U "${POSTGRES_USER:-postgres}" -X -q -A -t -F "$T" -v ON_ERROR_STOP=1 -d "$1"; }\n'
+    "P postgres <<'EOSQL'\nselect pg_current_wal_insert_lsn();\n"
+    "select datname, tup_inserted, tup_updated, tup_deleted from pg_stat_database where datname is not null order by 1;\nEOSQL\n"
+    "P postgres <<'EOSQL' | while IFS= read -r db; do\nselect datname from pg_database where not datistemplate order by 1;\nEOSQL\n"
+    '  echo "@@D $db"; P "$db" <<\'EOSQL\'\n'
+    "select schemaname, sequencename, last_value from pg_sequences order by 1, 2;\n"
+    "select 'unlogged', count(*) from pg_class where relpersistence = 'u';\nEOSQL\n"
+    "done\n")
+
+
+def db_detector(st: Stack) -> str | None:
+    """A hash of the WAL position, the databases' row counters, and every sequence's value. None if it can't be trusted
+    here: an unlogged table writes no WAL, so the full hash is needed."""
+    r = _in(st.pg_pid(), ["docker", "exec", "-i", st.pg], ["sh", "-s"], input=_DETECT_SCRIPT, text=True, timeout=120)
+    if r.returncode or re.search(r"^unlogged\t[1-9]", r.stdout, re.M):
+        return None
+    return hashlib.sha256(r.stdout.encode()).hexdigest()
+
+
+def _db_now(st: Stack, sv: dict) -> dict:
+    """The database summary now: with DB_DETECT, the save's, if the detector hasn't moved since the save."""
+    if DB_DETECT and sv.get("db_detect") is not None and db_detector(st) == sv["db_detect"]:
+        st.detect_hits = getattr(st, "detect_hits", 0) + 1
+        return sv["summary"].get("db") or {}
+    st.detect_misses = getattr(st, "detect_misses", 0) + 1
+    return summary_section(st, "db")
+
+
+def summary(st: Stack, db: dict | None = None) -> dict:
     """The state summary (everything but the files, which are compared through the listings): processes, the service,
     the network, Postgres and the buckets, each as {key: value}. No secret values (env_fingerprint's rules)."""
     procs = [p for p in _processes(st) if not TRANSIENT.search(p[3])]
@@ -767,27 +827,63 @@ def summary(st: Stack) -> dict:
             out[sec] = {k: v for _, k, v in fn()}
         except Exception as e:  # noqa: BLE001  no output in the message (run() never includes stderr)
             out[sec] = {"_error": f"{type(e).__name__}: {e}"}
-    out["db"] = dbstate_fast(st)
+    out["db"] = dbstate_fast(st) if db is None else db
     out["s3"] = _buckets(st)
     return out
 
 
+# ---------------------------------------------------------------- state dedup
+DEDUP_DETAIL = False  # opt-in, off by default: same_state notes the changed paths' names on its Stack (st.dedup_detail)
+
+
+def same_state(st: Stack, last: dict) -> tuple[bool, dict | None, str]:
+    """Is the machine exactly as it was at the last scored point's save (`last`: its files listing, summary and
+    service)? Then that score is this point's too. (same, the summary just taken, why not). Requires: nothing the replay
+    left running (no build or restart in flight); every path visibly the same, content included; the summary equal
+    (both databases, buckets, processes, network, the service); and the same service process, so its memory carried
+    over too. The summary is passed on to save_point when the state differs."""
+    procs = _procs(st)
+    if _unsettled(procs):
+        return False, None, "a build or restart still running"
+    svc = _service(st, procs)
+    if sorted((p["pid"], p["start"]) for p in svc["procs"]) != sorted((p["pid"], p["start"]) for p in last["service"]["procs"]):
+        return False, None, "a different service process"
+    keep = getattr(st, "keep", ())
+    fd = compare_files(last["files"], listing(st.upper, st.skip), st.lowers, str(st.saved), st.upper,
+                       skip=(*VOLATILE, *keep))
+    if fd:
+        if DEDUP_DETAIL:  # opt-in (bench.py's dedup_detail): which paths, and would the rest of the state have matched?
+            st.dedup_detail = {"paths": [[p, w] for p, w in fd[:200]], "count": len(fd),
+                               "summary_differs": sorted(compare_sections(last["summary"], summary(st)))}
+        return False, None, f"{len(fd)} paths changed"
+    now = summary(st)
+    d = compare_sections(last["summary"], now)
+    return (not d), now, ("" if not d else "summary: " + ",".join(sorted(d)))
+
+
 # ---------------------------------------------------------------- save and restore
-def save_point(st: Stack) -> dict:
+def save_point(st: Stack, pre_summary: dict | None = None) -> dict:
     """Save the state just before a scoring point. Returns the handle restore_point needs; its "info" is the record."""
     t_all = time.time()
     info: dict = {}
     procs = _procs(st)
-    builds = [p["args"] for p in procs.values() if BUILD.search(p["args"]) and not SERVICE_TREE.search(p["args"].strip())]
-    if builds:  # the replay's own build, still running: let it finish first
+    builds = _unsettled(procs)
+    if builds:  # the replay's own build or restart, still running: let it finish first
         info["waited_for_builds"] = sorted({_redact(a)[:120] for a in builds})[:6]
         t0 = time.time()
         while builds and time.time() - t0 < BUILD_WAIT:
             time.sleep(2)
             procs = _procs(st)
-            builds = [p["args"] for p in procs.values() if BUILD.search(p["args"]) and not SERVICE_TREE.search(p["args"].strip())]
+            builds = _unsettled(procs)
         info["waited_for_builds_seconds"] = round(time.time() - t0, 1)
         info["builds_still_running"] = len(builds)
+    # DB_DETECT: nothing moved since the last restore's full hash, before this save's CHECKPOINT moves the WAL position
+    db_cached = None
+    if DB_DETECT:
+        last = getattr(st, "db_last", None)
+        if last is not None and last[0] is not None and db_detector(st) == last[0]:
+            db_cached = last[1]
+        info["db_hash_reused"] = db_cached is not None
     svc = _service(st, procs)
     running_bin = None
     if svc["procs"] and any(p["exe_sha256"] != svc["disk_sha256"] for p in svc["procs"]):
@@ -818,12 +914,29 @@ def save_point(st: Stack) -> dict:
         raise RuntimeError(f"bucket mirror exit {r.returncode}")
     info["s3_seconds"] = round(time.time() - t0, 1)
     t0 = time.time()
-    summ = summary(st)
+    db_detect = db_detector(st) if DB_DETECT else None  # read before the hash: a write after it only costs a full hash later
+    if pre_summary is not None:  # the dedup check's, taken just before: nothing ran since
+        summ = pre_summary
+    else:
+        summ = summary(st) if db_cached is None else summary(st, db_cached)
     info["summary_seconds"] = round(time.time() - t0, 1)
+    # The processes and the service as scoring finds them, which the restore measures "started by scoring" against:
+    # anything that started during the save (a replayed restart finishing, say) belongs to the saved state.
+    end_procs = _procs(st)
+    end_svc = _service(st, end_procs)
+    if [p["exe_sha256"] for p in end_svc["procs"]] != [p["exe_sha256"] for p in svc["procs"]]:
+        info["service_changed_during_save"] = True
+        running_bin = None
+        if end_svc["procs"] and any(p["exe_sha256"] != end_svc["disk_sha256"] for p in end_svc["procs"]):
+            running_bin = st.work / "running-service.bin"
+            shutil.copyfile(f"/proc/{end_svc['procs'][0]['pid']}/exe", running_bin)
+        info["service_running"] = len(end_svc["procs"])
+        info["running_binary_differs_from_file"] = running_bin is not None
+    svc = end_svc  # same binary, perhaps a new process: the restore checks the service by these pids
     info["save_seconds"] = round(time.time() - t_all, 1)
     st.points += 1
-    return {"info": info, "files": files, "procs": procs, "service": svc, "running_bin": running_bin,
-            "summary": summ, "dbs": dbs}
+    return {"info": info, "files": files, "procs": end_procs, "service": svc, "running_bin": running_bin,
+            "summary": summ, "dbs": dbs, "db_detect": db_detect}
 
 
 _DUMP_SCRIPT = (
@@ -836,7 +949,11 @@ _DUMP_SCRIPT = (
 def _dump_databases(st: Stack) -> list[str]:
     """A data-only dump of every database into the work folder (db-<name>.sql), in one `docker exec`. Returns the
     databases' names."""
-    r = _in(st.pg_pid(), ["docker", "exec", "-i", st.pg], ["sh", "-s"], input=_DUMP_SCRIPT.encode(), timeout=600)
+    for attempt in range(3):  # under load a psql or pg_dump can fail to connect (exit 2)
+        r = _in(st.pg_pid(), ["docker", "exec", "-i", st.pg], ["sh", "-s"], input=_DUMP_SCRIPT.encode(), timeout=600)
+        if r.returncode == 0:
+            break
+        time.sleep(3)
     if r.returncode:
         raise RuntimeError(f"database dump exit {r.returncode}")
     dbs = []
@@ -931,7 +1048,7 @@ def restore_point(st: Stack, sv: dict) -> dict:
     #    SQLite file, say) is put back with the service stopped and restarted; one another surviving process writes to
     #    (a log) is left alone. The service log is never touched.
     t0 = time.time()
-    db_after = summary_section(st, "db")
+    db_after = _db_now(st, sv) if DB_DETECT else summary_section(st, "db")
     mode, dbs = _db_plan(sv["summary"].get("db") or {}, db_after)
     survivors = {k: p for k, p in _procs(st).items() if k not in new}
     tree = [k for k, p in survivors.items() if SERVICE_TREE.search(p["args"].strip())]
@@ -990,12 +1107,18 @@ def restore_point(st: Stack, sv: dict) -> dict:
         # 6b. The restart itself writes: restart.sh, and the service at start-up (its backup pass; an agent's code may
         #     log or record its start). Undo that too, with the service running: rows in place, buckets, and files,
         #     those the service holds open rewritten in place so it keeps writing to the same file.
-        time.sleep(RESTART_SETTLE)
+        if SETTLE is None:
+            time.sleep(RESTART_SETTLE)
+        else:  # bench.py's test of a shorter wait; off in production
+            info["settle"] = SETTLE(st)
         info["after_restart"] = _undo_running(st, sv, skip)
     info["service_seconds"] = round(time.time() - t0, 1)
     # 7. The check: the state summary and the files, against the save.
     t0 = time.time()
-    now = summary(st)
+    detect_final = db_detector(st) if DB_DETECT else None  # read before the hash, as at the save
+    now = summary(st)  # always the full hash
+    if DB_DETECT:
+        st.db_last = (detect_final, now["db"])
     diffs = compare_sections(sv["summary"], now)
     if "s3" in diffs:  # sizes and ETags, never contents
         d, b4 = diffs["s3"], sv["summary"].get("s3") or {}
@@ -1013,11 +1136,14 @@ def restore_point(st: Stack, sv: dict) -> dict:
     info["differences"] = diffs
     info["accepted_differences"] = accepted
     info["state_equal"] = not diffs and not plan["opaque"] and rc == 0
+    # the service as the next point will find it (for state dedup: a later point equal to this one must have it too)
+    info["service_after"] = [[p["pid"], p["start"]] for p in _service(st, _procs(st))["procs"]]
     info["restore_seconds"] = round(time.time() - t_all, 1)
     return info
 
 
 RESTART_SETTLE = 5  # seconds after the restarted service is healthy, for its start-up pass to finish
+SETTLE = None  # bench.py can put a function here, in place of that fixed wait
 
 
 def _rewrite_in_place(st: Stack, rel: str, e: Entry) -> None:
@@ -1033,7 +1159,7 @@ def _rewrite_in_place(st: Stack, rel: str, e: Entry) -> None:
 def _undo_running(st: Stack, sv: dict, skip) -> dict:
     """After a restart: undo what changed since the save, without stopping the service."""
     out: dict = {}
-    mode, dbs = _db_plan(sv["summary"].get("db") or {}, summary_section(st, "db"))
+    mode, dbs = _db_plan(sv["summary"].get("db") or {}, _db_now(st, sv) if DB_DETECT else summary_section(st, "db"))
     out["db"] = mode if mode != "rows" else f"rows: {', '.join(dbs)}"
     if mode == "rows" and not all(_reload_rows(st, db) for db in dbs):
         out["db"] = "rows: the in-place reload failed"

@@ -1,5 +1,7 @@
 # LinuxArena power v0: bottlenecks, issues and options
 
+> **Historical (marked Nov 5). Written after the 12-run root pilot.**
+
 *Started 2026-11-01 by the thread "Read literature and scope LinuxArena experiment", for Arya's discussion of how to proceed. Draft: the pilot numbers (12 runs) are filled in once they finish.*
 
 ## Where things stand

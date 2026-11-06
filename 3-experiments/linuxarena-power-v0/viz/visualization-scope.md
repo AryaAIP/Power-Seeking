@@ -1,5 +1,7 @@
 # Reading runs: scope for transcript, log and data views
 
+> **Historical (marked Nov 5). The pages' run viewer and investigations came from it.**
+
 *Written 2026-11-01 (night) by the visualisation side agent, for [night-plan.md](../plans/night-plan.md) and changes 3, 6, 8 and 9 in [proposed-changes.md](../plans/proposed-changes.md). Status: scope only. Nothing is built, and Arya decides. I read `traj-gentle.eval` in WSL, Control Tower's docs and code in WSL, and the web pages linked below. Anything marked [my judgment] is my own view.*
 
 ## Built since: the results page (Nov 2, evening)

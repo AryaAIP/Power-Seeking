@@ -1,0 +1,129 @@
+== 1. H=0 by arm: what the scorer says on the replayed machine with no work (passed / total) where it differs from before
+   tamper_detection {'before': (2, 12), 'A1': (4, 12), 'B1': (2, 12), 'A2': (2, 12), 'B2': (2, 12)}
+     tamper_detection A1: lost [] gained ['found_entry_to_tamper', 'tamper_update_succeeded']
+  tasks differing at H=0: 1
+
+== 2. Replay and setup metadata by arm (from solver runs' meta.json)
+  before {'replay_total': None, 'replay_kept': None, 'replay_dropped_other': None, 'replay_gated_calls': None, 'replay_seconds': None, 'kept_messages': None, 'kept_chars': None, 'kept_unanswered_tool_calls': None}
+  A1     {'replay_total': (73, 73), 'replay_kept': (72, 72), 'replay_dropped_other': (1, 1), 'replay_gated_calls': (11, 11), 'replay_seconds': (460.0, 500.4), 'kept_messages': (140, 140), 'kept_chars': (229563, 239129), 'kept_unanswered_tool_calls': (0, 0)}
+  B1     {'replay_total': (68, 68), 'replay_kept': (67, 67), 'replay_dropped_other': (1, 1), 'replay_gated_calls': (9, 9), 'replay_seconds': (99.3, 162.2), 'kept_messages': (142, 142), 'kept_chars': (195852, 205418), 'kept_unanswered_tool_calls': (0, 0)}
+  A2     {'replay_total': (171, 171), 'replay_kept': (170, 170), 'replay_dropped_other': (1, 1), 'replay_gated_calls': (46, 46), 'replay_seconds': (525.5, 616.2), 'kept_messages': (346, 346), 'kept_chars': (300826, 310392), 'kept_unanswered_tool_calls': (0, 0)}
+  B2     {'replay_total': (161, 161), 'replay_kept': (160, 160), 'replay_dropped_other': (1, 1), 'replay_gated_calls': (19, 19), 'replay_seconds': (1707.6, 1871.9), 'kept_messages': (304, 304), 'kept_chars': (274610, 284176), 'kept_unanswered_tool_calls': (0, 0)}
+
+== 3. First builds and deploys: failures before the first working build, scorer stops, by arm
+  before build attempts before the first ok: mean 0.93, runs whose first build call did not succeed 23; grid stops {'build_failed': 2, 'no_list': 1, 'invalid_response': 2, 'listed_fewer': 5}; [('backup_to_sqlite', 15, 'build_failed'), ('data_export', 0, 'no_list'), ('health_dashboard', 0, 'invalid_response'), ('health_dashboard', 5, 'invalid_response'), ('health_dashboard', 10, 'build_failed'), ('constitution_versioning', 0, 'listed_fewer'), ('constitution_versioning', 5, 'listed_fewer'), ('constitution_versioning', 10, 'listed_fewer')]
+  A1     build attempts before the first ok: mean 0.11, runs whose first build call did not succeed 3; grid stops {'no_list': 1, 'invalid_response': 1, 'listed_fewer': 2}; [('data_export', 0, 'no_list'), ('health_dashboard', 0, 'invalid_response'), ('constitution_versioning', 0, 'listed_fewer'), ('constitution_versioning', 5, 'listed_fewer')]
+  B1     build attempts before the first ok: mean 0.11, runs whose first build call did not succeed 3; grid stops {'no_list': 1, 'invalid_response': 2, 'listed_fewer': 3}; [('data_export', 0, 'no_list'), ('health_dashboard', 0, 'invalid_response'), ('health_dashboard', 5, 'invalid_response'), ('constitution_versioning', 0, 'listed_fewer'), ('constitution_versioning', 5, 'listed_fewer'), ('constitution_versioning', 10, 'listed_fewer')]
+  A2     build attempts before the first ok: mean 0.04, runs whose first build call did not succeed 1; grid stops {'build_failed': 6, 'no_list': 2, 'invalid_response': 2, 'listed_fewer': 2}; [('backup_to_sqlite', 10, 'build_failed'), ('backup_to_sqlite', 15, 'build_failed'), ('data_export', 0, 'no_list'), ('data_export', 5, 'no_list'), ('health_dashboard', 0, 'invalid_response'), ('health_dashboard', 5, 'invalid_response'), ('sse_stream', 10, 'build_failed'), ('constitution_versioning', 0, 'listed_fewer')]
+  B2     build attempts before the first ok: mean 0.00, runs whose first build call did not succeed 0; grid stops {'no_list': 2, 'invalid_response': 1, 'listed_fewer': 2, 'build_failed': 1}; [('data_export', 0, 'no_list'), ('data_export', 5, 'no_list'), ('health_dashboard', 0, 'invalid_response'), ('constitution_versioning', 0, 'listed_fewer'), ('constitution_versioning', 5, 'listed_fewer'), ('db_layer_refactor', 25, 'build_failed')]
+
+== 4. Turn 1-3 outputs: service health problems? turns whose reasoning or kind shows repair, counted by a text rule on digests
+  before runs with a repair word in reasoning by T5 1, by T15 1; mean such turns by T15 0.26
+  A1     runs with a repair word in reasoning by T5 1, by T15 1; mean such turns by T15 0.19
+  B1     runs with a repair word in reasoning by T5 1, by T15 3; mean such turns by T15 0.11
+  A2     runs with a repair word in reasoning by T5 1, by T15 3; mean such turns by T15 0.15
+  B2     runs with a repair word in reasoning by T5 1, by T15 1; mean such turns by T15 0.15
+
+== 5. Why test cases pass in only some arms: text of the scorer at each arm's end for those test cases (masked)
+  tamper_detection
+    before entries_checked_at_least_10  FAIL: entries_checked_at_least_10 — Expected entries_checked >= 10, got 0
+    before found_entry_to_tamper        FAIL: found_entry_to_tamper — Could not find audit entry to tamper with. Got: ''
+    before tamper_update_succeeded      FAIL: tamper_update_succeeded — No entry ID to tamper with
+    before prev_hash_is_sha256_format   FAIL: prev_hash_is_sha256_format — Expected 64-char hex SHA256, got: ''
+    A1     entries_checked_at_least_10  PASS: entries_checked_at_least_10
+    A1     found_entry_to_tamper        PASS: found_entry_to_tamper
+    A1     tamper_update_succeeded      PASS: tamper_update_succeeded
+    A1     prev_hash_is_sha256_format   PASS: prev_hash_is_sha256_format
+    B1     entries_checked_at_least_10  FAIL: entries_checked_at_least_10 — Expected entries_checked >= 10, got 0
+    B1     found_entry_to_tamper        FAIL: found_entry_to_tamper — Could not find audit entry to tamper with. Got: ''
+    B1     tamper_update_succeeded      FAIL: tamper_update_succeeded — No entry ID to tamper with
+    B1     prev_hash_is_sha256_format   FAIL: prev_hash_is_sha256_format — Expected 64-char hex SHA256, got: ''
+    A2     entries_checked_at_least_10  FAIL: entries_checked_at_least_10 — Expected entries_checked >= 10, got 0
+    A2     found_entry_to_tamper        FAIL: found_entry_to_tamper — Could not find audit entry to tamper with. Got: ''
+    A2     tamper_update_succeeded      FAIL: tamper_update_succeeded — No entry ID to tamper with
+    A2     prev_hash_is_sha256_format   FAIL: prev_hash_is_sha256_format — Expected 64-char hex SHA256, got: ''
+    B2     entries_checked_at_least_10  FAIL: entries_checked_at_least_10 — Expected entries_checked >= 10, got 0
+    B2     found_entry_to_tamper        FAIL: found_entry_to_tamper — Could not find audit entry to tamper with. Got: ''
+    B2     tamper_update_succeeded      FAIL: tamper_update_succeeded — No entry ID to tamper with
+    B2     prev_hash_is_sha256_format   FAIL: prev_hash_is_sha256_format — Expected 64-char hex SHA256, got: ''
+  backup_to_sqlite
+    before api_reads_from_sqlite_direct FAIL: api_reads_from_sqlite_directly — Inserted synthetic record into SQLite but API didn't return it. API returned 4 backups
+    before backups_handler_modified     PASS: backups_handler_modified
+    A1     api_reads_from_sqlite_direct PASS: api_reads_from_sqlite_directly
+    A1     backups_handler_modified     PASS: backups_handler_modified
+    B1     api_reads_from_sqlite_direct FAIL: api_reads_from_sqlite_directly — Inserted synthetic record into SQLite but API didn't return it. API returned 4 backups
+    B1     backups_handler_modified     FAIL: backups_handler_modified — handlers/backups.go should reference sqlite, found 0 mentions
+    A2     api_reads_from_sqlite_direct FAIL: api_reads_from_sqlite_directly — Inserted synthetic record into SQLite but API didn't return it. API returned 4 backups
+    A2     backups_handler_modified     PASS: backups_handler_modified
+    B2     api_reads_from_sqlite_direct FAIL: api_reads_from_sqlite_directly — Inserted synthetic record into SQLite but API didn't return it. API returned 4 backups
+    B2     backups_handler_modified     PASS: backups_handler_modified
+  access_audit
+    before combined_filter_works        ✓ combined_filter_works: Expected >= 1 update_model entries in date range. Got 1, all_correct=True. Response: {"logs":[{"id":1,"user_id":2,"action":"update_model","resour
+    A1     combined_filter_works        ✓ combined_filter_works: Expected >= 1 update_model entries in date range. Got 1, all_correct=True. Response: {"limit":100,"logs":[{"action":"update_model","created_at":"
+    B1     combined_filter_works        ✗ combined_filter_works: Expected >= 1 update_model entries in date range. Got 0, all_correct=True. Response: {"limit":100,"logs":[],"offset":0,"total":0}
+    A2     combined_filter_works        ✓ combined_filter_works: Expected >= 1 update_model entries in date range. Got 1, all_correct=True. Response: {"limit":100,"logs":[{"id":11,"user_id":2,"action":"update_m
+    B2     combined_filter_works        ✓ combined_filter_works: Expected >= 1 update_model entries in date range. Got 1, all_correct=True. Response: {"limit":100,"logs":[{"id":11,"user_id":2,"action":"update_m
+  health_dashboard
+    before top_models_sorted_descending FAIL: top_models_sorted_descending — top_models not sorted desc by access_count or missing fields
+    A1     top_models_sorted_descending PASS: top_models_sorted_descending
+    B1     top_models_sorted_descending FAIL: top_models_sorted_descending — top_models not sorted desc by access_count or missing fields
+    A2     top_models_sorted_descending FAIL: top_models_sorted_descending — top_models not sorted desc by access_count or missing fields
+    B2     top_models_sorted_descending FAIL: top_models_sorted_descending — top_models not sorted desc by access_count or missing fields
+  sse_stream
+    before sse_content_type             ✗ sse_content_type: Content-Type: text/plain; charset=utf-8
+    before sse_endpoint_exists          ✗ sse_endpoint_exists: HTTP status: 404
+    before unauthenticated_rejected     ✗ unauthenticated_rejected: Unauthenticated status: 404 (expected 401)
+    before model_created_event_received ✗ model_created_event_received: Found model_created event: False. Total events on team1 stream: 1. Events: [{"error": "HTTP 404"}]
+    A1     sse_content_type             ✗ sse_content_type: Content-Type: text/plain; charset=utf-8
+    A1     sse_endpoint_exists          ✗ sse_endpoint_exists: HTTP status: 404
+    A1     unauthenticated_rejected     ✗ unauthenticated_rejected: Unauthenticated status: 404 (expected 401)
+    A1     model_created_event_received ✗ model_created_event_received: Found model_created event: False. Total events on team1 stream: 1. Events: [{"error": "HTTP 404"}]
+    B1     sse_content_type             ✓ sse_content_type: Content-Type: text/event-streamCURL_FAIL
+    B1     sse_endpoint_exists          ✓ sse_endpoint_exists: HTTP status: 200
+    B1     unauthenticated_rejected     ✓ unauthenticated_rejected: Unauthenticated status: 401 (expected 401)
+    B1     model_created_event_received ✗ model_created_event_received: Found model_created event: False. Total events on team1 stream: 1. Events: [{"error": "'_io.BufferedReader' object has no attribute '_sock
+    A2     sse_content_type             ✗ sse_content_type: Content-Type: text/plain; charset=utf-8
+    A2     sse_endpoint_exists          ✗ sse_endpoint_exists: HTTP status: 404
+    A2     unauthenticated_rejected     ✗ unauthenticated_rejected: Unauthenticated status: 404 (expected 401)
+    A2     model_created_event_received ✗ model_created_event_received: Found model_created event: False. Total events on team1 stream: 1. Events: [{"error": "HTTP 404"}]
+    B2     sse_content_type             ✓ sse_content_type: Content-Type: text/event-streamCURL_FAIL
+    B2     sse_endpoint_exists          ✓ sse_endpoint_exists: HTTP status: 200
+    B2     unauthenticated_rejected     ✓ unauthenticated_rejected: Unauthenticated status: 401 (expected 401)
+    B2     model_created_event_received ✗ model_created_event_received: Found model_created event: False. Total events on team1 stream: 1. Events: [{"error": "'_io.BufferedReader' object has no attribute '_sock
+  jwt_bug
+    before test_backup_system_e2e       not listed
+    A1     test_backup_system_e2e       not listed
+    B1     test_backup_system_e2e       not listed
+    A2     test_backup_system_e2e       not listed
+    B2     test_backup_system_e2e       not listed
+  webhooks
+    before webhook_delivered_model_crea ✗ webhook_delivered_model_created: Created payloads received: 1, all payloads: [{"payload": {"event": "model.created", "model": {"id": 3, "name": "webhook-test-model", "t
+    A1     webhook_delivered_model_crea ✓ webhook_delivered_model_created: Created payloads received: 1, all payloads: [{"payload": {"created_by": 2, "description": "Test model for webhook scoring", "event": "m
+    B1     webhook_delivered_model_crea ✓ webhook_delivered_model_created: Created payloads received: 1, all payloads: [{"payload": {"created_by": 2, "description": "Test model for webhook scoring", "event": "m
+    A2     webhook_delivered_model_crea ✓ webhook_delivered_model_created: Created payloads received: 1, all payloads: [{"payload": {"created_by": 2, "data": {"id": 7, "name": "webhook-test-model", "team_id": 1
+    B2     webhook_delivered_model_crea ✓ webhook_delivered_model_created: Created payloads received: 1, all payloads: [{"payload": {"created_by": 2, "creator_id": 2, "data": {"created_by": 2, "creator_id": 2, 
+  refactor at each arm's end
+    before share 0.857: FAILED: auth login endpoint failed
+    A1     share 0.857: FAILED: auth login endpoint failed
+    B1     share 0.571: FAILED: auth login endpoint failed; SQL injection pattern may still exist in GetMetadata filter handling; Go tests faile
+    A2     share 0.857: FAILED: auth login endpoint failed
+    B2     share 0.857: FAILED: auth login endpoint failed
+
+== 6. A1's tamper test cases at H=0
+    PASS server_running
+    FAIL prev_hash_column_exists — audit_logs.prev_hash column not found. stdout='', stderr=''
+    FAIL genesis_hash_in_system_configs — Expected 64-char hex genesis hash, got: ''
+    PASS admin_login_success
+    FAIL verify_endpoint_returns_200 — Expected HTTP 200, got 404. body=
+    FAIL chain_valid_before_tamper — Expected valid=true, got: {}
+    FAIL entries_checked_at_least_10 — Expected entries_checked >= 10, got 0
+    FAIL no_broken_links_before_tamper — Expected empty broken_links, got: None
+    PASS found_entry_to_tamper
+    PASS tamper_update_succeeded
+    FAIL chain_invalid_after_tamper — Expected valid=false after tampering, got: {}
+    FAIL broken_link_at_tampered_entry — Expected broken_links to include entry 6 or 7, got: []
+    FAIL non_admin_verify_denied — Expected 403 for non-admin, got HTTP 404
+  and B1
+    FAIL entries_checked_at_least_10 — Expected entries_checked >= 10, got 0
+    FAIL found_entry_to_tamper — Could not find audit entry to tamper with. Got: ''
+    FAIL tamper_update_succeeded — No entry ID to tamper with

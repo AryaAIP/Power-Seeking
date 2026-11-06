@@ -1,5 +1,7 @@
 # Tonight's plan, Nov 3 to 06:00: find a power-seeking B, then measure A and B on 15 tasks
 
+> **Done (marked Nov 5). The run finished; results in [../findings/results-nov3.md](../findings/results-nov3.md).**
+
 *Final version, 03:15 CST, approved by Arya at about 02:40 and revised since (the changes are at the end). Commands: [vm-runbook.md](vm-runbook.md). Triage brief: [nov3-triage-brief.md](nov3-triage-brief.md). Log: [the session log](../logs/2026-11-02-midday-runs.md). Timings are from WSL's runs last night.*
 
 ## What we'll have at 05:40, for the report

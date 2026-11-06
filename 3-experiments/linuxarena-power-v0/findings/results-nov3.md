@@ -2,7 +2,7 @@
 
 *Written 2026-11-03 at about 12:00 CST, from the stored records and the session log; nothing was launched. The source of truth for what happened is the main session log, [../logs/2026-11-02-midday-runs.md](../logs/2026-11-02-midday-runs.md), from the "02:45" entry on. Arya's decisions are in [../../../1-handoff/decisions-log.md](../../../1-handoff/decisions-log.md). Where every file lives: [data-map.md](data-map.md). Per Arya (Nov 3), the numbers are strict values: no confidence intervals and no low/high brackets.*
 
-**Pending:** every-turn rescoring (score and roll back) is about to run and will replace the per-5-turn values below. All the numbers that will change are in one table, [section 3](#3-the-numbers). Update that table and the sentences marked *(numbers)* when it lands.
+**Pending:** every-turn rescoring (score and roll back) will replace the per-5-turn values below. It is paused at 48 of 130 runs (Arya, Nov 3 19:52), so every number here is still per 5 turns. All the numbers that will change are in one table, [section 3](#3-the-numbers). Update that table and the sentences marked *(numbers)* when it lands.
 
 ## 1. The answer first
 
@@ -70,11 +70,11 @@ Each arm also has a no-work run (H = 0: the task is set up and scored with no so
 | H = 50 | | | −0.020 | | +0.014 |
 | Mean over H = 1..80 | | | −0.028 | | +0.003 |
 
-Figures: [../viz/nov3-power-curves-pair1.png](../viz/nov3-power-curves-pair1.png) and [pair 2](../viz/nov3-power-curves-pair2.png) (drawn at 08:47 under the first-pass rule, so slightly off; redraw after the rescoring). The pages: pair 1 https://claude.ai/artifact/RxVDZt1SzBfjiX6NcCdf22, pair 2 https://claude.ai/artifact/RfgNfq4BYRN2bfZBXqQwEh.
+Figures: [../viz/nov3-power-curves-pair1.png](../viz/nov3-power-curves-pair1.png) and [pair 2](../viz/nov3-power-curves-pair2.png) (drawn at 08:47 under the first-pass rule, so slightly off; redraw after the rescoring). The pages: both pairs on one page, https://claude.ai/artifact/RxVDZt1SzBfjiX6NcCdf22 (this link showed pair 1 alone until later on Nov 3); pair 2 alone, https://claude.ai/artifact/RfgNfq4BYRN2bfZBXqQwEh.
 
 **What the rule changed.** Under the first-pass rule (log, 08:30–09:45) the gains over H = 1..80 were A +0.128, B +0.111, A2 +0.081, B2 +0.038. Pair 1's B lost 0.011 because the last-scored rule counts the solver's own breakages. Pair 2's gap closed from −0.044 to +0.003, mostly through B2's corrected answer (about +0.037 to B2, section 8) and partly because A2's solvers broke test cases that had passed.
 
-**Stale copies.** [power-horizons-v4.json](power-horizons-v4.json)/[.txt](power-horizons-v4.txt) and [v4b/](v4b/power-horizons-v4.txt) were written at 08:38–08:40 under the first-pass rule and before the correction. `harness/vm/finish_v4.sh` rewrites them from the configs, which now set `last-scored`.
+**The computed tables.** [power-horizons-v4.json](power-horizons-v4.json)/[.txt](power-horizons-v4.txt) (pair 1) and [v4b/](v4b/power-horizons-v4.txt) (pair 2) were rewritten at 12:05 and 12:14 on Nov 3 under `last-scored`, with the correction, from the per-5-turn records. They hold the values in the table above, except that A2's mean over H = 1..80 is 0.70145 there, which the table shows as 0.702. Only the two curve figures still show the first-pass rule.
 
 ## 4. The audit and the independent recomputation
 
@@ -138,15 +138,14 @@ Arya decided (~10:15) to count it correct. The correction is recorded with its e
 - **Continuing the chat.** After either trajectory the solver continues the trajectory's chat, so it already knows the code base; from the initial state it starts a new chat. That likely explains much of the gain both A and B show over the initial state (my reading). No arm separates the two; an arm where the solver starts a new chat on the changed machine would.
 - **Pair 2's control gained power on its own** (section 7).
 - **The agent's account already has a route to the database superuser** through the allowed rebuild and restart (the science review), so kept credentials mostly save turns.
-- **Scoring every 5 turns, with gaps.** Between scored steps a value is read from the last scored step, so curves lag, and a missing point makes an arm read an earlier value. Missing now: 27 points in the initial state, 14 in A2 and 15 in B2 (section 4). Since test cases mostly start passing as a run goes on, this usually lowers those arms at the affected H. The every-turn rescoring removes both problems.
+- **Scoring every 5 turns, with gaps.** Between scored steps a value is read from the last scored step, so curves lag, and a missing point makes an arm read an earlier value. Missing now: 27 points in the initial state, 14 in A2 and 15 in B2 (section 4). Since test cases mostly start passing as a run goes on, this usually lowers those arms at the affected H. The every-turn rescoring removes both problems. On the 48 runs rescored so far, [../plans/scoring-schedules-analysis.md](../plans/scoring-schedules-analysis.md) measures how far every-5-turn values are off.
 - **15 of the 27 tasks are scored by counts,** not by named test cases (section 4).
 - **The storage question is one test case,** and B2's was corrected by hand (section 8).
 - **Load.** One no-work scorer crashed under load and was rerun (`nowork-v4-afterB-p5r`); one per-step job has no record. The every-turn validation also hit scorer timeouts under load, which the rescoring handles by rescoring those points.
-- **Four trajectory transcripts are held back from the repository** until they're re-redacted (`traj4-errors-blockers`, `-lean`, `-roadmap`, `traj4-minio-strong`). None is in either pair.
+- **Four trajectory transcripts were held back from the repository** until they were re-redacted (`traj4-errors-blockers`, `-lean`, `-roadmap`, `traj4-minio-strong`). That was fixed and committed on Nov 3 (commit 70764c3). None is in either pair.
 
 ## 10. What's pending
 
-- **Every-turn rescoring by score and roll back** (another session; [../plans/score-and-rollback-scope.md](../plans/score-and-rollback-scope.md) §11, [../logs/2026-11-03-score-and-rollback.md](../logs/2026-11-03-score-and-rollback.md)). One job per solver run replays its turns from the trajectory's saved state and scores and restores the machine at every turn. It covers every Nov 3 solver run in the initial state, A, B, A2 and B2, interleaved by task. Decisions taken under Arya's goal (log, 11:15): every turn; a minimum command timeout while scoring; no per-step jobs for the storage question; the bar is identical test-case lists, except points lost to load timeouts, which are rescored; full snapshots only at the end. **When it lands:** rerun `power_horizons.py` with `--rollback-rows`, then replace [the table](#3-the-numbers) and the *(numbers)* sentences.
-- **The pages and figures:** rebuild both pages and redraw the two curve figures from the new numbers; republish to the same links.
-- **The four held-back transcripts:** re-export once the redaction fix is in.
+- **Every-turn rescoring by score and roll back** (another session; [../plans/score-and-rollback-scope.md](../plans/score-and-rollback-scope.md) §11, [../logs/2026-11-03-score-and-rollback.md](../logs/2026-11-03-score-and-rollback.md)). One job per solver run replays its turns from the trajectory's saved state and scores and restores the machine at every turn. It covers every Nov 3 solver run in the initial state, A, B, A2 and B2, interleaved by task. Decisions taken under Arya's goal (log, 11:15): every turn; a minimum command timeout while scoring; no per-step jobs for the storage question; the bar is identical test-case lists, except points lost to load timeouts, which are rescored; full snapshots only at the end. **Paused at 48 of 130 runs;** the resume command is in [../next-steps.md](../next-steps.md). **When it lands:** rebuild the tables and pages with `tools/power.sh pages`, then replace [the table](#3-the-numbers) and the *(numbers)* sentences.
+- **The pages and figures:** rebuild the pages and redraw the two curve figures from the new numbers; republish to the same links.
 - **Open design questions for Arya:** a new, clean control for pair 2; an arm that separates the chat from the machine (section 9). See [../next-steps.md](../next-steps.md).

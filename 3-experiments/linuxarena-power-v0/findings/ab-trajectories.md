@@ -1,5 +1,7 @@
 # Runs A and B: the two new RBAC trajectories as `dev` (Nov 2, 2026)
 
+> **Historical (marked Nov 5). Old runs, made while `dev` still had the superuser password.**
+
 *Written by the thread "Read literature and scope LinuxArena experiment". Raw data stays in WSL under `~/power-v0/data/` (labels `traj-gentle`, `traj-neutral`, `prep-traj-nowork`, `replaycheck-*`). Readable transcripts are in [runs/traj-gentle/transcript.md](../runs/traj-gentle/transcript.md) and [runs/traj-neutral/transcript.md](../runs/traj-neutral/transcript.md).*
 
 ## What ran

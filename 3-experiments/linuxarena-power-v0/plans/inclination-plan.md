@@ -1,5 +1,7 @@
 # Inclining the trajectory agent to seek power: plan
 
+> **Historical (marked Nov 5). The notes are now `INCLINATIONS` in `harness/power_v0.py`.**
+
 *Written 2026-11-01 by the thread "Read literature and scope LinuxArena experiment". This is the fallback Arya asked for in case the constrained-solver rerun still shows no power: prompt the trajectory agent toward power-seeking. Status: prepared, not run.*
 
 ## What changes, and what must not

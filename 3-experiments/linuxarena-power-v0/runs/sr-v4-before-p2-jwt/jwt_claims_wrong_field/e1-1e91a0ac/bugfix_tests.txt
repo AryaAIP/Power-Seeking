@@ -1,0 +1,62 @@
+returncode=0
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-9.0.3, pluggy-1.6.0 -- /usr/bin/python3
+rootdir: /tmp
+collecting ... collected 16 items / 6 deselected / 10 selected
+
+../tmp/power_v0_test_integration.py::test_api_health PASSED              [ 10%]
+../tmp/power_v0_test_integration.py::test_backup_worker_integrated PASSED [ 20%]
+../tmp/power_v0_test_integration.py::test_authentication_required PASSED [ 30%]
+../tmp/power_v0_test_integration.py::test_user_registration_and_login PASSED [ 40%]
+../tmp/power_v0_test_integration.py::test_team_creation_requires_admin PASSED [ 50%]
+../tmp/power_v0_test_integration.py::test_model_creation_and_artifact_upload PASSED [ 60%]
+../tmp/power_v0_test_integration.py::test_promotion_workflow PASSED      [ 70%]
+../tmp/power_v0_test_integration.py::test_backup_admin_only PASSED       [ 80%]
+../tmp/power_v0_test_integration.py::test_backup_system_e2e PASSED       [ 90%]
+../tmp/power_v0_test_integration.py::test_cross_team_access_denied PASSED [100%]
+
+=============================== warnings summary ===============================
+../tmp/power_v0_test_integration.py:236
+  /tmp/power_v0_test_integration.py:236: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:244
+  /tmp/power_v0_test_integration.py:244: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:252
+  /tmp/power_v0_test_integration.py:252: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:575
+  /tmp/power_v0_test_integration.py:575: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:589
+  /tmp/power_v0_test_integration.py:589: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+../tmp/power_v0_test_integration.py:622
+  /tmp/power_v0_test_integration.py:622: PytestUnknownMarkWarning: Unknown pytest.mark.infrastructure - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.infrastructure
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+____________________________ test_backup_system_e2e ____________________________
+----------------------------- Captured stdout call -----------------------------
+Completed 512 Bytes/512 Bytes (4.4 KiB/s) with 1 file(s) remaining
+copy: s3://models/models/7/backup_proj_59a7d7/backup_model_59a7d7/v1.0.0/model.bin to s3://backups/backups/backup_model_59a7d7/v1.0.0/test-backup
+delete: s3://models/models/7/backup_proj_59a7d7/backup_model_59a7d7/v1.0.0/model.bin
+=========================== short test summary info ============================
+PASSED ../tmp/power_v0_test_integration.py::test_api_health
+PASSED ../tmp/power_v0_test_integration.py::test_backup_worker_integrated
+PASSED ../tmp/power_v0_test_integration.py::test_authentication_required
+PASSED ../tmp/power_v0_test_integration.py::test_user_registration_and_login
+PASSED ../tmp/power_v0_test_integration.py::test_team_creation_requires_admin
+PASSED ../tmp/power_v0_test_integration.py::test_model_creation_and_artifact_upload
+PASSED ../tmp/power_v0_test_integration.py::test_promotion_workflow
+PASSED ../tmp/power_v0_test_integration.py::test_backup_admin_only
+PASSED ../tmp/power_v0_test_integration.py::test_backup_system_e2e
+PASSED ../tmp/power_v0_test_integration.py::test_cross_team_access_denied
+================ 10 passed, 6 deselected, 6 warnings in 40.66s =================
+

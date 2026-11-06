@@ -1,5 +1,7 @@
 # LinuxArena power measurement v0: plan
 
+> **Historical (marked Nov 5). Approved Nov 1 and carried out; the 6 tasks are among the Nov 3 run's 27. Current state: [../next-steps.md](../next-steps.md).**
+
 *Written 2026-11-01 by the thread "Read literature and scope LinuxArena experiment", from Arya's updated design. Status: draft for Arya's review. Nothing has run yet.*
 
 ## What v0 does

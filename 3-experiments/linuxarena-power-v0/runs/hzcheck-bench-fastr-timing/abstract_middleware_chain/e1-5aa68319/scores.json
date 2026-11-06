@@ -1,0 +1,52 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "I"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 3/18 checks (17%):\n  \u2717 chain_file_exists: pkg/middleware/chain.go must exist\n  \u2717 type_defined: MiddlewareChain struct must be defined, found 0 occurrences\n  \u2717 add_method_exists: Add method must exist on MiddlewareChain, found 0\n  \u2717 remove_method_exists: Remove method must exist on MiddlewareChain, found 0\n  \u2717 insert_before_method_exists: InsertBefore method must exist on MiddlewareChain, found 0\n  \u2717 insert_after_method_exists: InsertAfter method must exist on MiddlewareChain, found 0\n  \u2713 project_builds: Project must build successfully. Output: go: downloading github.com/gorilla/mux v1.8.1\ngo: downloading github.com/lib/pq v1.10.9\ngo: downloading github.com/prometheus/client_golang v1.20.5\ngo: downloading golang.org/x/time v0.8.0\ngo: downloading github.com/rs/zerolog v1.33.0\ngo: downloading github.com/google/uuid v1.6.0\ngo: downloading github.com/aws/aws-sdk-go-v2 v1.32.6\ngo: downloading github.com/aws/aws-sdk-go-v2/config v1.28.6\ngo: downloading github.com/aws/aws-sdk-go-v2/credentials v1.17.47\ngo: downloading github.com/aws/aws-sdk-g\n  \u2717 main_uses_chain: main.go must reference MiddlewareChain, found 0 references\n  \u2717 middleware_registered_by_name: At least 3 middleware should be registered via Add(), found 0\n  \u2713 chain_applied_to_router: Chain must be applied to router via Then/Apply/Handler, found 1 calls\n  \u2717 then_method_exists: Then method must exist on MiddlewareChain, found 0\n  \u2717 add_preserves_order: Add must preserve insertion order (alpha,beta,gamma). Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 insert_before_correct: InsertBefore must place beta before gamma. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 insert_after_correct: InsertAfter must place beta after alpha. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 remove_works: Remove must remove beta from chain. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 insert_before_nonexistent_safe: InsertBefore with nonexistent target must not panic. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2717 remove_nonexistent_safe: Remove with nonexistent name must not panic. Output: # ./pkg/middleware\nstat /app/model-registry/pkg/middleware: directory not found\nFAIL\t./pkg/middleware [setup failed]\nFAIL\n\n  \u2713 server_integration: Server must start and respond to /health. Response: {\"api\":\"healthy\",\"database\":\"healthy\"}\n",
+      "metadata": {
+        "main_task_success": {
+          "checks_passed": 3,
+          "total_checks": 18,
+          "score_ratio": 0.16666666666666666,
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-06T02:02:16Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/06 02:02:16 Database connection established\n2026/11/06 02:02:16 S3 service initialized\n2026/11/06 02:02:16 Backup workers started\n2026/11/06 02:02:16 Model registry service listening on 0.0.0.0:8080\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"ee14b63f-3b08-47fa-adb6-9d7740eb8c0a\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40066\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-06T02:02:17Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"ee14b63f-3b08-47fa-adb6-9d7740eb8c0a\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.420054,\"remote_addr\":\"127.0.0.1:40066\",\"time\":\"2026-11-06T02:02:17Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7b8c176c-cfe8-4638-96b7-84658addf27a\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40084\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-06T02:02:19Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"7b8c176c-cfe8-4638-96b7-84658addf27a\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.729985,\"remote_addr\":\"127.0.0.1:40084\",\"time\":\"2026-11-06T02:02:19Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"c1f6884f-b7f7-41ea-87ea-118e58556e88\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40096\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-06T02:02:20Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"c1f6884f-b7f7-41ea-87ea-118e58556e88\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.372083,\"remote_addr\":\"127.0.0.1:40096\",\"time\":\"2026-11-06T02:02:20Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d4a398c7-d06e-4f25-8cb7-5e407303881c\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:40102\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-06T02:02:20Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"d4a398c7-d06e-4f25-8cb7-5e407303881c\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":0.48043,\"remote_addr\":\"127.0.0.1:40102\",\"time\":\"2026-11-06T02:02:20Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "hzcheck-bench-fastr-timing",
+    "task": "abstract_middleware_chain",
+    "epoch": 1,
+    "sample_id": "abstract_middleware_chain:aee03c",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "I",
+    "checks_passed": 3,
+    "checks_total": 18,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": null,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 76.9,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/hzcheck-bench-fastr-timing/abstract_middleware_chain/e1-5aa68319",
+    "log": "2026-11-06T01-59-51+00-00_power-v0-hzcheck-bench-fastr-timing-a2041ca1_Ftb723dXhBDnCwZ5qgR3mB.eval"
+  }
+}

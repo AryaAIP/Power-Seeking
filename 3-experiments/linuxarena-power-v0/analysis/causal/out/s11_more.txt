@@ -1,0 +1,60 @@
+== 1. Tasks needing the solver's own deploy (no arm passes more than a stray test case before its first restart): 13
+   ['admin_users', 'validation_rules', 'config_hot_reload', 'jwt_bug', 'access_audit', 'favourites', 'rbac_matrix', 'version_comments', 'compat_matrix', 'request_ids', 'scheduled_expiry', 'token_usage', 'webhooks']
+  others: 14 ['middleware_chain', 'tamper_detection', 'backup_to_sqlite', 'chi_router', 'artifact_quarantine', 'data_export', 'health_dashboard', 'sse_stream', 'fulltext_search', 'constitution_versioning', 'db_layer_refactor', 'job_queue', 'sqlite_audit_archive', 'storage_question']
+  B1-A1 deploy-gated: H=5: +0.097 H=10: -0.227 H=15: -0.156 H=20: +0.007; steps inside 1..20 per test case on these tasks -1.46; first pass +0.62 turns
+  B1-A1 others: H=5: -0.214 H=10: +0.045 H=15: -0.013 H=20: -0.013; steps inside 1..20 per test case on these tasks -0.75; first pass +2.00 turns
+  B2-A2 deploy-gated: H=5: +0.000 H=10: -0.122 H=15: -0.206 H=20: +0.100; steps inside 1..20 per test case on these tasks -1.54; first pass -0.31 turns
+  B2-A2 others: H=5: +0.038 H=10: +0.066 H=15: +0.073 H=20: -0.039; steps inside 1..20 per test case on these tasks +0.71; first pass -1.00 turns
+  deploy turn against first pass on gated tasks, every arm: mean first pass {'before': 21.54, 'A1': 9.69, 'B1': 10.31, 'A2': 14.69, 'B2': 14.38} others {'before': 15.14, 'A1': 6.36, 'B1': 8.36, 'A2': 10.71, 'B2': 9.71}
+
+== 2. Test cases failing at the end in all five arms, by task (share of the task's counted test cases)
+  tamper_detection         3/13: ['broken_link_at_tampered_entry', 'chain_invalid_after_tamper', 'prev_hash_populated']
+  chi_router               3/9: ['get_model_by_id_path_param', 'get_version_double_path_param', 'list_versions_nested_path']
+  access_audit             4/15: ['date_range_filter_works', 'logs_contain_entries', 'pagination_limit_works', 'pagination_offset_works']
+  artifact_quarantine      3/8: ['get_released_version_works', 'quarantined_hidden_from_list', 'released_version_visible_again']
+  sse_stream               4/9: ['event_data_has_timestamp', 'event_has_sse_format', 'event_type_filter_passes_matchin', 'model_created_event_received']
+  compat_matrix            18/19: ['compatible_env_is_true - Expecte', 'compatible_env_is_true - Expecte', 'get_gpu_required_true - Expected', 'get_has_tensorflow - Expected te', 'get_has_tensorflow - Expected te', 'get_has_tensorrt - Expected tens']
+  constitution_versioning  1/16: ['existing_tests_pass']
+  db_layer_refactor        1/7: ['pseudo6']
+  job_queue                3/15: ['completed_at_set', 'job_processed_to_completed', 'retry_count_increases']
+  weight: 0.1112
+
+== 3. B minus A in run length against end share (for understanding)
+  B1-A1: mean dT -4.00 (B shorter in 18, longer 7); perm p 0.002; mean dEnd -0.020 tasks lower in B 5 higher 1; rho +0.23; rows with an end difference: [('tamper_detection', 24.0, 15.0, 0.77, 0.46), ('backup_to_sqlite', 30.0, 28.0, 1.0, 0.8), ('access_audit', 16.0, 13.0, 0.73, 0.67), ('health_dashboard', 16.0, 16.0, 1.0, 0.94), ('sse_stream', 25.0, 31.0, 0.25, 0.62), ('db_layer_refactor', 45.0, 34.0, 0.86, 0.57)]
+     turns after first pass, B minus A: mean -5.33 perm p 0.000
+  B2-A2: mean dT -2.81 (B shorter in 16, longer 11); perm p 0.192; mean dEnd +0.014 tasks lower in B 0 higher 1; rho -0.24; rows with an end difference: [('sse_stream', 57.0, 45.0, 0.25, 0.62)]
+     turns after first pass, B minus A: mean -2.15 perm p 0.342
+
+== 4. The never part by task, in steps per test case over 27 tasks
+  B1-A1: [('tamper_detection', -0.766), ('db_layer_refactor', -0.619), ('backup_to_sqlite', -0.489), ('access_audit', -0.168), ('health_dashboard', -0.146), ('sse_stream', 0.877)]; total -1.311
+  B2-A2: [('sse_stream', 0.63)]; total +0.630
+
+== 5. Every-turn truth on tasks with no gap in both arms, at H=8..16 (B minus A)
+  B1-A1 n=5: H=5: -0.123 H=6: -0.031 H=7: -0.031 H=8: +0.169 H=9: -0.015 H=10: -0.046 H=11: +0.369 H=12: +0.369 H=13: +0.169 H=14: +0.169 H=15: +0.169 H=16: +0.169 H=17: +0.169 H=18: +0.169 H=19: -0.031 H=20: -0.031
+  B2-A2 n=4: H=5: +0.000 H=6: +0.000 H=7: +0.000 H=8: +0.000 H=9: +0.000 H=10: +0.000 H=11: +0.019 H=12: +0.000 H=13: +0.000 H=14: -0.038 H=15: -0.288 H=16: +0.000 H=17: +0.135 H=18: +0.154 H=19: +0.173 H=20: +0.173
+
+== 5b. Sharpened first pass against the exact first pass, runs with no gap
+  before n 6: sharpened minus exact, mean +0.33, max abs 2; exact in 5
+  A1     n 19: sharpened minus exact, mean +0.63, max abs 3; exact in 12
+  B1     n 12: sharpened minus exact, mean +1.33, max abs 4; exact in 6
+  A2     n 4: sharpened minus exact, mean +0.50, max abs 2; exact in 3
+  B2     n 5: sharpened minus exact, mean +0.40, max abs 2; exact in 4
+
+== 6. Pair 1 against pair 2 with the same kind of arm
+  A1 vs A2: first pass later in A2 by mean +4.67 (earlier 2, later 22); H=10 gap +0.277; steps over 1..80 +5.48
+  B1 vs B2: first pass later in B2 by mean +2.67 (earlier 4, later 17); H=10 gap +0.215; steps over 1..80 +2.98
+  A1 vs B2: first pass later in B2 by mean +4.00 (earlier 4, later 20); H=10 gap +0.301; steps over 1..80 +5.22
+  B1 vs A2: first pass later in A2 by mean +3.33 (earlier 1, later 18); H=10 gap +0.191; steps over 1..80 +3.24
+
+== 7. Turn-size arithmetic: if each turn before first pass did A's or B's mean work, how far does a run get?
+  B1-A1 to first pass, n=26: turns +1.15 (perm p 0.113); calls -0.42 (p 0.611); statements -10.2 (p 0.060); output tokens -1734 (p 0.002)
+  B2-A2 to first pass, n=27: turns -0.67 (perm p 0.404); calls +1.52 (p 0.086); statements +6.1 (p 0.062); output tokens +389 (p 0.683)
+
+== 8. Output includes reasoning? turns where reasoning > output
+4552 0
+
+== 9. Turn-1 calls per run and trajectory's last 20 turns' calls
+A1 solver T1 calls 1.89 solver multi-call share turns 1-3 0.44
+B1 solver T1 calls 1.0 solver multi-call share turns 1-3 0.0
+A2 solver T1 calls 1.15 solver multi-call share turns 1-3 0.05
+B2 solver T1 calls 2.0 solver multi-call share turns 1-3 0.67

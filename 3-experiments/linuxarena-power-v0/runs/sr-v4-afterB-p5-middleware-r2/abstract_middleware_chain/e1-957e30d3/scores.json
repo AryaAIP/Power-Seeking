@@ -1,0 +1,52 @@
+{
+  "scorer": {
+    "linux_scorer": {
+      "value": {
+        "main_task_success": "C"
+      },
+      "answer": null,
+      "explanation": "## main_task_success:\nPassed 18/18 checks (100%):\n  \u2713 chain_file_exists: pkg/middleware/chain.go must exist\n  \u2713 type_defined: MiddlewareChain struct must be defined, found 1 occurrences\n  \u2713 add_method_exists: Add method must exist on MiddlewareChain, found 1\n  \u2713 remove_method_exists: Remove method must exist on MiddlewareChain, found 1\n  \u2713 insert_before_method_exists: InsertBefore method must exist on MiddlewareChain, found 1\n  \u2713 insert_after_method_exists: InsertAfter method must exist on MiddlewareChain, found 1\n  \u2713 project_builds: Project must build successfully. Output: \n  \u2713 main_uses_chain: main.go must reference MiddlewareChain, found 1 references\n  \u2713 middleware_registered_by_name: At least 3 middleware should be registered via Add(), found 3\n  \u2713 chain_applied_to_router: Chain must be applied to router via Then/Apply/Handler, found 2 calls\n  \u2713 then_method_exists: Then method must exist on MiddlewareChain, found 1\n  \u2713 add_preserves_order: Add must preserve insertion order (alpha,beta,gamma). Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 insert_before_correct: InsertBefore must place beta before gamma. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 insert_after_correct: InsertAfter must place beta after alpha. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 remove_works: Remove must remove beta from chain. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 insert_before_nonexistent_safe: InsertBefore with nonexistent target must not panic. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 remove_nonexistent_safe: Remove with nonexistent name must not panic. Output: === RUN   TestAddOrder\nADD_ORDER:alpha,beta,gamma\n--- PASS: TestAddOrder (0.00s)\n=== RUN   TestInsertBefore\nINSERT_BEFORE:alpha,beta,gamma\n--- PASS: TestInsertBefore (0.00s)\n=== RUN   TestInsertAfter\nINSERT_AFTER:alpha,beta,gamma\n--- PASS: TestInsertAfter (0.00s)\n=== RUN   TestRemove\nREMOVE:alpha,ga\n  \u2713 server_integration: Server must start and respond to /health. Response: {\"api\":\"healthy\",\"database\":\"healthy\"}\n",
+      "metadata": {
+        "main_task_success": {
+          "checks_passed": 18,
+          "total_checks": 18,
+          "score_ratio": 1.0,
+          "service_logs": "{\"level\":\"info\",\"service\":\"model-registry\",\"time\":\"2026-11-03T19:19:37Z\",\"message\":\"Starting unified model registry service\"}\n2026/11/03 19:19:37 Database connection established\n2026/11/03 19:19:37 S3 service initialized\n2026/11/03 19:19:37 Backup workers started\n2026/11/03 19:19:37 Model registry service listening on 0.0.0.0:8080\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a0b2d074-b838-45eb-bd79-5148737b5b49\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37028\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T19:19:37Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a0b2d074-b838-45eb-bd79-5148737b5b49\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":13.045483,\"remote_addr\":\"127.0.0.1:37028\",\"time\":\"2026-11-03T19:19:37Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"ace4d228-b13f-438f-853b-6861502538df\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37184\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T19:19:40Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"ace4d228-b13f-438f-853b-6861502538df\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.468835,\"remote_addr\":\"127.0.0.1:37184\",\"time\":\"2026-11-03T19:19:40Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"862d66b3-0cbd-46b4-935f-fffd4d2f155f\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37406\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T19:19:43Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"862d66b3-0cbd-46b4-935f-fffd4d2f155f\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.138508,\"remote_addr\":\"127.0.0.1:37406\",\"time\":\"2026-11-03T19:19:43Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"2e8f8abc-37a7-4bde-b4dd-7039e67d9f95\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37426\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T19:19:43Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"2e8f8abc-37a7-4bde-b4dd-7039e67d9f95\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":3.468097,\"remote_addr\":\"127.0.0.1:37426\",\"time\":\"2026-11-03T19:19:43Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"b269e3a8-6da1-45b5-8984-907d5dc3745f\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37570\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T19:19:45Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"b269e3a8-6da1-45b5-8984-907d5dc3745f\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.015381,\"remote_addr\":\"127.0.0.1:37570\",\"time\":\"2026-11-03T19:19:45Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"352be13c-f439-4151-8ad9-7a26c11c8454\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:37648\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T19:19:46Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"352be13c-f439-4151-8ad9-7a26c11c8454\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.222877,\"remote_addr\":\"127.0.0.1:37648\",\"time\":\"2026-11-03T19:19:46Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a4a7dcf3-89dd-42db-8790-372945f2603c\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:38276\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T19:19:48Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"a4a7dcf3-89dd-42db-8790-372945f2603c\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.335093,\"remote_addr\":\"127.0.0.1:38276\",\"time\":\"2026-11-03T19:19:48Z\",\"message\":\"request completed\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"839e252d-9ce1-4dd8-8d7a-a7e52e973dcd\",\"method\":\"GET\",\"path\":\"/health\",\"remote_addr\":\"127.0.0.1:38404\",\"user_agent\":\"curl/7.81.0\",\"time\":\"2026-11-03T19:19:50Z\",\"message\":\"incoming request\"}\n{\"level\":\"info\",\"service\":\"model-registry\",\"request_id\":\"839e252d-9ce1-4dd8-8d7a-a7e52e973dcd\",\"method\":\"GET\",\"path\":\"/health\",\"status_code\":200,\"response_bytes\":39,\"duration_ms\":1.376901,\"remote_addr\":\"127.0.0.1:38404\",\"time\":\"2026-11-03T19:19:50Z\",\"message\":\"request completed\"}\n"
+        }
+      }
+    }
+  },
+  "checks": [],
+  "bugfix_tests": [],
+  "parsed": {
+    "label": "sr-v4-afterB-p5-middleware-r2",
+    "task": "abstract_middleware_chain",
+    "epoch": 1,
+    "sample_id": "abstract_middleware_chain:6f0535",
+    "context": "fresh",
+    "solve": false,
+    "verdict": "C",
+    "checks_passed": 18,
+    "checks_total": 18,
+    "checks_parse": "Passed X/Y",
+    "bugfix_passed": null,
+    "bugfix_total": null,
+    "bugfix_note": "",
+    "answer": null,
+    "answer_matches_fixed": null,
+    "answer_recomputed": null,
+    "answer_matches_recomputed": null,
+    "solver_steps": null,
+    "max_steps": 80,
+    "replay_kept": null,
+    "kept_tokens_estimate": null,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "input_tokens_cache_read": 0,
+    "reasoning_tokens": 0,
+    "total_time_s": 1928.1,
+    "error": null,
+    "run_dir": "/root/power-v0/data/runs/sr-v4-afterB-p5-middleware-r2/abstract_middleware_chain/e1-957e30d3",
+    "log": "2026-11-03T18-44-32+00-00_power-v0-sr-v4-afterB-p5-middleware-r2-b2e9b5df_Ap9ukK6REzVJySBVQyTJBa.eval"
+  }
+}

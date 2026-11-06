@@ -1,0 +1,155 @@
+== check: by-test-case steps against the reference mean over H=1..80
+before reference 0.6418 from bits 0.6408
+A1 reference 0.77 from bits 0.7686
+B1 reference 0.742 from bits 0.7395
+A2 reference 0.7015 from bits 0.7007
+B2 reference 0.7048 from bits 0.7036
+
+== B minus A in steps per test case (task-equal weights): later versus never
+classes: both pass at end; only A at end; only B at end; neither at end
+B1-A1: reference -2.24 steps; bits -2.33; both(later) -1.04; only_A(never in B) -2.19; only_B(never in A) +0.88; neither +0.02; share of tc: both 0.843 only_A 0.034 only_B 0.012 neither 0.111; raw {'both': 291, 'neither': 40, 'only_A': 10, 'only_B': 3}
+B2-A2: reference +0.26 steps; bits +0.23; both(later) -0.30; only_A(never in B) +0.00; only_B(never in A) +0.63; neither -0.10; share of tc: both 0.854 only_A 0.000 only_B 0.012 neither 0.134; raw {'both': 294, 'neither': 47, 'only_B': 3}
+A1-before: reference +10.26 steps; bits +10.22; both(later) +8.88; only_A(never in B) +0.00; only_B(never in A) +1.35; neither +0.00; share of tc: both 0.857 only_A 0.000 only_B 0.019 neither 0.124; raw {'both': 294, 'neither': 43, 'only_B': 7}
+B1-before: reference +8.02 steps; bits +7.90; both(later) +7.65; only_A(never in B) -0.82; only_B(never in A) +1.02; neither +0.05; share of tc: both 0.840 only_A 0.017 only_B 0.015 neither 0.128; raw {'both': 290, 'neither': 46, 'only_A': 4, 'only_B': 4}
+A2-before: reference +4.78 steps; bits +4.79; both(later) +4.82; only_A(never in B) -0.32; only_B(never in A) +0.14; neither +0.15; share of tc: both 0.852 only_A 0.005 only_B 0.002 neither 0.141; raw {'both': 293, 'neither': 49, 'only_A': 1, 'only_B': 1}
+B2-before: reference +5.04 steps; bits +5.02; both(later) +4.52; only_A(never in B) -0.32; only_B(never in A) +0.77; neither +0.05; share of tc: both 0.852 only_A 0.005 only_B 0.015 neither 0.128; raw {'both': 293, 'neither': 46, 'only_A': 1, 'only_B': 4}
+
+== never part by task (steps per test case over all 27 tasks = value/27)
+  B1-A1 tamper_detection         only_A   -20.7 only_B    +0.0 later    -3.1  end A 0.77 B 0.46
+  B1-A1 db_layer_refactor        only_A   -16.7 only_B    +0.0 later    -2.1  end A 0.86 B 0.57
+  B1-A1 backup_to_sqlite         only_A   -13.2 only_B    +0.0 later    +3.0  end A 1.00 B 0.80
+  B1-A1 access_audit             only_A    -4.5 only_B    +0.0 later    -3.3  end A 0.73 B 0.67
+  B1-A1 health_dashboard         only_A    -3.9 only_B    +0.0 later    -4.2  end A 1.00 B 0.94
+  B1-A1 sse_stream               only_A    +0.0 only_B   +23.7 later    -1.1  end A 0.25 B 0.62
+  B2-A2 sse_stream               only_A    +0.0 only_B   +17.0 later    +1.1  end A 0.25 B 0.62
+
+== test cases that passed and later stopped (by end of run), weight by task
+before passed then not at end 0 (weight 0.0000) dipped and came back 1
+A1 passed then not at end 0 (weight 0.0000) dipped and came back 0
+B1 passed then not at end 6 (weight 0.0148) dipped and came back 0
+A2 passed then not at end 10 (weight 0.0274) dipped and came back 8
+B2 passed then not at end 4 (weight 0.0103) dipped and came back 4
+
+== time to pass per test case, 5-turn grid: quantiles among test cases passing at any scored point
+before {'n_tc': 344, 'never_raw': 50, 'never_task_weight': 0.143, 'q10': 10, 'q25': 15, 'q50': 20, 'q75': 25, 'q90': 30, 'mean_given_pass': 21.156, 'le5': 0.037, 'le10': 0.118, 'le15': 0.277, 'le20': 0.47, 'le30': 0.812}
+A1 {'n_tc': 344, 'never_raw': 43, 'never_task_weight': 0.124, 'q10': 5, 'q25': 5, 'q50': 10, 'q75': 15, 'q90': 20, 'mean_given_pass': 10.835, 'le5': 0.265, 'le10': 0.6, 'le15': 0.775, 'le20': 0.828, 'le30': 0.876}
+B1 {'n_tc': 344, 'never_raw': 44, 'never_task_weight': 0.13, 'q10': 5, 'q25': 10, 'q50': 10, 'q75': 15, 'q90': 20, 'mean_given_pass': 11.825, 'le5': 0.206, 'le10': 0.51, 'le15': 0.707, 'le20': 0.838, 'le30': 0.87}
+A2 {'n_tc': 344, 'never_raw': 40, 'never_task_weight': 0.119, 'q10': 10, 'q25': 10, 'q50': 15, 'q75': 20, 'q90': 25, 'mean_given_pass': 15.443, 'le5': 0.056, 'le10': 0.328, 'le15': 0.581, 'le20': 0.742, 'le30': 0.878}
+B2 {'n_tc': 344, 'never_raw': 43, 'never_task_weight': 0.123, 'q10': 8, 'q25': 10, 'q50': 15, 'q75': 20, 'q90': 30, 'mean_given_pass': 15.994, 'le5': 0.076, 'le10': 0.305, 'le15': 0.524, 'le20': 0.753, 'le30': 0.871}
+
+== test cases by which arms pass them at the end (task-equal weight)
+  pass at end in all five: 0.8349 raw 289
+  in none: 0.1112 raw 40
+  in some only: 0.0539 raw 15
+  ever-pass: all five 0.8374 none 0.0953 some 0.0673
+   pattern before,A1,B1,A2,B2 11111 0.8349 289
+   pattern before,A1,B1,A2,B2 00000 0.1112 40
+   pattern before,A1,B1,A2,B2 01000 0.0172 6
+   pattern before,A1,B1,A2,B2 11011 0.0168 4
+   pattern before,A1,B1,A2,B2 00101 0.0123 3
+   pattern before,A1,B1,A2,B2 11100 0.0053 1
+   pattern before,A1,B1,A2,B2 01111 0.0023 1
+
+== gap against slope at the curve: uses grid values at H multiples of 5
+pair A1/B1
+  H= 5 gap -0.064 slope A 0.060 B 0.051 gap/slope -1.16 steps; lag via A curve 1.21 via B curve 1.04
+  H=10 gap -0.086 slope A 0.051 B 0.049 gap/slope -1.73 steps; lag via A curve 1.30 via B curve 2.39
+  H=15 gap -0.081 slope A 0.023 B 0.031 gap/slope -3.02 steps; lag via A curve 2.32 via B curve 3.11
+  H=20 gap -0.003 slope A 0.010 B 0.016 gap/slope -0.25 steps; lag via A curve 0.31 via B curve 0.53
+  H=25 gap -0.020 slope A 0.005 B 0.003 gap/slope -5.06 steps; lag via A curve 2.09 via B curve —
+  H=30 gap -0.020 slope A 0.000 B 0.000 gap/slope +nan steps; lag via A curve 7.09 via B curve —
+  best constant shift on H=1..30: B(H)=A(H-k), k=+0.3, rmse 0.0458 (no shift 0.0521); with a level too: k=+0.1, level -0.0382, rmse 0.0302
+pair A2/B2
+  H= 5 gap +0.020 slope A 0.032 B 0.030 gap/slope +0.63 steps; lag via A curve -0.37 via B curve -1.30
+  H=10 gap -0.024 slope A 0.052 B 0.044 gap/slope -0.50 steps; lag via A curve 0.45 via B curve 0.56
+  H=15 gap -0.061 slope A 0.039 B 0.044 gap/slope -1.48 steps; lag via A curve 1.21 via B curve 1.37
+  H=20 gap +0.028 slope A 0.024 B 0.026 gap/slope +1.13 steps; lag via A curve -1.35 via B curve -0.63
+  H=25 gap -0.041 slope A 0.014 B 0.012 gap/slope -3.11 steps; lag via A curve 1.99 via B curve 2.29
+  H=30 gap +0.012 slope A 0.004 B 0.010 gap/slope +1.86 steps; lag via A curve — via B curve -0.68
+  best constant shift on H=1..30: B(H)=A(H-k), k=+0.1, rmse 0.0416 (no shift 0.0426); with a level too: k=+0.1, level -0.0124, rmse 0.0397
+
+== steps lost per test case inside the window H=1..W (mean over 1..W of B-A, times W)
+  B1-A1 {10: -0.43, 15: -0.76, 20: -1.09, 30: -1.23, 40: -1.43, 80: -2.24}
+  B2-A2 {10: 0.15, 15: -0.16, 20: -0.37, 30: -0.46, 40: -0.3, 80: 0.27}
+  A1-before {10: 1.67, 15: 4.13, 20: 6.49, 30: 9.01, 40: 9.43, 80: 10.25}
+  B1-before {10: 1.24, 15: 3.37, 20: 5.39, 30: 7.77, 40: 8.0, 80: 8.02}
+  A2-before {10: 0.3, 15: 1.57, 20: 3.0, 30: 4.7, 40: 4.86, 80: 4.77}
+  B2-before {10: 0.45, 15: 1.41, 20: 2.63, 30: 4.24, 40: 4.56, 80: 5.04}
+
+== by task at H=5,10,15,20 and steps inside H=1..20 (for understanding, not the headline)
+B1-A1 @5: mean -0.064 sd 0.405 se 0.078; favour B 2 A 8 tie 17; drop A-top1,3,5 -> -0.031 +0.019 +0.058; drop B-top1,3,5 -> -0.101 -0.138 -0.138; sign p 0.109; perm p 0.430
+B1-A1 @10: mean -0.086 sd 0.446 se 0.086; favour B 4 A 7 tie 16; drop A-top1,3,5 -> -0.049 +0.025 +0.066; drop B-top1,3,5 -> -0.123 -0.159 -0.167; sign p 0.549; perm p 0.321
+B1-A1 @15: mean -0.082 sd 0.381 se 0.073; favour B 2 A 9 tie 16; drop A-top1,3,5 -> -0.044 +0.024 +0.037; drop B-top1,3,5 -> -0.119 -0.132 -0.132; sign p 0.065; perm p 0.282
+B1-A1 @20: mean -0.003 sd 0.274 se 0.053; favour B 2 A 6 tie 19; drop A-top1,3,5 -> +0.028 +0.041 +0.049; drop B-top1,3,5 -> -0.040 -0.054 -0.054; sign p 0.289; perm p 0.938
+B1-A1 @w20: mean -1.094 sd 4.231 se 0.814; favour B 8 A 12 tie 7; drop A-top1,3,5 -> -0.723 -0.136 +0.283; drop B-top1,3,5 -> -1.279 -1.649 -1.945; sign p 0.503; perm p 0.191
+B2-A2 @5: mean +0.020 sd 0.181 se 0.035; favour B 2 A 1 tie 24; drop A-top1,3,5 -> +0.035 +0.035 +0.035; drop B-top1,3,5 -> -0.011 -0.015 -0.015; sign p 1.000; perm p 0.750
+B2-A2 @10: mean -0.024 sd 0.356 se 0.069; favour B 4 A 5 tie 18; drop A-top1,3,5 -> +0.010 +0.061 +0.073; drop B-top1,3,5 -> -0.061 -0.094 -0.097; sign p 1.000; perm p 0.750
+B2-A2 @15: mean -0.061 sd 0.362 se 0.070; favour B 6 A 5 tie 16; drop A-top1,3,5 -> -0.024 +0.041 +0.063; drop B-top1,3,5 -> -0.083 -0.114 -0.122; sign p 1.000; perm p 0.404
+B2-A2 @20: mean +0.028 sd 0.366 se 0.070; favour B 8 A 5 tie 14; drop A-top1,3,5 -> +0.060 +0.099 +0.106; drop B-top1,3,5 -> -0.009 -0.060 -0.069; sign p 0.581; perm p 0.694
+B2-A2 @w20: mean -0.374 sd 2.620 se 0.504; favour B 11 A 9 tie 7; drop A-top1,3,5 -> -0.182 +0.174 +0.467; drop B-top1,3,5 -> -0.528 -0.773 -0.958; sign p 0.824; perm p 0.465
+
+== correlation across tasks of (B1-A1) and (B2-A2)
+  H=5: pearson -0.356 spearman -0.081  sd(B1-A1) 0.405 sd(B2-A2) 0.181; implied per-run sd if all noise 0.286, 0.128
+  H=10: pearson -0.061 spearman -0.208  sd(B1-A1) 0.446 sd(B2-A2) 0.356; implied per-run sd if all noise 0.316, 0.252
+  H=15: pearson -0.060 spearman -0.046  sd(B1-A1) 0.381 sd(B2-A2) 0.362; implied per-run sd if all noise 0.270, 0.256
+  H=20: pearson +0.399 spearman +0.015  sd(B1-A1) 0.274 sd(B2-A2) 0.366; implied per-run sd if all noise 0.194, 0.259
+  H=w20: pearson -0.070 spearman +0.030  sd(B1-A1) 4.231 sd(B2-A2) 2.620; implied per-run sd if all noise 2.991, 1.853
+  H=all: pearson +0.463 spearman +0.033  sd(B1-A1) 9.081 sd(B2-A2) 5.333; implied per-run sd if all noise 6.421, 3.771
+
+== paired first-pass turn on the grid; negative = B earlier
+B1-A1: n 27 mean +1.56 median +0.0 B later 11 B earlier 6 same 10 sign p 0.332 perm p 0.107; missing []
+    ('config_hot_reload', 25.0, 20.0, -5.0)
+    ('jwt_bug', 20.0, 15.0, -5.0)
+    ('favourites', 10.0, 5.0, -5.0)
+    ('rbac_matrix', 10.0, 5.0, -5.0)
+    ('sqlite_audit_archive', 15.0, 10.0, -5.0)
+    ('storage_question', 14.0, 11.0, -3.0)
+    ('middleware_chain', 5.0, 5.0, 0.0)
+    ('admin_users', 15.0, 15.0, 0.0)
+    ('validation_rules', 10.0, 10.0, 0.0)
+    ('backup_to_sqlite', 10.0, 10.0, 0.0)
+    ('data_export', 5.0, 5.0, 0.0)
+    ('health_dashboard', 5.0, 5.0, 0.0)
+    ('fulltext_search', 5.0, 5.0, 0.0)
+    ('version_comments', 10.0, 10.0, 0.0)
+    ('compat_matrix', 5.0, 5.0, 0.0)
+    ('job_queue', 5.0, 5.0, 0.0)
+    ('chi_router', 5.0, 10.0, 5.0)
+    ('access_audit', 5.0, 10.0, 5.0)
+    ('artifact_quarantine', 5.0, 10.0, 5.0)
+    ('sse_stream', 5.0, 10.0, 5.0)
+    ('constitution_versioning', 5.0, 10.0, 5.0)
+    ('db_layer_refactor', 10.0, 15.0, 5.0)
+    ('request_ids', 10.0, 15.0, 5.0)
+    ('token_usage', 10.0, 15.0, 5.0)
+    ('tamper_detection', 0.0, 10.0, 10.0)
+    ('scheduled_expiry', 10.0, 20.0, 10.0)
+    ('webhooks', 10.0, 20.0, 10.0)
+B2-A2: n 27 mean -0.48 median +0.0 B later 6 B earlier 8 same 13 sign p 0.791 perm p 0.633; missing []
+    ('scheduled_expiry', 20.0, 10.0, -10.0)
+    ('admin_users', 25.0, 20.0, -5.0)
+    ('config_hot_reload', 25.0, 20.0, -5.0)
+    ('backup_to_sqlite', 10.0, 5.0, -5.0)
+    ('artifact_quarantine', 15.0, 10.0, -5.0)
+    ('sse_stream', 15.0, 10.0, -5.0)
+    ('sqlite_audit_archive', 20.0, 15.0, -5.0)
+    ('storage_question', 11.0, 8.0, -3.0)
+    ('middleware_chain', 5.0, 5.0, 0.0)
+    ('tamper_detection', 10.0, 10.0, 0.0)
+    ('jwt_bug', 10.0, 10.0, 0.0)
+    ('favourites', 15.0, 15.0, 0.0)
+    ('data_export', 10.0, 10.0, 0.0)
+    ('health_dashboard', 5.0, 5.0, 0.0)
+    ('fulltext_search', 10.0, 10.0, 0.0)
+    ('version_comments', 15.0, 15.0, 0.0)
+    ('compat_matrix', 10.0, 10.0, 0.0)
+    ('constitution_versioning', 10.0, 10.0, 0.0)
+    ('db_layer_refactor', 15.0, 15.0, 0.0)
+    ('token_usage', 15.0, 15.0, 0.0)
+    ('webhooks', 20.0, 20.0, 0.0)
+    ('validation_rules', 15.0, 20.0, 5.0)
+    ('chi_router', 10.0, 15.0, 5.0)
+    ('access_audit', 10.0, 15.0, 5.0)
+    ('rbac_matrix', 10.0, 15.0, 5.0)
+    ('job_queue', 5.0, 10.0, 5.0)
+    ('request_ids', 15.0, 20.0, 5.0)

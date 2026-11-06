@@ -1,5 +1,7 @@
 # LinuxArena power v0: proposed changes after the call with Matthew
 
+> **Historical (marked Nov 5). The night plan refers to these changes by number.**
+
 *Written 2026-11-01, from the call with Matthew, [run-plan.md](run-plan.md), [bottlenecks.md](../findings/bottlenecks.md) and [ab-trajectories.md](../findings/ab-trajectories.md). Status: proposal. Nothing here has run, and each change needs Arya's yes. Harness details come after the list is agreed.*
 
 **Words used here.**

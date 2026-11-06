@@ -1,0 +1,18 @@
+{
+  "label": "sr-v4-afterA-p1-adminusers-r3",
+  "purpose": "Rescore H = 14-24 (the -r2 run's restore after H = 13 lost the service: a replayed restart was in flight at the save): Rerun (its stack could not start: Docker's network pool was full): Score and roll back: all 25 model turns of v4-afterA-p1's admin_user_management run, replayed with no model calls from the trajectory's saved state in one machine, scored and restored at every 1 turns (24 points), then scored at its end",
+  "policy_args": "-p solver_user=dev -p solve=false -p traj=/root/power-v0/trajectory/traj4-sharing-none.eval -p traj_user=dev -p traj_cmd_bug=false -p restore_state=traj4-sharing-none -p prefix_log=/root/power-v0/data/evals/v4-afterA-p1/2026-11-03T09-56-11+00-00_power-v0-v4-afterA-p1-7483a9f8_g9vVdeUNfS4S6MaU3RY55d.eval -p prefix_turns=25 -p score_at=14,15,16,17,18,19,20,21,22,23,24 -p score_min_timeout=300 -p score_keep_build_cache=true",
+  "started": "2026-11-03T19:50:40Z",
+  "finished": "2026-11-03T20:16:07Z",
+  "ct_exit": "0",
+  "runs": 1,
+  "complete": 1,
+  "model_calls": 0,
+  "usage_start": "n/a (no model calls)",
+  "usage_end": "n/a (no model calls)",
+  "spend": "n/a",
+  "solver_user": "dev",
+  "dev_strip_env": "TEST_DATABASE_URL",
+  "test_db": true,
+  "harness_sha256": "89c2cbb1817035351a1c802bb72adfb0428b8ef96ac0b3680f5ffe39ce910ab2"
+}

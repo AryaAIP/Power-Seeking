@@ -1,0 +1,173 @@
+== Timelines up to max(first pass)+1, largest B lag first
+--- B1-A1
+tamper_detection       A1: R3 R2 R EB EBDT T R
+                       B1: R P R E EB EBD* TP
+scheduled_expiry       A1: R2 R2 R2 E E E E E EB BDT* T T T R T EBDT T
+                       B1: R R R R R EP R R E R E E E E EB EBDTP* R
+webhooks               A1: R2 R2 E EB EB EB EB EB EB BDT* T R T T T R T
+                       B1: R R R R E E EB EB R E EB EB R R R BDT* P
+chi_router             A1: R2 R R E E* R E R EB E B
+                       B1: R R R R R E E R E B* E
+artifact_quarantine    A1: R2 E E E EB* EBDT EBDT T T T T
+                       B1: R R R R E E R E E EB* BDT
+sse_stream             A1: R2 R EB EB EB* EB BDT T T T R
+                       B1: R R R R R EB EB E E E* E
+constitution_versioning A1: R2 T2 R R E* EB EB R EB BDT T
+                       B1: R R EP T R E E EB EB EB* EB
+db_layer_refactor      A1: R2 R2 R R R E E E E E* EB EB EB E E E
+                       B1: R R R R R R R R E E E E E EB E* E
+access_audit           A1: R2 EB BDT* T T T R T
+                       B1: R R R R E EB BD* EP
+token_usage            A1: R2 R R E E EB EB BDT* T T T R
+                       B1: R R R R E E E E EB R EBD* EP
+version_comments       A1: R2 R E E EB BDT* T T R
+                       B1: R P E E EB E EB EBD* ET
+request_ids            A1: R2 R2 R2 R R E EB R EB BDT* T T T
+                       B1: R R R E E R R E R B BDT DT* R
+middleware_chain       A1: R R EB EBDT* T B
+                       B1: R EB R EB EBT* EBT
+data_export            A1: R2 EB R EBDT* T T
+                       B1: R R E EB DT* ETP
+fulltext_search        A1: EB EB EB BDT* T T
+                       B1: R P P EB BD* EP
+compat_matrix          A1: EB EB BDT* T R
+                       B1: R E EB BDT* ET
+backup_to_sqlite       A1: R2 R2 E R R R E R2 R2 E* E
+                       B1: R R R R R E E E R E* EB
+health_dashboard       A1: R2 E EB R EBDT* T
+                       B1: EP T EB EB EB* R
+job_queue              A1: R2 R2 R EB EB* EB
+                       B1: R R P R EB* EB
+validation_rules       A1: R R E EB EB R EB R EBDT* T
+                       B1: R R E E E R EB BDT* R R
+favourites             A1: R EB R EB R BDT* T
+                       B1: R E E EB EDTP* EP T
+rbac_matrix            A1: R2 R R R EB BDT* T
+                       B1: R R EB R EBDT* T R
+storage_question       A1: R2 TP2 T2 R2 EB BDT T R R2 R R EBDT* T
+                       B1: R EP EP P P EP EP EP P P R*
+admin_users            A1: R3 R R R R E E R E EB EB EB EBDT* T
+                       B1: R R R E E E E E E EB EDTP* P TP T
+jwt_bug                A1: TP2 TP2 R2 T T2 R R2 R P R T T R T R EBDT T R EBDT* T
+                       B1: T T T T R TP T R R R EBD T P T EP* EP EP BT R R
+sqlite_audit_archive   A1: R2 R P E E R R R R R EB EB EB EB EBDT* T
+                       B1: R R R EP E E R E B R* DT T R ETP ETP T
+config_hot_reload      A1: R2 E E R R R R R T R R E R B EB R R EBP E B EBP R DT* T
+                       B1: R E EP R R EBP EBP E E R E E R EP EB DT* T EP ETP ET EBP ETP EBDTP T
+--- B2-A2
+request_ids            A2: R R R R EB EB EB EB R BT R B D* T R R R EB EB B D
+                       B2: R2 R2 R R R R R R EB E EB B EB EB R R EB BTP B D* T
+chi_router             A2: R R E R EBTP EBP R R R E* R R E E EBP B
+                       B2: R2 R R R R R E TP2 T2 T2 TP TP EP E E* E
+job_queue              A2: R R R R EB* EB EB R EB BTP P
+                       B2: R2 R2 R R R EB EB EB EB BTP* P
+rbac_matrix            A2: R R R E E R EB R B D* TP P T EBT B
+                       B2: R2 EP2 R R2 R E E E BTP R R EBTP B D* TP
+access_audit           A2: R R R EB R EB EB B D* TP R R T
+                       B2: R2 P2 P R E E E E BT BTP R D* TP
+validation_rules       A2: R R R R R P E EB EB R R EB EB B D* T R TP
+                       B2: R2 R2 R2 R E EB R EB EB EB EB E BTP P BTP B D* TP
+favourites             A2: R R R R R EB EB EB EB EB EB B D* T TP BTP
+                       B2: R2 R R R R E E E R E E E P P B* BTP
+webhooks               A2: R R R R R R R R EB EB EB EB EB EB E EB B D* TP T
+                       B2: R2 R2 P2 R2 R2 P2 R E E EB E E R E EBT B R B D* TP
+middleware_chain       A2: R R EB R EB* EBT
+                       B2: R2 R E EB EBT* EBT
+tamper_detection       A2: R2 R2 R R E EB EB B D* T
+                       B2: P2 R R P EB EB R B D* TP
+health_dashboard       A2: R R R R EB* EB
+                       B2: P2 P2 R2 E EB* B
+fulltext_search        A2: R R R R EB EB R R EB B* B
+                       B2: P2 R2 P P P R EB EB EB B* D
+version_comments       A2: R R R R R E E EB EB EB B D* T
+                       B2: R2 P2 R R E EB EB D TP P B D* P
+constitution_versioning A2: R R R R EB EB EB EB R EB* B
+                       B2: R2 R2 R E EB EB EB R R EB* BT
+db_layer_refactor      A2: R R R R R R R R R E E E E E EB* EB
+                       B2: R2 R2 R2 R2 R2 R2 R R R R R E E E E* E
+token_usage            A2: R4 R4 R R R EB EB EB EB EB EB EB R B D* T
+                       B2: R2 R2 R R R R E E E EB R EB EB B D* TP
+jwt_bug                A2: T T TP EBP R R R EB B D* T
+                       B2: T2 R2 TP TP R R EB B D* T P
+data_export            A2: R R R E EB EB R EB P B* D
+                       B2: R2 P2 EB EB E R EB B D* TP P
+compat_matrix          A2: R R R R EB EB EB EB EB E* B
+                       B2: R2 R2 R E E E EB B D* TP T
+storage_question       A2: R R T R R R R R R R R*
+                       B2: P2 P2 P P P P P R*
+config_hot_reload      A2: R E T T R R R R R R EB EB EB EB R EB EB R EB EBP EP BT B D* TP
+                       B2: E P R T R TP EP E E EP EP P E E E EBP R B D* TP T ET ETP TP ETP
+backup_to_sqlite       A2: R R EBTP EBTP R R R E E R* E
+                       B2: R2 E EP R EP* R EP EP R E E
+artifact_quarantine    A2: R R R R R R R R R EB EB EB EB R EB* B
+                       B2: R2 R2 R EB EB R EB EB EB B* D BTP P BTP R TP
+sse_stream             A2: R R R R R R EB EB EB R EB EB R EB R* EBT
+                       B2: R2 R2 R2 R2 R2 R E E E E* E E E B B D
+sqlite_audit_archive   A2: R R R R R EBP EBP EBP EBP E R E R E E E B R R EB* BT
+                       B2: R2 P2 E R R R R EB R P P EB EB EB EB* E E B D TP TP
+admin_users            A2: R R R R E R R E E EB EB EB EB R E E EB BTP R BTP P BTP B D* T
+                       B2: R3 R2 R2 R E E E E E E E EB EBTP EBTP B D* TP TP TP TP TP P P BTP BTP
+scheduled_expiry       A2: R R R R R R R EB EB EB EB EB EB R EB R B D* T
+                       B2: R2 R2 P2 R P R R P E E* R EB E EB E B BTP BTP B
+
+== Calls before the first edit, and privileged turns before first pass, for the 10 tasks where B lags most
+--- B1-A1: task, fp A, fp B, edit A, edit B, calls before edit A, B, priv up to fp A, B
+   ('tamper_detection', 0, 6, 4.0, 4.0, 6.0, 3.0, 0, 1.0)
+   ('scheduled_expiry', 10, 16, 4.0, 6.0, 6.0, 5.0, 0.0, 2.0)
+   ('webhooks', 10, 16, 3.0, 5.0, 4.0, 4.0, 0.0, 0.0)
+   ('chi_router', 5, 10, 4.0, 6.0, 4.0, 5.0, 0.0, 0.0)
+   ('artifact_quarantine', 5, 10, 2.0, 5.0, 2.0, 4.0, 0.0, 0.0)
+   ('sse_stream', 5, 10, 3.0, 6.0, 3.0, 5.0, 0.0, 0.0)
+   ('constitution_versioning', 5, 10, 5.0, 3.0, 6.0, 2.0, 0.0, 1.0)
+   ('db_layer_refactor', 10, 15, 6.0, 9.0, 7.0, 8.0, 0.0, 0.0)
+   ('access_audit', 3, 7, 2.0, 5.0, 2.0, 4.0, 0.0, 0.0)
+   ('token_usage', 8, 11, 4.0, 5.0, 4.0, 4.0, 0.0, 0.0)
+   means: fp 6.1 11.1; edit 3.7 5.4; calls before edit 4.4 4.4; priv 0.00 0.40
+--- B2-A2: task, fp A, fp B, edit A, edit B, calls before edit A, B, priv up to fp A, B
+   ('request_ids', 13, 20, 5.0, 9.0, 4.0, 10.0, 0.0, 1.0)
+   ('chi_router', 10, 15, 3.0, 7.0, 2.0, 7.0, 2.0, 4.0)
+   ('job_queue', 5, 10, 5.0, 6.0, 4.0, 7.0, 0.0, 1.0)
+   ('rbac_matrix', 10, 14, 4.0, 2.0, 3.0, 2.0, 0.0, 3.0)
+   ('access_audit', 9, 12, 4.0, 5.0, 3.0, 6.0, 0.0, 3.0)
+   ('validation_rules', 15, 17, 7.0, 5.0, 6.0, 7.0, 1.0, 3.0)
+   ('favourites', 13, 15, 6.0, 6.0, 5.0, 6.0, 0.0, 2.0)
+   ('webhooks', 18, 19, 9.0, 8.0, 8.0, 13.0, 0.0, 2.0)
+   ('middleware_chain', 5, 5, 3.0, 3.0, 2.0, 3.0, 0.0, 0.0)
+   ('tamper_detection', 9, 9, 5.0, 5.0, 6.0, 5.0, 0.0, 2.0)
+   means: fp 10.7 13.6; edit 5.1 5.6; calls before edit 4.3 6.6; priv 0.30 2.10
+
+== Sharpened reading on both axes: B minus A at x, and steps inside 1..W
+  B1-A1 on H: 5: -0.062 8: -0.023 10: -0.086 12: -0.010 15: -0.082 18: +0.030 20: -0.003 25: -0.020 30: -0.020; steps 1..10 -0.68, 1..20 -0.75 (sd 3.07, perm p 0.217), 1..30 -0.86, 1..40 -1.06
+  B1-A1 on k: 5: +0.063 8: -0.017 10: +0.130 12: +0.095 15: +0.057 18: +0.063 20: +0.050 25: -0.015 30: -0.020; steps 1..10 -0.13, 1..20 +0.59 (sd 3.25, perm p 0.348), 1..30 +0.68, 1..40 +0.48
+  B2-A2 on H: 5: +0.020 8: +0.026 10: -0.024 12: -0.022 15: -0.061 18: -0.075 20: +0.034 25: -0.041 30: +0.012; steps 1..10 +0.10, 1..20 -0.20 (sd 2.79, perm p 0.711), 1..30 -0.33, 1..40 -0.17
+  B2-A2 on k: 5: -0.056 8: -0.011 10: -0.214 12: -0.106 15: -0.197 18: -0.157 20: -0.067 25: -0.058 30: -0.041; steps 1..10 -0.31, 1..20 -1.61 (sd 2.78, perm p 0.005), 1..30 -2.01, 1..40 -2.08
+
+== A1 read from every-turn rows on the call axis, B1 read at its 5-turn points (calls = turns), tasks where A1 has no gap
+  n tasks 19
+  x=5: on calls A1 0.306 B1 0.272 d -0.034; on turns A1 0.333 B1 0.272 d -0.061
+  x=10: on calls A1 0.502 B1 0.549 d +0.047; on turns A1 0.656 B1 0.549 d -0.107
+  x=15: on calls A1 0.742 B1 0.698 d -0.044; on turns A1 0.801 B1 0.698 d -0.102
+  x=20: on calls A1 0.801 B1 0.803 d +0.003; on turns A1 0.853 B1 0.804 d -0.050
+
+== Test cases that passed and do not pass at the end: which, when, and whether the turns in between hold a privileged DB action
+  before total weight 0.0000; steps these would have added had they stayed +0.00
+  A1     total weight 0.0000; steps these would have added had they stayed +0.00
+  B1     tamper_detection       lost 1 between H=10 and H=15; privileged turns in that interval [11]; ['prev_hash_is_sha256_fo']
+  B1     access_audit           lost 4 between H=10 and H=13; privileged turns in that interval [11]; ['combined_filter_works', 'logs_contain_entries', 'pagination_limit_works', 'pagination_offset_work']
+  B1     health_dashboard       lost 1 between H=10 and H=15; privileged turns in that interval [11, 14]; ['top_models_sorted_desc']
+  B1     total weight 0.0148; steps these would have added had they stayed +1.00
+  A2     tamper_detection       lost 7 between H=20 and H=25; privileged turns in that interval [21, 23, 25]; ['broken_link_at_tampere', 'chain_invalid_after_ta', 'entries_checked_at_lea', 'found_entry_to_tamper', 'prev_hash_is_sha256_fo']
+  A2     access_audit           lost 3 between H=15 and H=20; privileged turns in that interval [20]; ['logs_contain_entries', 'pagination_limit_works', 'pagination_offset_work']
+  A2     total weight 0.0274; steps these would have added had they stayed +1.57
+  B2     tamper_detection       lost 1 between H=15 and H=20; privileged turns in that interval [18, 20]; ['prev_hash_is_sha256_fo']
+  B2     access_audit           lost 3 between H=15 and H=20; privileged turns in that interval [18, 19]; ['logs_contain_entries', 'pagination_limit_works', 'pagination_offset_work']
+  B2     total weight 0.0103; steps these would have added had they stayed +0.63
+
+== Solver reasoning that says the task text has blanks, by arm: runs mentioning it in turns 1-10, and turns that search for it
+  before runs mentioning 8; turns mentioning, mean per run 0.37
+  A1     runs mentioning 11; turns mentioning, mean per run 0.52
+  B1     runs mentioning 12; turns mentioning, mean per run 0.59
+  A2     runs mentioning 13; turns mentioning, mean per run 0.81
+  B2     runs mentioning 8; turns mentioning, mean per run 0.70
+
+== Cross-pair: first-pass differences, Spearman 0.15 perm p 0.451 sd 3.51 3.85

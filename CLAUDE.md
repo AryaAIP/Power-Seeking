@@ -18,6 +18,8 @@ This folder is Arya's SPAR research project on measuring **power-seeking in AI a
 
 `README.md` at this level is the full index, with the literature and the people.
 
+**The common commands** are in `tools/power.sh`: status, sync, tests, link check, secret scan, the read cache, the dataset, power, and the pages. In WSL, from this folder: `bash tools/power.sh <command>`; with no command it lists them.
+
 ## Layout
 
 The top-level folders are numbered in reading order:
@@ -26,7 +28,7 @@ The top-level folders are numbered in reading order:
 - `3-experiments/`
 - `4-background-oct-2026/`
 - `5-reading-notes-nov-2026/`
-- `tools/`, for repository tools.
+- `tools/`, for repository tools: `power.sh`, `check_links.py`, `record_cache.py`.
 
 An experiment folder, using `linuxarena-power-v0/` as the model:
 
@@ -36,11 +38,12 @@ An experiment folder, using `linuxarena-power-v0/` as the model:
 | `next-steps.md` | What to do next, with exact commands. Rewrite it, don't append to it |
 | `plans/` | Plans and proposals, including the plan a session follows |
 | `logs/` | One running log per session: `YYYY-MM-DD-<what>.md`, newest entries at the bottom, a summary at the top when the session ends |
-| `findings/` | Results and analyses (`results-*.md`, audits) |
+| `findings/` | Results and analyses (`results-*.md`, `nov5-*.md`, `task-power/`, audits). `findings/README.md` lists them by question; `findings/data-map.md` says where all the data lives |
+| `analysis/` | The dataset built from the records for analysis, by `analysis/build_dataset.py`, and the scripts behind the Nov 5 reports |
 | `tasks/` | Task-set documents |
-| `runs/` | Generated readable records, `runs/<label>/<task>/<run>/`, plus `runs/runs-registry.md`. Never edit the generated files by hand; rerun the export |
+| `runs/` | Generated readable records, `runs/<label>/<task>/<run>/`, plus `runs/runs-registry.md`. Never edit the generated files by hand; rerun the export. Never move a batch folder: code finds runs by label |
 | `harness/` | The code, the one copy to edit. `harness/README.md` lists every file |
-| `viz/` | Visualisation plans and pages |
+| `viz/` | Visualisation plans, the pages and their configs (`run-v4-both.json` is the main page's). `old/` holds retired files |
 | `pilot-results/` | Data from the old pilot runs |
 
 **Raw data stays in WSL**, under `/root/power-v0/data/`: the `.eval` logs, snapshots and database dumps. It's too big for OneDrive, and the raw logs contain secrets.
@@ -74,9 +77,9 @@ An experiment folder, using `linuxarena-power-v0/` as the model:
 | `v<N>-before`, `v<N>-afterA`, `v<N>-afterB` | Solver runs |
 | `nowork-v<N>-S0`, `nowork-v<N>-afterA`, `nowork-v<N>-afterB` | No-work runs (H = 0, and the replay check) |
 | `hz-<label>-<task>-H<h>` | Per-step scoring, one job per (run, H) |
-| `sr-<batch>-<task short>` | Score and roll back: one job scores a run at every turn (`plans/score-and-rollback-scope.md`) |
+| `sr-<batch>-<task short>` | Score and roll back: one job scores a run at every turn (`plans/score-and-rollback-scope.md`). A rerun or rescore adds `-r<N>` |
 | `traj4-<task short>-<note>`; `v4-…-p<k>`, `nowork-v4-…-p<k>` | Nov 3: the trajectory search, and solver and no-work batches split by machine part `p1`–`p5`; `A2`/`B2` are pair 2 |
-| `hzcheck-*`, `restorecheck-*`, `probe-v<N>` | Checks |
+| `hzcheck-*`, `restorecheck-*`, `probe-v<N>` | Checks. `hzcheck-bench-*` are the Nov 5 efficiency tests |
 | `vmcheck-*` | Checks of the cloud machine against WSL's runs (`plans/vm-runbook.md`) |
 
 The registry lists every label.
@@ -87,7 +90,7 @@ The registry lists every label.
   - No LinuxArena, BashArena, ControlArena or Control Tower code on the Windows filesystem: read it in WSL or on GitHub.
   - Never print, store or ask Arya for an API key. The OpenRouter key is a Windows user variable passed in with `WSLENV` (see the session notes, section 3).
   - Never print secret values. Exported records redact them.
-- **GitHub:** the raw pilot logs (`3-experiments/*/logs/*.eval`) contain secrets and must never be pushed (`.gitignore`). Pushing waits for Arya to name the repository.
+- **GitHub:** the raw pilot logs (`3-experiments/*/logs/*.eval`) contain secrets and must never be pushed (`.gitignore`). The repository is `AryaAIP/Power-Seeking` (private), branch `initial-import`. Run the secret scan (`tools/power.sh scan`) before every commit.
 - **Approvals:**
   - Paid runs need Arya's go-ahead.
   - When Arya asks to discuss, run nothing until the plan is agreed.
@@ -102,7 +105,7 @@ The registry lists every label.
 - **The session log** (`logs/`) gets a timestamped entry at every launch, finish, failure and fix, and at least every 30 minutes.
 - **The session notes' section 0** is rewritten at the end of each phase.
 - **Decisions go in `1-handoff/decisions-log.md`.**
-- **After moving or adding files,** update the folder README and run `python3 tools/check_links.py` (from WSL: `python3 -I /mnt/c/.../tools/check_links.py`). It must report 0 broken links.
+- **After moving or adding files,** update the folder README and run `bash tools/power.sh links` in WSL. It must report 0 broken links.
 
 ## Practical gotchas
 
@@ -110,4 +113,5 @@ The registry lists every label.
 - **When passing `/root/...` paths from Git Bash, set `MSYS_NO_PATHCONV=1`.**
 - **Control Tower pulls the internet-simulator image every time an environment starts.** On a flaky connection that pull hangs and stalls every job together for about 75 minutes. `ct.env` therefore points `INTERNET_SIMULATOR_IMAGE` at a local name (`localhost/env-internet-simulator:v1.0.1`, a second name for the same image), so the pull fails at once and the cached image is used.
 - **There's no Python on Windows;** use WSL's `python3`. For Control Tower, always call `.venv/bin/ct` directly.
+- **Reading `/mnt/c` is slow, and `git status` there takes minutes.** Set `POWER_CACHE=/root/power-v0/cache` to read the run records through the read cache, as `tools/power.sh` does. It changes no output (`tools/test_record_cache.py`).
 - **Writing for Arya:** plain words, the answer first, sources linked, and conditions described by what is actually done. See `1-handoff/working-with-arya.md`.

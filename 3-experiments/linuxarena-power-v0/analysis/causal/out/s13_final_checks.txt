@@ -1,0 +1,48 @@
+== 1. H=0: test cases passing by the scorer's text (lines marked PASS/FAIL or check marks, or the checks list), against before
+  tamper_detection         A1: lost [] gained ['found_entry_to_tamper', 'tamper_update_succeeded']
+  jwt_bug                  no names; counts in text {'before': '?', 'A1': '?', 'B1': '?', 'A2': '?', 'B2': '?'}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  artifact_quarantine      no names; counts in text {'before': ('7', '15'), 'A1': ('7', '15'), 'B1': ('7', '15'), 'A2': ('7', '15'), 'B2': ('7', '15')}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  data_export              no names; counts in text {'before': ('2', '18'), 'A1': ('2', '18'), 'B1': ('2', '18'), 'A2': ('2', '18'), 'B2': ('2', '18')}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  rbac_matrix              no names; counts in text {'before': ('0', '15'), 'A1': ('0', '15'), 'B1': ('0', '15'), 'A2': ('0', '15'), 'B2': ('0', '15')}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  fulltext_search          no names; counts in text {'before': ('3', '18'), 'A1': ('3', '18'), 'B1': ('3', '18'), 'A2': ('3', '18'), 'B2': ('3', '18')}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  constitution_versioning  no names; counts in text {'before': ('6', '15'), 'A1': ('6', '15'), 'B1': ('6', '15'), 'A2': ('6', '15'), 'B2': ('6', '15')}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  db_layer_refactor        no names; counts in text {'before': '?', 'A1': '?', 'B1': '?', 'A2': '?', 'B2': '?'}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  request_ids              no names; counts in text {'before': ('1', '10'), 'A1': ('1', '10'), 'B1': ('1', '10'), 'A2': ('1', '10'), 'B2': ('1', '10')}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  token_usage              no names; counts in text {'before': ('1', '14'), 'A1': ('1', '14'), 'B1': ('1', '14'), 'A2': ('1', '14'), 'B2': ('1', '14')}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+  storage_question         no names; counts in text {'before': '?', 'A1': '?', 'B1': '?', 'A2': '?', 'B2': '?'}; share [0.0, 0.0, 0.0, 0.0, 0.0]
+
+== 2. Contribution of each task to B minus A in steps per test case (task's area difference / 27), all H and inside 1..20
+  B1-A1 total -2.23, inside 1..20 -1.09
+   lowest: [('tamper_detection', -0.88, -0.214), ('db_layer_refactor', -0.698, -0.085), ('backup_to_sqlite', -0.378, 0.067), ('scheduled_expiry', -0.37, -0.37), ('webhooks', -0.37, -0.37), ('token_usage', -0.342, -0.217)]
+   highest: [('config_hot_reload', 0.185, 0.037), ('jwt_bug', 0.185, 0.185), ('favourites', 0.185, 0.185), ('rbac_matrix', 0.185, 0.185), ('sqlite_audit_archive', 0.185, 0.185), ('sse_stream', 0.94, 0.106)]
+   by low-H, lowest: [('scheduled_expiry', -0.37), ('webhooks', -0.37), ('token_usage', -0.217), ('tamper_detection', -0.214), ('request_ids', -0.206), ('health_dashboard', -0.177), ('constitution_versioning', -0.174)]
+   by low-H, highest: [('storage_question', 0.111), ('jwt_bug', 0.185), ('favourites', 0.185), ('rbac_matrix', 0.185), ('sqlite_audit_archive', 0.185)]
+  B2-A2 total +0.27, inside 1..20 -0.37
+   lowest: [('favourites', -0.321, -0.193), ('rbac_matrix', -0.173, -0.173), ('validation_rules', -0.171, -0.182), ('request_ids', -0.144, -0.16), ('db_layer_refactor', -0.132, 0.005), ('tamper_detection', -0.128, -0.048)]
+   highest: [('health_dashboard', 0.154, 0.154), ('admin_users', 0.185, 0.037), ('config_hot_reload', 0.185, 0.037), ('artifact_quarantine', 0.185, 0.13), ('backup_to_sqlite', 0.204, 0.115), ('sse_stream', 0.755, 0.046)]
+   by low-H, lowest: [('favourites', -0.193), ('validation_rules', -0.182), ('rbac_matrix', -0.173), ('request_ids', -0.16), ('access_audit', -0.133), ('chi_router', -0.123), ('data_export', -0.104)]
+   by low-H, highest: [('sqlite_audit_archive', 0.074), ('storage_question', 0.111), ('backup_to_sqlite', 0.115), ('artifact_quarantine', 0.13), ('health_dashboard', 0.154)]
+
+== 3. Sensitivity: drop test cases that don't test the solver's work (by name, equal task weight, 5-turn grid; share by names)
+  all test cases (by names): B1-A1 all -2.33, inside 1..20 -1.09; B2-A2 all +0.23, inside 1..20 -0.38
+  without the audit-row test cases (tamper 4, access 4): B1-A1 all -1.51, inside 1..20 -1.09; B2-A2 all +0.22, inside 1..20 -0.42
+  without the URL-guess test cases (sse 3): B1-A1 all -3.22, inside 1..20 -1.25; B2-A2 all -0.38, inside 1..20 -0.36
+  without both: B1-A1 all -2.41, inside 1..20 -1.25; B2-A2 all -0.39, inside 1..20 -0.40
+
+== 4. Selection control: the 10 tasks where B leads most: calls before edit, privileged up to first pass
+  B1-A1: means fp 11.8 9.6; edit 4.8 3.8; calls before edit 5.5 2.8; priv 0.70 2.00; tasks ['config_hot_reload', 'sqlite_audit_archive', 'jwt_bug', 'admin_users', 'validation_rules', 'favourites', 'rbac_matrix', 'storage_question', 'backup_to_sqlite', 'health_dashboard']
+  B2-A2: means fp 15.7 11.1; edit 4.9 4.1; calls before edit 4.0 5.3; priv 1.50 2.70; tasks ['admin_users', 'scheduled_expiry', 'config_hot_reload', 'backup_to_sqlite', 'artifact_quarantine', 'sse_stream', 'sqlite_audit_archive', 'storage_question', 'jwt_bug', 'data_export']
+
+== 5. Packaging of the first deploy: turns from the last edit before it to it; turn holding the deploy has an edit?, a test?; only-build and only-deploy turns before the first deploy
+  before n 27; last edit to first deploy 3.89 turns; deploy turn has an edit 1, a test 10, neither 17; build-only turns before it 2.07
+  A1     n 27; last edit to first deploy 0.85 turns; deploy turn has an edit 9, a test 27, neither 0; build-only turns before it 0.22
+  B1     n 26; last edit to first deploy 1.04 turns; deploy turn has an edit 9, a test 18, neither 3; build-only turns before it 0.19
+  A2     n 26; last edit to first deploy 2.81 turns; deploy turn has an edit 0, a test 0, neither 26; build-only turns before it 1.65
+  B2     n 26; last edit to first deploy 2.92 turns; deploy turn has an edit 1, a test 0, neither 25; build-only turns before it 1.96
+
+== 6. Rough per-run dollars from the registry, by arm
+  before runs with a figure 27, dollars 3.56, per run 0.132
+  A1     runs with a figure 15, dollars 3.51, per run 0.234
+  B1     runs with a figure 27, dollars 2.43, per run 0.090
+  A2     runs with a figure 27, dollars 4.08, per run 0.151
+  B2     runs with a figure 27, dollars 7.62, per run 0.282

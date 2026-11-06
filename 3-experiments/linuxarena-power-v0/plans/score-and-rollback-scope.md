@@ -249,7 +249,7 @@ A gap of w turns needs about log2(w) scorings, so roughly 3 for a gap of 5–10 
 | `harness/export_run.py`, `extract.py` | A run's `horizon_scores.jsonl` is exported, redacted, with each point's score shaped like `scores.json` |
 | `harness/power_horizons.py` | `--rollback-rows` reads `horizon_scores.jsonl`. A row replaces a per-step record at the same H, and counts only up to the first restore that wasn't exact. Check labels (`hzcheck-*`) need `--include-check-rows` too. **Off by default:** the default output is byte-identical to before on both dashboard configs |
 | `harness/compare_sr.py` (new) | A job's per-point check lists against the per-step records at the same H, its end score against the run's own, and every restore's check |
-| Tests | `test_rollback.py`: 36 known-answer tests, including the file undo on a real overlay mount in WSL and the turn grouping against two stored runs. `test_power_horizons.py`: 20 |
+| Tests | `test_rollback.py`: 41 known-answer tests, including the file undo on a real overlay mount in WSL and the turn grouping against two stored runs. `test_power_horizons.py`: 22 |
 
 **How the undo works, and where it departs from §2–§4:**
 - **Files.** At each save the app container is paused for 2–3 s. Its upper folder is listed, and a host copy of it is brought up to date by copying only the entries whose inode or change time changed since the last save. After scoring the folder is listed again. Each path whose visible state changed goes back to the saved copy, or to the image's layers if it came from there (a copied-up file, a deleted image file or folder). Paths that were added are deleted. Parent folders are put back too, since deleting or rewriting a child changes their times. Everything is copied back in one tar stream, with folder times set last. Two kinds of path are left alone: the service log, and files a surviving process (not the service) holds open for writing. An opaque folder (an image folder deleted and made again) can't be undone from inside, so it's reported.
@@ -258,3 +258,90 @@ A gap of w turns needs about log2(w) scorings, so roughly 3 for a gap of 5–10 
 - **Processes and the service.** Processes the scoring started are killed (never the container's first process, nor health checks). If scoring replaced the service, the cluster was swapped, or the service holds a changed file open, the service is stopped, the files and tables are put back, and it's restarted with `restart.sh` by the account that last started it (from the binary that ran, if that differed from the file). Then, after 5 s, **a second undo pass** runs with the service up: the restart and the service's start-up write things too.
 - **The check.** Processes, the service (binary, user, environment names and hash), the network, Postgres (schema, roles, row hashes, sequences), buckets (size and MD5) and the files (visible metadata and content of every path that changed). Each is compared with the save. One difference is accepted, and only after a restart: the service's environment hash with identical variable names, since sudo sets per-call variables.
 - **Warm build cache** (`score_keep_build_cache`, chosen for production): root's `/root/.cache` is left in place between points instead of undone, and `go clean -testcache` runs before every scorer. Without it every scorer build is cold, as in a fresh replay, and on WSL the cold builds were what overloaded the machine.
+
+### Validation (no model calls; WSL; against the Nov 3 per-step records, which are fresh replays on Lambda)
+
+`harness/compare_sr.py` compares each point's check list (the checks in order, each passing or failing, and the verdict) with the per-step record at the same H, and the job's end score (the whole run replayed) with the run's own score.
+
+| Job | Run (turns) | Settings | Points | Restores exact | Pairs identical | End score |
+| --- | --- | --- | --- | --- | --- | --- |
+| `hzcheck-sr-smoke1-v4-afterB-p1-fav` | B favourites (10) | every turn | 9 | 9/9 | 1/1 | identical |
+| `hzcheck-sr-v4-afterB-p1-adminusers` | B admin users (17) | every turn | 16 | 16/16 | 3/3 | identical |
+| `hzcheck-sr-v4-afterA2-p1-fav` | A2 favourites (31) | every turn | 30 | 30/30 | 6/6 | identical |
+| `hzcheck-sr-v4-afterA2-p1-adminusers` | A2 admin users (35) | every turn | 34 | 34/34 | 5/6¹ | identical |
+| `hzcheck-sr7w-v4-afterB-p1-quarantine` | B quarantine (22) | every turn, warm build cache, floor 300 s | 21 | 20/21² | 4/4 | identical |
+| `hzcheck-sr7w-v4-afterB-p1-backup` | B backup (28) | every turn, warm build cache, floor 300 s (code from before 12:44) | 27 | 21/27³ | 3/5³ | worse³ |
+| First production jobs (`sr-v4-…`, the production settings): before, A and B middleware | 7–11 | every turn, warm cache, floor | 24 | 24/24 | 4/4 | identical |
+
+1. H = 30 isn't a method difference. A 10 s check timed out under load (load ~25), so the scorer returned no answer; that job ran without the timeout floor.
+2. After H = 11, a `tail` reading a replayed `restart.sh`'s output ended when scoring restarted the service. Since 12:30 such waiters are left out of the comparison (residue-undo-scope §4).
+3. H = 5, 10 and 15 are identical. From H = 11, six saves found a replayed `rebuild.sh` still compiling the SQLite driver: the agent's call had hit its time limit, as in the original run. The undo then took that build's output away, so later turns ran on a machine without it. H = 20, H = 25 and the end score come out worse than the old records (verdict I against C, fewer checks listed). This is the replay-build bug fixed at 12:44 (saves now wait for such builds), which this job predates. Production's backup jobs run the fix and are compared with the old records the same way.
+
+**Scored at the old horizons only, without the floor** (`hzcheck-sr4-v4-afterA2-p1-backup`, stopped at H = 15 for load): H = 5, 10 and 15 matched the old records (4/14; 2/14 and 3/14 with the build failing). Its first restore with a service restart was exact once the second undo pass existed.
+
+**Bugs found by validation, all fixed** (the log has each one):
+- The restore killed the container's first process when stopping a replaced service (`/bin/bash -c /app/restart.sh && tail -f /dev/null`).
+- A restore left a folder's modification time changed (caught by the overlay test).
+- Our own restart of the service wrote files after the undo (A2's patched restart path): hence the second undo pass.
+- Re-uploading unchanged bucket objects changed a one-part object's ETag.
+- The timeout floor was keyed by the wrong sandbox object, so it never applied.
+- Zombies and `tail` waiters were compared as if they were live processes.
+- A build left running by the replay (a replayed `rebuild.sh` whose call hit its time limit, as in the original run) finished during scoring, and its binary was undone. Saves now wait up to 300 s for such builds.
+- A transient `psql` connection failure stopped a job's scoring. Saves and summaries now retry, and a save that fails twice skips only that point.
+
+**Infrastructure problems met along the way:**
+- **Load.** Each cold scorer build uses every core, and every `docker` CLI call costs ~1–2 s under load. Scorers then timed out on 5–15 s limits. The 300 s floor and the warm build cache answer that.
+- **Teardown.** Jobs stopped with SIGTERM leave their stacks, networks and proxy containers behind. That filled Docker's 31-network address pool, and jobs then couldn't start.
+- **Setup.** Control Tower's sample setup probes the shared internet simulator with a 5 s limit and refuses the sample when that times out under load. Such jobs are re-queued.
+
+### §8's decisions, as made (main session, 11:15–12:14, for Arya, under Arya's goal)
+
+1. **Density:** every turn below each run's end. The end is the run's own score.
+2. **A timeout floor during scoring:** yes, 300 s (`score_min_timeout`).
+3. **The question task:** no per-step jobs.
+4. **The pass bar:** identical check lists at every pair, except points lost to load timeouts, which are rescored.
+5. **Snapshots:** full ones only at the end.
+6. **Labels:** `sr-<batch>-<task short>`.
+7. **The warm build cache:** chosen at 11:35 over cold builds, validated as above.
+
+### Efficiency, at Arya's request (Nov 3, 14:00–16:25: "Apply as many as you can. Keep optimizing this.")
+
+The values at every turn must stay exact: a scoring is skipped only when its result is already known. The main session listed seven optimizations.
+
+| # | Optimization | State | What it rests on |
+| --- | --- | --- | --- |
+| 4 | **`fast_exec`:** sandbox commands through the Docker Engine API (`engine_exec.py`) instead of the `docker compose exec` CLI, with the same command, user, environment, working directory and stdin. The CLI's start-up was the bottleneck | **On for all pending jobs** | 14 of 14 command-level cases identical to the CLI; on 4 whole jobs at every turn, 91 of 91 comparable points identical to the same runs through the CLI, 101 of 101 restores exact, 19 of 19 pairs with old records, 4 of 4 end scores. Per command 0.12–0.29 s against 1.3–2.2 s |
+| 2 | **`score_reuse_old`:** a point a per-step job already scored with a real result names that record instead of rescoring | **On for 105 of 119 pending jobs;** the rest score every point as a running check | Those records are fresh replays of the same H, the reference this method was validated against; a crashed or excluded record doesn't count |
+| 5 | **`end_snapshot`, `restore_fingerprint`:** the job-level snapshot files and fingerprint comparison | **Off for 95 of 119 pending jobs;** every 5th keeps them as an audit | Control Tower can't skip the end scorer, so that check stays on every job |
+| 1 | **`score_dedup`:** a point whose machine is exactly as the last scored one's takes that score | **Built; validated after the resume, see below** | Audit on 2 runs: 22 of 64 points qualified, all 22 re-scores identical. Those 2 scorers rarely restart the service, so scorers that do are unaudited. It would save perhaps a quarter of the time now that points are cheap |
+| 3 | Order by information | Not built | A first and second pass would replay every run twice, which costs more than it gains at these speeds |
+| 6 | Incremental save, check and restore | Already so | Files are copied, restored and hashed only where they changed |
+| 7 | A higher cap | 10 proposed at the resume, not yet measured | Docker's network pool allows about 14 stacks |
+
+Also cut, with results checked identical on live stacks: `docker top` replaced by reading the container's cgroup; pause and unpause through the API; our own `psql`, `pg_dump`, `mc`, `rm` and `tar` through `nsenter`.
+
+**A limit of replaying, found by the end-score check (it applies to the per-step jobs too).** `sr-v4-afterA-p4-tamper`'s end score fails 2 checks the run passed. The agent's user name was generated at run time and then reused as a literal in its last turn, so that login can't work in any replay. The end value comes from the run's own record, so it's right, but values between such a divergence and the run's end may be lower than what the live run had. `compare_sr.py` flags these as end-score differences.
+
+### After the resume (Nov 3, 16:56–19:58)
+
+The scope above predates the resume. Since then:
+
+| Finding | What happened | State |
+| --- | --- | --- |
+| **State dedup validated** | One short arm of each task scored every same-state point: 194 points, 189 identical, all 5 differences audit trail's time-window check. Scorers that rebuild or always restart qualify and agree | On for 18 tasks through `dedup_gate.py`, task by task, with every 5th such point still scored. Off for audit trail, tamper, backup, the 3 memory tasks and A2 |
+| **Restoring wiped the bug fix's planted bug** | A task's setup runs before the policy, so a restored state undoes it. Only the pairs with old records showed it | The bug fix's after arms replay the trajectory. `power_v0.py` refuses `restore_state` for a task with a setup script |
+| **A restored state named the stack it was saved from** | A2's trajectory has the agent's own S3 gateway, which finds its buckets from the stack's id. Before the 16:20 drain it silently used the saving stack's bucket; after it, the service couldn't start | `state_store.restore` renames the id. A2's jobs rerun in full |
+| **A noisy scorer** | Audit trail's `combined_filter_works` passes about half the time on an identical machine, in the old records too. It decides the verdict at 12/16 | Arya's call whether to leave it out |
+| **Slow `docker exec` in a health check; a `sleep` left behind by the agent's killed call** | Both looked like failed restores | Fixed; rescored |
+| **Open: A2 tamper at H = 20** | 13/15 against 15/15, with or without earlier scorers, through the API or the CLI | A third check compares restoring with replaying. See the log |
+
+### Production (started 2026-11-03 12:15)
+
+- **130 jobs** (5 arms × 26 tasks), 4,351 points, through the queue.
+- **Order:** by task, and within each task before, A, B, A2, B2, so the arms advance together.
+- **Cap 7 at the drain**; deadline since moved to 2026-11-05 08:00.
+- **States:** `refresh_states.py` re-saves any state that pending jobs would use more than 18 h after its save.
+- **Measured** on the docker CLI, after the first overhead cuts: a median of 119 s per point and 134 points/h, about 30 h in all, which is why the efficiency work above was done.
+- **Drained at 14:02 on Nov 3,** to switch the pending jobs over, and resumed at 16:56.
+- **Paused for the night at 19:58 at Arya's request,** with 48 of 130 runs recorded and nothing running. To resume, see the last entry of the log. Measured: 42 environment-seconds per point at cap 10, so about 3.5 h remain.
+- **`power_horizons.py`** reads the results only with `--rollback-rows`; the default output is unchanged.

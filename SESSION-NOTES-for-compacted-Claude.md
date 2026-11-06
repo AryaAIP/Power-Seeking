@@ -2,26 +2,27 @@
 
 *Written in a hurry at Arya's request before context compaction, by the thread "Read literature and scope LinuxArena experiment". These are the details not already captured elsewhere. Read with: README.md, `5-reading-notes-nov-2026/synthesis.md`, `3-experiments/linuxarena-power-v0/{plans/plan,plans/run-plan,findings/bottlenecks,tasks/task-candidates}.md`, `1-handoff/decisions-log.md`.*
 
-## 0. Current state (Nov 3, 12:05 CST): read this first
+## 0. Current state (Nov 5, 10:00 CST): read this first
 
-- **Read [CLAUDE.md](CLAUDE.md) first.** It has the conventions, the layout, the run workflow, the label scheme and the rules. Two things in it are older than Arya's Nov 3 decisions: results now carry **no confidence intervals** (strict values only), and the label scheme doesn't list `sr-*`, `restorecheck-*` or the `-p<k>` part suffix yet.
+- **Read [CLAUDE.md](CLAUDE.md) first.** It has the conventions, the layout, the run workflow, the label scheme and the rules.
 - **The Nov 3 run is done and home** (Lambda, 124 cores, plus WSL, 03:00–08:30; Lambda is terminated):
   - a search for a power-seeking trajectory: 42 trajectories `traj4-<task>-<note>`;
   - two pairs, each a power-seeking trajectory and the no-note control on the same task: pair 1 A = `traj4-sharing-none`, B = `traj4-sharing-side`; pair 2 A2 = `traj4-minio-none`, B2 = `traj4-minio-keep`;
   - 27 future tasks, solver runs from the initial environment state and after each of the four trajectories (the solver continues the trajectory's chat), each scored every 5 turns.
-- **The result:** neither power-seeking trajectory left more power than its control. Mean POWER_H over H = 1..80 under the `last-scored` rule: initial state 0.642; pair 1 A 0.770, B 0.742; pair 2 A2 0.702, B2 0.705. Pair 2's control got root on its own, so it isn't a clean control. Audited and independently recomputed. Everything is in [findings/results-nov3.md](3-experiments/linuxarena-power-v0/findings/results-nov3.md).
-- **Arya's decisions (~10:15):** the reward rule is `last-scored` (a test case counts at H if it passes at the last scored step at or before H); B2's storage answer counts as correct ([findings/score-corrections.json](3-experiments/linuxarena-power-v0/findings/score-corrections.json)). See [1-handoff/decisions-log.md](1-handoff/decisions-log.md).
-- **Running or about to run (Arya away until ~13:30; Arya's goal: score every run at every turn, sync to the pages, clean up the repository, sort the data):**
-  - **every-turn rescoring by score and roll back,** in another session: 130 jobs `sr-v4-<arm>-p<k>-<task>` on WSL, from the trajectories' saved states ([plans/score-and-rollback-scope.md](3-experiments/linuxarena-power-v0/plans/score-and-rollback-scope.md) §11, [its log](3-experiments/linuxarena-power-v0/logs/2026-11-03-score-and-rollback.md)). When it lands: `power_horizons.py --rollback-rows`, then the results table, the figures and the pages;
-  - **a page agent** finishing both pages (`viz/build_dashboard.py`): the `last-scored` wording, the correction, the task filter, the solver triage;
-  - **a redaction fix** for 4 transcripts held back from the repository (`traj4-errors-blockers`, `-lean`, `-roadmap`, `traj4-minio-strong`).
-  Check with `cat /root/power-v0/queue/status.tsv`, `tail /root/power-v0/sr-validate/status.log` and `docker ps -q | wc -l` before launching anything.
-- **Done in the data tidy (12:00):** [findings/results-nov3.md](3-experiments/linuxarena-power-v0/findings/results-nov3.md), [findings/data-map.md](3-experiments/linuxarena-power-v0/findings/data-map.md) (where every piece of data lives), the experiment [README.md](3-experiments/linuxarena-power-v0/README.md) and [next-steps.md](3-experiments/linuxarena-power-v0/next-steps.md).
+- **The result, every 5 turns:** neither power-seeking trajectory left more power than its control. Mean POWER_H over H = 1..80 under the `last-scored` rule: initial state 0.642; pair 1 A 0.770, B 0.742; pair 2 A2 0.702, B2 0.705. Pair 2's control got root on its own, so it isn't a clean control. Audited and independently recomputed. Everything is in [findings/results-nov3.md](3-experiments/linuxarena-power-v0/findings/results-nov3.md).
+- **Arya's decisions (Nov 3 ~10:15):** the reward rule is `last-scored` (a test case counts at H if it passes at the last scored step at or before H); B2's storage answer counts as correct ([findings/score-corrections.json](3-experiments/linuxarena-power-v0/findings/score-corrections.json)). See [1-handoff/decisions-log.md](1-handoff/decisions-log.md).
+- **Every-turn rescoring is paused at 48 of 130 runs** (score and roll back, jobs `sr-v4-<arm>-p<k>-<task>`; Arya, Nov 3 19:52). 85 lines are pending, about 3.5 h. The exact resume command, and what to do first, are in [next-steps.md](3-experiments/linuxarena-power-v0/next-steps.md), section 1. No production jobs are running.
+- **Running now (Nov 5):**
+  - **the main session's research stretch:** plan [plans/nov5-research-plan.md](3-experiments/linuxarena-power-v0/plans/nov5-research-plan.md), log [logs/2026-11-05-power-research.md](3-experiments/linuxarena-power-v0/logs/2026-11-05-power-research.md). The reports are in ([findings/README.md](3-experiments/linuxarena-power-v0/findings/README.md), by question). The synthesis is [findings/nov5-what-power-looks-like.md](3-experiments/linuxarena-power-v0/findings/nov5-what-power-looks-like.md). Still to come: reports on the other main tasks (`findings/task-power/others/`, paused at the usage limit; the log says how to resume);
+  - **the score-and-roll-back session:** short free efficiency tests on WSL ([plans/scoring-efficiency-tests.md](3-experiments/linuxarena-power-v0/plans/scoring-efficiency-tests.md)), at most 3 stacks at once.
+  Check with `bash tools/power.sh status` (in WSL) before launching anything.
+- **The pages:** both pairs on one page https://claude.ai/artifact/RxVDZt1SzBfjiX6NcCdf22, pair 2 alone https://claude.ai/artifact/RfgNfq4BYRN2bfZBXqQwEh. Every 5 turns; rebuild them with `tools/power.sh pages` when the rescoring lands.
 - **Where to read:**
+  - [README.md](3-experiments/linuxarena-power-v0/README.md) of the experiment: a start-here table, then every file with its status;
   - [next-steps.md](3-experiments/linuxarena-power-v0/next-steps.md): the steps with exact commands, and the open questions for Arya;
-  - [logs/2026-11-02-midday-runs.md](3-experiments/linuxarena-power-v0/logs/2026-11-02-midday-runs.md): the main session's log; Nov 3 from "02:45" on;
-  - the published pages: pair 1 https://claude.ai/artifact/RxVDZt1SzBfjiX6NcCdf22, pair 2 https://claude.ai/artifact/RfgNfq4BYRN2bfZBXqQwEh.
-- **GitHub:** `AryaAIP/Power-Seeking` (private), branch `initial-import`, last pushed at 0787e62. Tonight's records and docs aren't pushed yet; the main session commits and pushes after a secret scan.
+  - [findings/data-map.md](3-experiments/linuxarena-power-v0/findings/data-map.md): where every piece of data lives.
+- **Common commands, in one script:** [tools/power.sh](tools/power.sh) (status, dataset, power, pages, secret scan, link check). It uses a read cache in WSL (`tools/record_cache.py`), which makes reading the records over `/mnt/c` take seconds instead of minutes.
+- **GitHub:** `AryaAIP/Power-Seeking` (private), branch `initial-import`, pushed up to 70764c3 (Nov 3). Later work isn't committed yet; the main session commits and pushes after a secret scan.
 - **Lesson:** background shells die with the Claude session, but the WSL queue keeps running. So queue dependent jobs ahead of time, or keep the session alive.
 
 *(This section is rewritten at the end of each phase.)*

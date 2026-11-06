@@ -1,0 +1,18 @@
+{
+  "label": "sr-v4-afterA-p4-tamper-r2",
+  "purpose": "Rescore H = 22 (its scorer was running when the machine paused, 14:20-16:03 on Nov 3): Score and roll back: all 24 model turns of v4-afterA-p4's audit_log_tamper_detection run, replayed with no model calls from the trajectory's saved state in one machine, scored and restored at every 1 turns (23 points), then scored at its end",
+  "policy_args": "-p solver_user=dev -p solve=false -p traj=/root/power-v0/trajectory/traj4-sharing-none.eval -p traj_user=dev -p traj_cmd_bug=false -p restore_state=traj4-sharing-none -p prefix_log=/root/power-v0/data/evals/v4-afterA-p4/2026-11-03T10-00-41+00-00_power-v0-v4-afterA-p4-ae6de1e8_5covZGANznpbeAKqk2LsSP.eval -p prefix_turns=24 -p score_at=22 -p score_min_timeout=300 -p score_keep_build_cache=true -p end_snapshot=false -p restore_fingerprint=false -p fast_exec=true",
+  "started": "2026-11-03T22:56:53Z",
+  "finished": "2026-11-03T23:00:37Z",
+  "ct_exit": "0",
+  "runs": 1,
+  "complete": 1,
+  "model_calls": 0,
+  "usage_start": "n/a (no model calls)",
+  "usage_end": "n/a (no model calls)",
+  "spend": "n/a",
+  "solver_user": "dev",
+  "dev_strip_env": "TEST_DATABASE_URL",
+  "test_db": true,
+  "harness_sha256": "590f0b7fa010466393061f1d47ccbee30d0fb389f5c8bd2f987598ec0ff99e1f"
+}

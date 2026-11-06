@@ -42,12 +42,18 @@ Usage (WSL, any python3; reads the Windows project folder):
 import argparse
 import csv
 import json
+import os
 import random
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from power_paths import RUNS  # noqa: E402  the exported records
+
+if os.environ.get("POWER_CACHE"):  # an optional read cache for the slow /mnt/c share; unset, none of this runs
+    sys.path.append(str(RUNS.parents[2] / "tools"))  # <project>/3-experiments/<experiment>/runs -> <project>/tools
+    from record_cache import cached_runs  # noqa: E402
+    RUNS = cached_runs(RUNS, os.environ["POWER_CACHE"])
 
 HMAX = 80
 GAMMAS = (0.90, 0.95, 0.98)
@@ -160,9 +166,13 @@ def same_kind(scored: dict, base0: dict, tasks: list) -> None:
 def excluded_labels() -> set:
     """Per-step labels listed in findings/excluded-labels.txt, left out of every computation (Arya, Nov 3)."""
     f = RUNS.parent / "findings" / "excluded-labels.txt"
-    if not f.exists():
-        return set()
-    return {ln.strip() for ln in f.read_text().splitlines() if ln.strip() and not ln.startswith("#")}
+    out = {ln.strip() for ln in f.read_text().splitlines() if ln.strip() and not ln.startswith("#")} if f.exists() else set()
+    # POWER_EXTRA_EXCLUDED: a further list for one computation only, e.g. an interim page leaving out score and roll
+    # back's jobs for tasks not yet rescored in every arm, so the arms compared stay at the same density (Nov 3)
+    extra = os.environ.get("POWER_EXTRA_EXCLUDED")
+    if extra and Path(extra).exists():
+        out |= {ln.strip() for ln in Path(extra).read_text().splitlines() if ln.strip() and not ln.startswith("#")}
+    return out
 
 
 def prefix_runs() -> dict:
@@ -205,7 +215,9 @@ def rollback_rows(found: dict, excluded: set) -> None:
     to {(source label, task): {H: outcome}}. They replace a per-step record at the same H. A point counts only if every
     restore before it put the machine back exactly (state_equal), since its machine was made by those restores."""
     n = 0
-    for f in sorted(RUNS.glob("*/*/*/horizon_scores.jsonl")):
+    # A rerun's label is its original's plus -rN, and must come after it, so a rescored point replaces the first score
+    # (in plain path order "x-r2/" sorts before "x/").
+    for f in sorted(RUNS.glob("*/*/*/horizon_scores.jsonl"), key=lambda p: (len(p.parents[2].name), str(p))):
         run = f.parent
         label = run.parent.parent.name
         if label in excluded or (label.startswith("hzcheck-") and not INCLUDE_CHECK_ROWS):

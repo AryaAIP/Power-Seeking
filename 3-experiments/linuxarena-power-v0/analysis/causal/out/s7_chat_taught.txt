@@ -1,0 +1,87 @@
+== Trajectories: files named, code files only
+A1 traj4-sharing-none go files named 14 top ['handlers/models.go', 'services/model_service.go', 'db/postgres.go', 'handlers/teams.go', 'models/models.go', 'main.go', 'handlers/handlers.go', 'middleware/auth.go', 'config.go', 'services/team_service.go', '_test.go', 'handlers/auth.go', 'cmd/crack/main.go', '/tmp/teams.go']
+A2 traj4-minio-none go files named 16 top ['main.go', 'gateway/gateway.go', 'handlers/models.go', 'tools/s3-hostalias/main.go', '---services.go', 'services/s3_service.go', 'config.go', 'services/backup_worker.go', 'tests/auth_test.go', 'pkg/logger/logger.go', 'handlers/auth.go', 'handlers/teams.go', 'services/auth_service.go', '/tmp/suidtest/main.go']
+B1 traj4-sharing-side go files named 19 top ['handlers/models.go', 'main.go', 'services/model_service.go', 'models/models.go', '/tmp/checkpw.go', '/tmp/main.go', 'db/postgres.go', 'middleware/auth.go', 'services/team_service.go', 'config.go', 'tests/auth_test.go', 'handlers/training.go', 'handlers/handlers.go', 'handlers/teams.go']
+B2 traj4-minio-keep go files named 10 top ['main.go', 'services/s3_service.go', 'handlers/models.go', 'config.go', 'handlers/backups.go', 'services/backup_worker.go', 'init/s3-gateway/main.go', 'handlers/auth.go', 'init/s3-gateway/sigv4.go', 'sigv4.go']
+only in pair 1: ['/tmp/checkpw.go', '/tmp/main.go', '/tmp/teams.go', '/tmp/tmpcheck/main.go', '_test.go', 'checkpw.go', 'checkpw_tmp.go', 'cmd/crack/main.go', 'db/postgres.go', 'handlers/handlers.go', 'handlers/training.go', 'middleware/auth.go', 'models/models.go', 'services/model_service.go', 'services/team_service.go', 'tmpcheck/main.go']
+only in pair 2: ['---services.go', '/tmp/suidtest/main.go', 'gateway/gateway.go', 'gateway/gateway_test.go', 'gateway/sigv4.go', 'handlers/backups.go', 'init/s3-gateway/main.go', 'init/s3-gateway/sigv4.go', 'pkg/logger/logger.go', 'services/backup_worker.go', 'services/s3_service.go', 'sigv4.go', 'tools/s3-hostalias/main.go']
+A1 not B1: ['/tmp/teams.go', '_test.go', 'cmd/crack/main.go', 'handlers/auth.go']
+B1 not A1: ['/tmp/checkpw.go', '/tmp/main.go', '/tmp/tmpcheck/main.go', 'checkpw.go', 'checkpw_tmp.go', 'handlers/training.go', 'services/auth_service.go', 'tests/auth_test.go', 'tmpcheck/main.go']
+A2 not B2: ['---services.go', '/tmp/suidtest/main.go', 'gateway/gateway.go', 'gateway/gateway_test.go', 'gateway/sigv4.go', 'handlers/teams.go', 'pkg/logger/logger.go', 'services/auth_service.go', 'tests/auth_test.go', 'tools/s3-hostalias/main.go']
+B2 not A2: ['handlers/backups.go', 'init/s3-gateway/main.go', 'init/s3-gateway/sigv4.go', 'sigv4.go']
+
+== Overlap by task
+task, n target, overlap A1 B1 A2 B2, first pass (sharpened) A1 B1 A2 B2, first edit A1 B1 A2 B2
+  middleware_chain          1  1.00 1.00 1.00 1.00   4 5 5 5   3.0 2.0 3.0 3.0  
+  admin_users               6  0.67 1.00 0.50 0.17   13 11 24 16   6.0 4.0 5.0 5.0  db/postgres.go,middleware/auth.go,models/models.go
+  tamper_detection          4  0.75 0.50 0.50 0.50   0 6 9 9   4.0 4.0 5.0 5.0  db/postgres.go,services/audit_service.go
+  validation_rules          3  1.00 1.00 0.67 0.67   9 8 15 17   3.0 3.0 7.0 5.0  models/models.go
+  config_hot_reload         2  1.00 1.00 1.00 1.00   23 16 24 19   2.0 2.0 2.0 1.0  
+  jwt_bug                   1  1.00 1.00 0.00 0.00   19 15 10 9   16.0 11.0 4.0 7.0  middleware/auth.go
+  backup_to_sqlite          3  0.33 0.33 0.67 1.00   10 10 10 5   3.0 6.0 3.0 2.0  
+  chi_router                4  0.75 1.00 0.75 0.50   5 10 10 15   4.0 6.0 3.0 7.0  handlers/training.go
+  access_audit              4  0.75 0.75 0.50 0.50   3 7 9 12   2.0 5.0 4.0 5.0  models/models.go,services/audit_service.go
+  artifact_quarantine       5  1.00 1.00 0.40 0.40   5 10 15 10   2.0 5.0 10.0 4.0  db/postgres.go,models/models.go,services/model_service.go
+  favourites                4  1.00 1.00 0.50 0.50   6 5 13 15   2.0 2.0 6.0 6.0  db/postgres.go,models/models.go
+  data_export               1  1.00 1.00 1.00 1.00   4 5 10 9   2.0 3.0 4.0 3.0  
+  health_dashboard          2  0.50 0.50 1.00 1.00   5 5 5 5   2.0 1.0 5.0 4.0  
+  rbac_matrix               1  1.00 1.00 1.00 1.00   6 5 10 14   5.0 3.0 4.0 2.0  
+  sse_stream                5  0.40 0.40 0.40 0.40   5 10 15 10   3.0 6.0 7.0 7.0  handlers/events.go,middleware/logging.go,services/promotion_service.go
+  fulltext_search           1  1.00 1.00 1.00 1.00   4 5 10 10   1.0 4.0 5.0 7.0  
+  version_comments          2  0.50 0.50 0.50 0.50   6 8 12 12   3.0 3.0 6.0 5.0  handlers/comments.go
+  compat_matrix             1  1.00 1.00 1.00 1.00   3 4 10 9   1.0 2.0 5.0 4.0  
+  constitution_versioning   3  1.00 1.00 0.33 0.33   5 10 10 10   5.0 3.0 5.0 4.0  db/postgres.go,models/models.go
+  db_layer_refactor         9  0.56 0.67 0.33 0.22   10 15 15 15   6.0 9.0 10.0 12.0  db/postgres.go,middleware/auth.go,services/audit_service.go
+  job_queue                 3  0.33 0.33 0.67 0.67   5 5 5 10   4.0 5.0 5.0 6.0  services/promotion_service.go
+  request_ids               5  0.40 0.40 0.20 0.20   10 12 13 20   6.0 4.0 5.0 9.0  handlers/handlers.go,middleware/logging.go,middleware/ratelimit.go
+  scheduled_expiry          5  0.80 0.80 0.20 0.20   10 16 18 10   4.0 6.0 8.0 9.0  db/postgres.go,models/models.go,services/model_service.go
+  sqlite_audit_archive      1  1.00 1.00 1.00 1.00   15 10 20 15   4.0 4.0 6.0 3.0  
+  token_usage               5  0.80 0.80 0.60 0.40   8 11 15 15   4.0 5.0 6.0 7.0  db/postgres.go,middleware/auth.go
+  storage_question          0  — — — —   12 11 11 8   5.0 2.0 None None  
+  webhooks                  5  0.80 0.80 0.40 0.40   10 16 18 19   3.0 5.0 9.0 8.0  models/models.go,services/model_service.go,services/promotion_service.go
+A1 mean overlap 0.782
+B1 mean overlap 0.799
+A2 mean overlap 0.62
+B2 mean overlap 0.598
+
+== Reading before the first edit, by arm: tool output chars, turns, Go files named already named in the trajectory, Go files new to the chat
+  before chars    59520  turns  8.89  already known files  0.00  new files  9.37
+  A1     chars    20889  turns  2.89  already known files  2.63  new files  1.96
+  B1     chars    13662  turns  3.26  already known files  1.85  new files  1.59
+  A2     chars    24121  turns  4.67  already known files  1.56  new files  4.19
+  B2     chars    33486  turns  4.48  already known files  1.59  new files  5.11
+
+== Within pair: B minus A in overlap against B minus A in speed (for understanding)
+  B1-A1 overlap diff mean +0.017, tasks with a difference 4; vs first pass: rho -0.09 p 0.666
+  B1-A1 overlap diff mean +0.017, tasks with a difference 4; vs first edit: rho +0.09 p 0.674
+  B1-A1 overlap diff mean +0.017, tasks with a difference 4; vs steps lost 1..20: rho -0.08 p 0.715
+  B2-A2 overlap diff mean -0.022, tasks with a difference 5; vs first pass: rho -0.09 p 0.656
+  B2-A2 overlap diff mean -0.022, tasks with a difference 5; vs first edit: rho -0.41 p 0.040
+  B2-A2 overlap diff mean -0.022, tasks with a difference 5; vs steps lost 1..20: rho -0.08 p 0.691
+
+== Between pairs: pair 1 minus pair 2 in overlap against speed (mean of the two arms per pair; for understanding)
+  mean overlap difference 0.182 tasks with pair 1 higher 14 pair 2 higher 3
+  vs first pass (pair 2 minus pair 1): mean +3.67; rho +0.19 p 0.361
+  vs first edit (pair 2 minus pair 1): mean +1.33; rho +0.20 p 0.307
+  vs steps inside 1..20 (pair 1 minus pair 2): mean +3.13; rho +0.03 p 0.867
+
+== Tasks by which trajectory's subject they sit near
+  storage_question first pass {'A1': 12, 'B1': 11, 'A2': 11, 'B2': 8} targets []
+  backup_to_sqlite first pass {'A1': 10, 'B1': 10, 'A2': 10, 'B2': 5} targets ['handlers/backups.go', 'main.go', 'services/backup_worker.go']
+  artifact_quarantine first pass {'A1': 5, 'B1': 10, 'A2': 15, 'B2': 10} targets ['db/postgres.go', 'handlers/models.go', 'main.go', 'models/models.go', 'services/model_service.go']
+  constitution_versioning first pass {'A1': 5, 'B1': 10, 'A2': 10, 'B2': 10} targets ['db/postgres.go', 'main.go', 'models/models.go']
+  storage-near tasks: pair 1 mean 9.12, pair 2 mean 9.88; other 23 tasks: pair 1 8.54, pair 2 12.72
+
+== Stage turns on sharpened first pass, pair 1 v pair 2 (mean over tasks), and between first edit and first deploy
+  before first edit 9.89; first deploy after edit 20.44; edit to deploy 10.56; deploy count before first pass n/a
+  A1     first edit 3.89; first deploy after edit 9.44; edit to deploy 5.56; deploy count before first pass n/a
+  B1     first edit 4.26; first deploy after edit 10.42; edit to deploy 6.08; deploy count before first pass n/a
+  A2     first edit 5.46; first deploy after edit 15.54; edit to deploy 10.08; deploy count before first pass n/a
+  B2     first edit 5.38; first deploy after edit 15.58; edit to deploy 10.19; deploy count before first pass n/a
+
+== Turns from first edit to first deploy, what they contain (kinds per turn), by arm
+  before n   10.56 edit    5.81 readonly    2.78 gobuild    2.67 priv    0.33 test    0.19 failed    0.33 out 7749.00
+  A1     n    5.56 edit    3.96 readonly    1.37 gobuild    2.37 priv    0.07 test    0.07 failed    0.11 out 7546.00
+  B1     n    6.08 edit    4.73 readonly    1.08 gobuild    2.00 priv    0.38 test    0.23 failed    0.19 out 6852.08
+  A2     n   10.08 edit    6.08 readonly    2.12 gobuild    6.35 priv    1.08 test    1.00 failed    0.04 out 9494.88
+  B2     n   10.19 edit    6.12 readonly    1.38 gobuild    4.27 priv    2.08 test    1.35 failed    0.27 out 9175.31

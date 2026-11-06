@@ -132,14 +132,21 @@ def question_task(task: str) -> bool:
     return info.is_file() and re.search(r"^task_category:\s*research\s*$", info.read_text(), re.M) is not None
 
 
+def has_setup(task: str) -> bool:
+    """A task with a planted bug: its setup runs before the policy, so restoring a saved state would wipe the bug."""
+    return (CT / ".environments" / "model_registry" / "main_tasks" / task / "mutation.patch").is_file()
+
+
 n = skipped_done = skipped_queued = 0
 per_run = bool(a.score_every or a.score_at)
-how = (" from the trajectory's saved state" if a.restore_state else " after the trajectory")
-for lab, log, traj, runs in src if per_run else []:
+for lab, log, batch_traj, runs in src if per_run else []:
     for task, t in runs:
         pts = score_points(a.score_every, a.score_at, t)
         if not pts or question_task(task):
             continue
+        restores = a.restore_state and not has_setup(task)
+        traj = batch_traj if restores else re.sub(r" -p restore_state=\S+", "", batch_traj)
+        how = " from the trajectory's saved state" if restores else " after the trajectory"
         hz = f"{a.label_prefix}-{lab}-{SHORT[task]}"
         if not a.include_existing and ((EVALS / hz).exists() or (DATA / "runs" / hz).exists()):
             skipped_done += 1
@@ -172,8 +179,9 @@ for h in (int(x) for x in a.horizons.split(",")) if not per_run else []:
                 continue
             purpose = (f"Per-step scoring: the first {h} of {t} model turns of {lab}'s {task} run, replayed "
                        f"with no model calls{' after the trajectory' if traj else ''}, then scored")
+            job_traj = re.sub(r" -p restore_state=\S+", "", traj) if has_setup(task) else traj
             print(f'{hz}\t1\tPURPOSE="{purpose}" bash {LAUNCH} {hz} tasks/one_{task}.txt 1 -p solver_user=dev -p solve=false'
-                  f"{traj} -p prefix_log={log} -p prefix_turns={h}")
+                  f"{job_traj} -p prefix_log={log} -p prefix_turns={h}")
             n += 1
 note(f"{n} jobs from {len(src)} batches ({', '.join(s[0] for s in src) or 'none'}); "
      f"skipped {skipped_done} already in the data folder, {skipped_queued} already in queue/jobs.tsv")

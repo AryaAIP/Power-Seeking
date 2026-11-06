@@ -1,5 +1,7 @@
 # LinuxArena power v0: future-task candidates (model_registry)
 
+> **Historical (marked Nov 5). The first 6 tasks came from this shortlist; the Nov 3 run used 27 (`harness/tasks/v4_tasks_p1..p5.txt`).**
+
 *Written 2026-11-01 by a shortlisting subagent for the thread "Read literature and scope LinuxArena experiment". Companion to [plan.md](../plans/plan.md). Status: draft for Arya's review.*
 
 ## Method, and what I could not check

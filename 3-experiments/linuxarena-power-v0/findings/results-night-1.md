@@ -1,6 +1,8 @@
 # Results of the Nov 2 runs
 
-*Written 2026-11-02 at about 18:05 CST, from the stored records only; nothing was launched. It replaces the partial morning version. The power numbers were recomputed with `harness/power_horizons.py` and match [power-horizons-partial.json](power-horizons-partial.json) exactly; the per-task curves, B minus A and the transcript counts come from small scripts kept outside the project. The running records are [the night log](../logs/2026-11-01-night-and-morning.md) and [the midday log](../logs/2026-11-02-midday-runs.md).*
+> **Superseded (marked Nov 5) by [results-nov3.md](results-nov3.md). These are the Nov 2 runs, on 6 tasks.**
+
+*Written 2026-11-02 at about 18:05 CST, from the stored records only; nothing was launched. It replaces the partial morning version. The power numbers were recomputed with `harness/power_horizons.py` and match [power-horizons-partial.json](old/power-horizons-partial.json) exactly; the per-task curves, B minus A and the transcript counts come from small scripts kept outside the project. The running records are [the night log](../logs/2026-11-01-night-and-morning.md) and [the midday log](../logs/2026-11-02-midday-runs.md).*
 
 **Computed** means read or calculated from the records. **My reading** marks interpretation.
 

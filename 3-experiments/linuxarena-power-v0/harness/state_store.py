@@ -34,6 +34,9 @@ def run(cmd, check=True, timeout=900, **kw):
     return r
 
 
+STACK_ID_FILES = ("/tmp/.trajectory-id", "/etc/vertex/trajectory-id", "/app/model-registry/trajectory_id")
+
+
 def bucket_suffix(project: str) -> str:
     """The s3-init script's cleaning of the compose project name (init/s3/init.sh)."""
     t = re.sub(r"[^a-z0-9-]", "-", project.lower())
@@ -166,8 +169,11 @@ def save(app_cid: str, dest: Path, extra: dict | None = None) -> dict:
 
 def _wait(cmd: list[str], seconds: int) -> bool:
     for _ in range(seconds):
-        if run(cmd, check=False, timeout=10).returncode == 0:
-            return True
+        try:
+            if run(cmd, check=False, timeout=10).returncode == 0:
+                return True
+        except subprocess.TimeoutExpired:  # a slow docker exec under load isn't an answer: ask again
+            pass
         time.sleep(1)
     return False
 
@@ -199,8 +205,19 @@ def restart_service(app_cid: str, as_dev: bool, info: dict) -> None:
                                      "http://localhost:8080/health"], 120)
 
 
+def _rename_stack_id(app_cid: str, old: str, new: str) -> list[str]:
+    """A restored state names the stack it was saved from. Control Tower writes the id into every new stack, and a
+    trajectory may copy it (A2's S3 gateway finds its buckets with it), so each such file must name this stack, as it
+    would after a replay here. Returns the files changed."""
+    if old == new:
+        return []
+    script = ('for f in "$@"; do if [ -f "$f" ] && [ "$(cat "$f")" = "$OLD" ]; then sed -i "s/$OLD/$NEW/" "$f" && echo "$f"; fi; done')
+    return run(["docker", "exec", "-e", f"OLD={old}", "-e", f"NEW={new}", app_cid, "sh", "-c", script, "sh",
+                *STACK_ID_FILES]).stdout.split()
+
+
 def restore(app_cid: str, src: Path) -> dict:
-    """Restore a saved state into this (fresh) stack: Postgres, files, buckets, then the service."""
+    """Restore a saved state into this (fresh) stack: Postgres, files, the stack's id, buckets, then the service."""
     man = json.loads((src / "manifest.json").read_text())
     if not man.get("complete"):
         raise RuntimeError(f"state {src} is incomplete")
@@ -228,6 +245,7 @@ def restore(app_cid: str, src: Path) -> dict:
     if r.returncode != 0:  # paths only, never contents
         info["files_tar_errors"] = r.stderr.decode(errors="replace").strip().splitlines()[-8:]
     info["files_seconds"] = round(time.time() - t0, 1)
+    info["stack_id_files"] = _rename_stack_id(app_cid, bucket_suffix(man["project"]), s["suffix"])
     # 3. Buckets: mirror the saved objects back, removing objects the fresh stack has and the state doesn't.
     t0 = time.time()
     tmp = f"/tmp/power-state-{s['suffix']}"

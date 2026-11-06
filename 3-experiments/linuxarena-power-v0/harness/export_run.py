@@ -157,6 +157,11 @@ def _horizon_rows(run_dir: Path, task: str) -> list[dict]:
                "scores": {"scorer": {"linux_scorer": sc} if sc else {}, "checks": _checks(expl),
                           "bugfix_tests": _bugfix_tests_text(r.get("bugfix_tests") or ""), "parsed": parsed},
                "state_equal": r.get("state_equal"), "error": r.get("error") or r.get("score_error"),
+               "skipped": r.get("skipped"),  # a point not scored because its save failed (the machine untouched)
+               "reused_from": r.get("reused_from"),  # a point a per-step job had already scored: its record (runs/...)
+               "same_state_as": r.get("same_state_as"),  # state dedup: the earlier point whose machine was identical
+               "dedup_audit_of": r.get("dedup_audit_of"),  # ... or scored anyway, as a check against that point
+               "dedup_differs": r.get("dedup_differs"),
                "seconds": r.get("seconds"), "save": r.get("save"), "restore": r.get("restore")}
         out.append(row)
     return out

@@ -3,8 +3,10 @@ anchors are skipped). Run after moving or adding files; it should print "0 broke
   python3 tools/check_links.py [ROOT] [--all]     (ROOT defaults to the project folder; --all includes
                                                   every generated run transcript)
 """
+import os
 import re
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -12,20 +14,38 @@ args = [a for a in sys.argv[1:] if not a.startswith("--")]
 root = Path(args[0]) if args else Path(__file__).resolve().parent.parent
 skip_runs = "--all" not in sys.argv  # run transcripts are generated and linked only to their own files
 link = re.compile(r"\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-bad = 0
-for md in sorted(root.rglob("*.md")):
-    rel = md.relative_to(root).as_posix()
+
+
+def markdown_files() -> list:
+    """Every .md file, not walking .git or a batch's run folders (those files are skipped anyway): over /mnt/c the walk
+    is most of the cost."""
+    found = []
+    for folder, dirs, files in os.walk(root):
+        rel = Path(folder).relative_to(root).as_posix()
+        rel = "" if rel == "." else rel + "/"
+        if not rel:
+            dirs[:] = [d for d in dirs if d != ".git"]
+        if skip_runs and "/runs/" in f"/{rel}" and rel.count("/") >= 4:
+            dirs[:] = []  # .../runs/<label>/<task>/: a file in it would have rel.count("/") > 4
+        found += [rel + f for f in files if f.endswith(".md")]
+    return sorted(found)
+
+
+def broken(rel: str) -> list:
+    md = root / rel
     if skip_runs and "/runs/" in f"/{rel}" and rel.count("/") > 4:
-        continue
-    text = md.read_text(errors="ignore")
-    for m in link.finditer(text):
+        return []
+    out = []
+    for m in link.finditer(md.read_text(errors="ignore")):
         target = m.group(1)
         if re.match(r"^[a-z]+:", target) or target.startswith("#"):
             continue
         path = unquote(target.split("#")[0])
-        if not path:
-            continue
-        if not (md.parent / path).exists():
-            bad += 1
-            print(f"{rel}: {target}")
-print(f"{bad} broken link(s)")
+        if path and not (md.parent / path).exists():
+            out.append(f"{rel}: {target}")
+    return out
+
+
+with ThreadPoolExecutor(16) as pool:  # file reads and stats wait on the share, so threads help
+    lines = [ln for found in pool.map(broken, markdown_files()) for ln in found]
+print("\n".join(lines + [f"{len(lines)} broken link(s)"]))

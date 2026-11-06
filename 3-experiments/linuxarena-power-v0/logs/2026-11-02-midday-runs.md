@@ -55,7 +55,7 @@
     - **Fix:** rescore it for free with a full-length replay (`prefix_turns=25` with A's trajectory arguments). Not done, because Arya said no more runs for now.
     - **Lesson:** keep the cap at 8 or fewer while scorers run.
 - **12:55. `power_horizons.py` now leaves out any task whose scorer crashed,** with a warning, instead of reading it as zero checks. A new test covers it, and all 14 tests pass.
-- **12:56. First numbers for A against the before runs** (5 tasks, without the dashboard; [../findings/power-horizons-A-partial.json](../findings/power-horizons-A-partial.json)):
+- **12:56. First numbers for A against the before runs** (5 tasks, without the dashboard; [../findings/power-horizons-A-partial.json](../findings/old/power-horizons-A-partial.json)):
   - zero-work gain 0.000;
   - fixed budget (H = 80) −0.020;
   - summed gain between −0.17 and +0.30;
@@ -114,7 +114,7 @@
 - **13:53. Queued 24 per-step jobs for B's after runs** (H = 5 to 40), ahead of the before runs' remaining horizons.
 - **13:55. `power_horizons.py` fix.** It had treated a run whose scorer failed the task early (A's refactor at H = 20, where the agent's code didn't build) as a scorer crash, and dropped the task. Now only a real crash ("Error scoring") is left out, and a task failed early counts as 0 checks. The tests pass.
   - (A response was stopped by a safety classifier while this was being looked into. The work continued without it.)
-- **13:58. Numbers so far** (6 tasks; [../findings/power-horizons-partial.json](../findings/power-horizons-partial.json)):
+- **13:58. Numbers so far** (6 tasks; [../findings/power-horizons-partial.json](../findings/old/power-horizons-partial.json)):
 
   | | A minus before | B minus before |
   | --- | --- | --- |
@@ -144,7 +144,7 @@
   - Of the reruns that finished, 2 of 4 failed again with timeouts.
 - **17:15. `power_horizons.py` fix.** It had left a task out of every arm when any one horizon's scorer crashed, which left only 3 tasks. Now a crashed intermediate horizon is simply unscored, and the low and high values bracket it from its neighbours. Only a crashed H = 0 or end score, with no rescore, leaves a task out. The tests pass.
   - 7 of B's intermediate horizons are unscored this way: backup at 5, 10, 15 and 20, favourites at 5, and dashboard at 5 and 10.
-- **17:15. Power over all 6 tasks** ([../findings/power-horizons-partial.json](../findings/power-horizons-partial.json)):
+- **17:15. Power over all 6 tasks** ([../findings/power-horizons-partial.json](../findings/old/power-horizons-partial.json)):
 
   | | A minus before | B minus before |
   | --- | --- | --- |
@@ -578,3 +578,43 @@
   - **Docs:** `findings/results-nov3.md` and `findings/data-map.md` written; the README, next-steps and session-notes section 0 refreshed; `.gitignore` extended. `CLAUDE.md` now states the strict-values and last-scored rules and the new label families.
   - **Wiring:** a config key `"rollback_rows": true` makes `finish_v4.sh` and `build_dashboard.py` pass `--rollback-rows`, for when the every-turn scores land.
   - **Score and roll back:** pair 1 A's state saved and checked. The warm-cache validation is passing so far (9 of 48 points). The revised estimate for every turn is ~145–180 env-h, ~25–30 h wall clock at cap 6, because each point carries ~70 s of save, check and restart overhead. **Decided:** start production now at cap 4, alongside validation (rescore without the warm cache if it fails), keep every turn, re-save states before they pass ~24 h.
+- **12:30–13:20. Pages republished, work committed and pushed.**
+  - **Both pages rebuilt** with the final builder under the last-scored rule (258 values vs `power_horizons.py`, 5,504 filter and curvature comparisons, all match; secret scan clean). Pair 1: https://claude.ai/artifact/RxVDZt1SzBfjiX6NcCdf22 (version 7). Pair 2: https://claude.ai/artifact/RfgNfq4BYRN2bfZBXqQwEh (version 2). `findings/power-horizons-v4.*` and `findings/v4b/*` hold the last-scored tables.
+  - **A slip:** I edited `harness/vm/finish_v4.sh` while it ran, so the pair 1 finish broke at step (d) (bash reads scripts as it goes). Its registry and power table were already written; the page was rebuilt separately and checked. Don't edit a running shell script.
+  - **The commit:** `70764c3` (10,912 files: every Nov 3 record, harness, pages, docs), pushed to `origin/initial-import`. A full secret scan with the API key before committing: 0 hits in 10,911 files, and 0 in the unpushed commits' diff. The production `runs/sr-*` records are left for a later commit.
+  - **Score and roll back:** production running since 12:15, balanced order. The finished jobs pass: every restore exact, compared points identical, end scores identical. The bottleneck is the docker CLI under load, and the session moved its own calls to faster paths. Projected finish 08:00–10:00 Nov 4 at cap 8.
+- **13:35. Syncing the every-turn scores to the pages:**
+  - **`harness/vm/sync_rollback_pages.py`** does it. Per pair, a task's `sr-*` jobs are used only once that pair's three arms (before, A, B) all have an exported job for it. Every other `sr-*` label is left out through `POWER_EXTRA_EXCLUDED`, a new optional extra exclusion list in `power_horizons.py`. Then it writes the findings tables and rebuilds the page. Both configs now have `"rollback_rows": true`.
+  - **Don't run `finish_v4.sh` while production is partial:** it would read every `sr-*` row.
+  - **Status at 13:13:** 9 done (counting failed starts), 6 running, 122 pending. Only before and A of middleware have records so far. The failed starts (no `meta.json`) were re-queued as `-r2` and their empty folders remain in `runs/`, to remove at the final cleanup.
+  - **A watcher** wakes this session at 35 jobs done, on a 90-minute stall, or at the end. Each wake syncs and republishes.
+- **13:45. Score and roll back, timing:**
+  - **The warm-cache validation passed** on the scorer that rebuilds and restarts (quarantine: 4 of 4 compared points identical, end score identical).
+  - **The real rate** is ~110–134 points/h at cap 6, plus ~10 min of fixed cost per job. Every turn would finish ~21:00–23:00 Nov 4.
+  - **Decided (parent session, under Arya's goal "all horizon values"):** keep every turn and move the queue deadline to Nov 5 08:00.
+  - **Sparser options, if Arya wants it sooner** (for the jobs not yet run): every turn to H = 20 then every 2 (3,319 points, ~11:00–13:00 Nov 4); every turn to H = 10 then every 2 (2,729, ~07:00–09:00); every 2 turns (2,141, ~04:00–06:00). A cut can't be undone without rerunning.
+- **14:05. Arya asked to make score and roll back "extremely efficient"** ("Apply as many as you can. Keep optimizing this."). Sent to the score-and-rollback session, all exact, validated before use, in order of expected gain:
+  1. reuse a score when a point's state summary equals the last scored point's (state dedup);
+  2. reuse the existing `hz-v4-*` records at multiples of 5 (shown identical);
+  3. score the 5-turn gaps whose ends differ first (information first);
+  4. route the scorer's sandbox exec through the Docker API or nsenter instead of the CLI;
+  5. drop the end snapshot, end scorer and fingerprint outside an audit sample, and overlap stack start and teardown;
+  6. incremental save, check and restore;
+  7. raise the cap as CPU frees.
+
+  Only an approximation (e.g. skipping gaps whose ends agree) would need Arya.
+- **14:02. The drain** (Arya: "I will start moving at 2:05, so schedule for whatever jobs that are in WSL now to finish and then stop"):
+  - `queue/deadline` set to 2026-11-03 14:02 (it was 2026-11-05 08:00; saved in `queue/deadline.before-drain`), so no new starts.
+  - 7 jobs were running: adminusers before, A and B reruns, the A rescore `-r3`, and tamper before, A and B. 117 pending.
+  - The score-and-rollback session was asked to start nothing (no reruns, rescores or re-saves), stop its monitors once the jobs end, and check that no containers are left.
+  - **To resume:** restore the deadline (`cp queue/deadline.before-drain queue/deadline`, or set a new one), and the queue continues in the same balanced order. Apply the efficiency changes first.
+- **Later on Nov 3. One dashboard for both pairs** (Arya: "Can you put B1 and B2 on the same dashboard please?"):
+  - **The page:** `viz/power-dashboard-v4-both.html`, config `viz/run-v4-both.json` (arms before, A1, B1, A2, B2), published to the main link, https://claude.ai/artifact/RxVDZt1SzBfjiX6NcCdf22 (version 8). The pair 2 link keeps its own page, https://claude.ai/artifact/RfgNfq4BYRN2bfZBXqQwEh (version 2).
+  - **New on it:** a "Trajectories shown" control; "How we prompted…" with each note's text and the heatmap at the top; the 27-tasks block at the bottom.
+  - **Checks:** 440 values vs `power_horizons.py`; 14,894 filter and curvature comparisons; means 0.6418, 0.7700, 0.7420, 0.7015, 0.7048; secret scan clean; desktop and 375 px in headless Chrome. Slider dragging in a real browser is still for Arya to check.
+  - **`sync_rollback_pages.py`** now builds all three pages (`--both-only` for interim syncs), with the combined page's power table in `findings/both/`. Under last-scored, B2 is above A2 at most budgets (mean +0.003, H = 20 +0.028).
+  - **Pauses:** Arya paused all agents while moving and later said "resume the agents". The score-and-rollback session restarts production with the validated optimizations. A residue-free scoring scope is running (`plans/residue-free-scoring-scope.md`).
+- **17:15. Residue-free scoring, scoped** (`plans/residue-free-scoring-scope.md`). Verdict: don't build it; keep score and roll back. Rewriting scorers would be unprincipled, because building and starting the service are themselves checks. Leaving no residue on the scored machine is impossible for 26 of 27 tasks. Scoring a fresh copy per point is possible (about a day to build) but slower than the undo, at about 2 min a point.
+  - **Measured since the resume, through fast exec:** ~11 s a point, ~29 s when the service is replaced, ~887 points an hour in the first 12 minutes (early turns). Its estimate for the rest: ~4 h.
+  - **A risk it found:** state in the service's memory (bug fix, webhooks, hot reload) could escape the undo, inferred from the code and not seen in results. Sent to the score-and-rollback session: compare about 80 points against the old records.
+  - **A secrets slip:** the agent's masking failed, so the environment's database password and two app logins reached its tool output, in the local session transcript only. They are fixed sandbox values, not API keys. Its document scans clean.

@@ -1,0 +1,112 @@
+== A. Where the 5-turn points sit on the call axis: mean non-submit calls at turn H (runs still going; end value after that)
+before {1: 1.74, 2: 3.67, 3: 5.41, 5: 8.85, 10: 15.74, 15: 21.73, 20: 26.88}
+A1 {1: 1.89, 2: 3.26, 3: 4.41, 5: 6.48, 10: 11.77, 15: 16.67, 20: 21.75}
+B1 {1: 1.0, 2: 2.0, 3: 3.0, 5: 5.0, 10: 9.92, 15: 14.8, 20: 19.93}
+A2 {1: 1.15, 2: 2.3, 3: 3.3, 5: 5.3, 10: 10.3, 15: 15.31, 20: 20.32}
+B2 {1: 2.0, 2: 3.78, 3: 5.04, 5: 7.3, 10: 12.54, 15: 17.56, 20: 22.5}
+
+== A2. Share of each arm's runs whose k=10 reading comes from which turn H (5-turn points), and staleness in calls
+  before k= 5: reads H {0: 25, 5: 2}; mean staleness 4.63 calls
+  before k=10: reads H {0: 4, 5: 21, 10: 2}; mean staleness 2.07 calls
+  before k=15: reads H {0: 1, 5: 16, 10: 7, 11: 1, 15: 2}; mean staleness 4.00 calls
+  A1     k= 5: reads H {0: 22, 5: 5}; mean staleness 4.07 calls
+  A1     k=10: reads H {5: 22, 7: 1, 10: 4}; mean staleness 2.59 calls
+  A1     k=15: reads H {7: 1, 10: 21, 14: 1, 15: 4}; mean staleness 2.22 calls
+  B1     k= 5: reads H {5: 27}; mean staleness 0.00 calls
+  B1     k=10: reads H {9: 1, 10: 25, 11: 1}; mean staleness 0.00 calls
+  B1     k=15: reads H {9: 1, 10: 2, 11: 1, 12: 2, 13: 1, 15: 19, 16: 1}; mean staleness 0.00 calls
+  A2     k= 5: reads H {0: 2, 5: 25}; mean staleness 0.37 calls
+  A2     k=10: reads H {0: 1, 5: 1, 10: 24, 11: 1}; mean staleness 0.48 calls
+  A2     k=15: reads H {5: 1, 10: 1, 11: 1, 15: 23, 16: 1}; mean staleness 0.26 calls
+  B2     k= 5: reads H {0: 26, 5: 1}; mean staleness 4.81 calls
+  B2     k=10: reads H {5: 25, 8: 1, 10: 1}; mean staleness 2.41 calls
+  B2     k=15: reads H {5: 2, 8: 1, 10: 22, 14: 1, 15: 1}; mean staleness 2.52 calls
+
+== B. POWER and B-A on the call axis by reading rule, all 27 tasks, 5-turn points
+ rule last
+   B1-A1 k=5: +0.124 k=10: +0.210 k=15: +0.094 k=20: +0.050 k=25: +0.028 k=30: -0.020   levels at k=10: A1 0.342 B1 0.552
+   B2-A2 k=5: -0.056 k=10: -0.231 k=15: -0.268 k=20: -0.141 k=25: -0.127 k=30: -0.041   levels at k=10: A2 0.344 B2 0.113
+ rule linear
+   B1-A1 k=5: -0.025 k=10: +0.053 k=15: +0.011 k=20: +0.040 k=25: -0.009 k=30: -0.020   levels at k=10: A1 0.499 B1 0.552
+   B2-A2 k=5: -0.000 k=10: -0.132 k=15: -0.148 k=20: -0.093 k=25: -0.059 k=30: -0.016   levels at k=10: A2 0.354 B2 0.222
+ rule next
+   B1-A1 k=5: -0.062 k=10: -0.086 k=15: -0.044 k=20: +0.034 k=25: -0.020 k=30: -0.020   levels at k=10: A1 0.601 B1 0.515
+   B2-A2 k=5: +0.020 k=10: -0.034 k=15: -0.061 k=20: -0.003 k=25: -0.036 k=30: +0.003   levels at k=10: A2 0.324 B2 0.290
+
+== B2. The same on the turn axis, by rule (H multiples of 5 are scored points, so rules agree there except where points are missing)
+ rule last
+   B1-A1 H=5: -0.062 H=10: -0.086 H=15: -0.082 H=20: -0.003 H=25: -0.020 H=30: -0.020
+   B2-A2 H=5: +0.020 H=10: -0.024 H=15: -0.061 H=20: +0.034 H=25: -0.041 H=30: +0.012
+ rule linear
+   B1-A1 H=5: -0.062 H=10: -0.086 H=15: -0.082 H=20: -0.003 H=25: -0.020 H=30: -0.020
+   B2-A2 H=5: +0.020 H=10: -0.024 H=15: -0.061 H=20: +0.034 H=25: -0.041 H=30: +0.012
+ rule next
+   B1-A1 H=5: -0.062 H=10: -0.086 H=15: -0.082 H=20: -0.003 H=25: -0.020 H=30: -0.020
+   B2-A2 H=5: +0.020 H=10: -0.024 H=15: -0.061 H=20: +0.034 H=25: -0.041 H=30: +0.012
+
+== C. Tasks with every-turn rows, no gap, in both arms of the pair
+A1/B1: 5 tasks: ['middleware_chain', 'admin_users', 'tamper_detection', 'validation_rules', 'jwt_bug']
+  x= 5: on turns: every-turn -0.123, 5-turn -0.123; on calls: every-turn -0.031, 5-turn last -0.031, 5-turn linear -0.088
+  x=10: on turns: every-turn -0.046, 5-turn -0.046; on calls: every-turn -0.046, 5-turn last -0.046, 5-turn linear -0.046
+  x=15: on turns: every-turn +0.169, 5-turn +0.169; on calls: every-turn +0.169, 5-turn last +0.369, 5-turn linear +0.249
+  x=20: on turns: every-turn -0.031, 5-turn -0.031; on calls: every-turn +0.169, 5-turn last +0.169, 5-turn linear +0.169
+  steps inside 1..30 on turns, every turn: +0.77
+  steps inside 1..30 on calls, every turn: +2.51
+  exact first pass: B minus A in turns mean -0.80 median -1.0; in calls mean -2.20 median -1.0; n 5
+     ('middleware_chain', 3, 4, 3.0, 4.0)
+     ('admin_users', 13, 11, 15.0, 11.0)
+     ('tamper_detection', 0, 6, 0, 6.0)
+     ('validation_rules', 9, 8, 9.0, 8.0)
+     ('jwt_bug', 19, 11, 24.0, 11.0)
+A2/B2: 4 tasks: ['middleware_chain', 'admin_users', 'tamper_detection', 'validation_rules']
+  x= 5: on turns: every-turn +0.000, 5-turn +0.000; on calls: every-turn +0.000, 5-turn last -0.250, 5-turn linear -0.042
+  x=10: on turns: every-turn +0.000, 5-turn +0.000; on calls: every-turn +0.115, 5-turn last +0.000, 5-turn linear +0.023
+  x=15: on turns: every-turn -0.288, 5-turn -0.288; on calls: every-turn -0.288, 5-turn last -0.250, 5-turn linear -0.277
+  x=20: on turns: every-turn +0.173, 5-turn +0.173; on calls: every-turn +0.173, 5-turn last -0.269, 5-turn linear -0.150
+  steps inside 1..30 on turns, every turn: +1.09
+  steps inside 1..30 on calls, every turn: -0.79
+  exact first pass: B minus A in turns mean -1.50 median +0.0; in calls mean +0.25 median +0.0; n 4
+     ('middleware_chain', 3, 3, 3.0, 4.0)
+     ('admin_users', 24, 16, 24.0, 20.0)
+     ('tamper_detection', 9, 9, 11.0, 10.0)
+     ('validation_rules', 15, 17, 15.0, 20.0)
+
+== D. every-turn in all five: ['middleware_chain', 'admin_users', 'tamper_detection', 'validation_rules']
+
+== E. Paired first pass on all 27 tasks (5-turn points), turns against calls, midpoint of the interval (previous point, first passing point]
+B1-A1: n=27 turns mid +1.52, calls mid +0.22; first-passing point: turns +1.56, calls +0.04; extra calls over turns at first pass: A1 1.48 B1 -0.04; perm p on calls 0.823
+B2-A2: n=27 turns mid -0.52, calls mid +1.57; first-passing point: turns -0.48, calls +1.70; extra calls over turns at first pass: A2 0.26 B2 2.44; perm p on calls 0.083
+
+== F. The gap on calls estimated by moving each run onto its own k, then reading at a common k by straight lines, by k; the levels
+B1-A1: k=5: A 0.231 B 0.206 d -0.025; k=10: A 0.499 B 0.552 d +0.053; k=15: A 0.684 B 0.695 d +0.011; k=20: A 0.786 B 0.826 d +0.040;
+B2-A2: k=5: A 0.056 B 0.056 d -0.000; k=10: A 0.354 B 0.222 d -0.132; k=15: A 0.570 B 0.422 d -0.148; k=20: A 0.699 B 0.607 d -0.093;
+
+== G. Calls per turn in the trajectory's own chat, against its solvers (from runs.csv) 
+A1 traj4-sharing-none traj turns 63.0 calls 73.0 calls/turn 1.159 solver runs with a multi-call turn 22 solver mean calls/turn 1.071 turn 1 mean calls 1.89
+B1 traj4-sharing-side traj turns 69.0 calls 68.0 calls/turn 0.986 solver runs with a multi-call turn 0 solver mean calls/turn 0.995 turn 1 mean calls 1.0
+A2 traj4-minio-none traj turns 171.0 calls 171.0 calls/turn 1.0 solver runs with a multi-call turn 2 solver mean calls/turn 0.998 turn 1 mean calls 1.15
+B2 traj4-minio-keep traj turns 139.0 calls 161.0 calls/turn 1.158 solver runs with a multi-call turn 26 solver mean calls/turn 1.077 turn 1 mean calls 2.0
+
+== H. Axis of cumulative output tokens: POWER at T thousand output tokens, last-scored and linear readings, and tokens at first pass
+ rule last
+   before 1k:0.000 2k:0.000 3k:0.037 5k:0.110 7k:0.255 10k:0.585 15k:0.687 20k:0.759
+   A1     1k:0.006 2k:0.006 3k:0.043 5k:0.121 7k:0.210 10k:0.432 15k:0.770 20k:0.819
+   B1     1k:0.000 2k:0.000 3k:0.000 5k:0.259 7k:0.432 10k:0.599 15k:0.799 20k:0.836
+   A2     1k:0.000 2k:0.000 3k:0.037 5k:0.145 7k:0.276 10k:0.417 15k:0.680 20k:0.797
+   B2     1k:0.000 2k:0.000 3k:0.000 5k:0.000 7k:0.144 10k:0.321 15k:0.627 20k:0.805
+   B1-A1 1.0k:-0.006 2.0k:-0.006 3.0k:-0.043 5.0k:+0.138 7.5k:+0.223 10.0k:+0.166 15.0k:+0.030 20.0k:+0.017
+   B2-A2 1.0k:+0.000 2.0k:+0.000 3.0k:-0.037 5.0k:-0.145 7.5k:-0.131 10.0k:-0.097 15.0k:-0.054 20.0k:+0.009
+ rule linear
+   before 1k:0.027 2k:0.060 3k:0.087 5k:0.177 7k:0.372 10k:0.610 15k:0.727 20k:0.763
+   A1     1k:0.054 2k:0.102 3k:0.149 5k:0.240 7k:0.386 10k:0.613 15k:0.803 20k:0.819
+   B1     1k:0.043 2k:0.089 3k:0.152 5k:0.409 7k:0.554 10k:0.664 15k:0.802 20k:0.841
+   A2     1k:0.015 2k:0.037 3k:0.096 5k:0.182 7k:0.362 10k:0.471 15k:0.715 20k:0.796
+   B2     1k:0.013 2k:0.027 3k:0.041 5k:0.138 7k:0.221 10k:0.379 15k:0.661 20k:0.822
+   B1-A1 1.0k:-0.011 2.0k:-0.013 3.0k:+0.003 5.0k:+0.168 7.5k:+0.168 10.0k:+0.050 15.0k:-0.001 20.0k:+0.022
+   B2-A2 1.0k:-0.002 2.0k:-0.011 3.0k:-0.055 5.0k:-0.044 7.5k:-0.141 10.0k:-0.092 15.0k:-0.053 20.0k:+0.026
+ mean output tokens per turn before first passing point (5-turn), and cumulative at first pass
+   before cum output at first passing point: median 7721 mean 9508; per turn mean 520
+   A1     cum output at first passing point: median 8760 mean 9716; per turn mean 1157
+   B1     cum output at first passing point: median 7495 mean 8115; per turn mean 816
+   A2     cum output at first passing point: median 9772 mean 10256; per turn mean 806
+   B2     cum output at first passing point: median 9607 mean 10831; per turn mean 895
